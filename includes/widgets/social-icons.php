@@ -374,6 +374,10 @@ class Widget_Social_Icons extends Widget_Base {
 		<?php
 	}
 
+	protected function render_amp() {
+		$this->render();
+	}
+
 	protected function _content_template() {
 		?>
 		<div class="elementor-social-icons-wrapper">

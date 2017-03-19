@@ -185,11 +185,18 @@ abstract class Widget_Base extends Element_Base {
 			ob_start();
 
 			$skin = $this->get_current_skin();
+
 			if ( $skin ) {
 				$skin->set_parent( $this );
-				$skin->render();
+				$obj = $skin;
 			} else {
-				$this->render();
+				$obj = $this;
+			}
+
+			if ( Plugin::$instance->amp->is_amp() ) {
+				$obj->render_amp();
+			} else {
+				$obj->render();
 			}
 
 			echo apply_filters( 'elementor/widget/render_content', ob_get_clean(), $this );

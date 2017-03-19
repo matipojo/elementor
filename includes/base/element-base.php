@@ -687,6 +687,8 @@ abstract class Element_Base {
 
 	protected function render() {}
 
+	protected function render_amp() {}
+
 	protected function get_default_data() {
 		return [
 			'id' => 0,

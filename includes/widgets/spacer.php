@@ -69,6 +69,10 @@ class Widget_Spacer extends Widget_Base {
 		<?php
 	}
 
+	protected function render_amp() {
+		$this->render();
+	}
+
 	protected function _content_template() {
 		?>
 		<div class="elementor-spacer">

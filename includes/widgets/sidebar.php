@@ -66,6 +66,10 @@ class Widget_Sidebar extends Widget_Base {
 		dynamic_sidebar( $sidebar );
 	}
 
+	protected function render_amp() {
+		$this->render();
+	}
+
 	protected function _content_template() {}
 
 	public function render_plain_content() {}

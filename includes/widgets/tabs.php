@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Modules\AMP\AMP;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Widget_Tabs extends Widget_Base {
@@ -274,6 +276,21 @@ class Widget_Tabs extends Widget_Base {
 				endforeach; ?>
 			</div>
 		</div>
+		<?php
+	}
+
+	protected function render_amp() {
+		AMP::instance()->add_component( 'accordion' );
+		$settings = $this->get_settings();
+		?>
+		<amp-accordion class="elementor-accordion">
+			<?php foreach ( $settings['tabs'] as $index => $item ) : ?>
+				<section <?php if ( 0 === $index ) { echo 'expanded'; } ?>>
+					<h4 class="elementor-accordion-title"><?php echo $item['tab_title']; ?></h4>
+					<div class="elementor-accordion-content elementor-clearfix"><?php echo $this->parse_text_editor( $item['tab_content'] ); ?></div>
+				</section>
+			<?php endforeach; ?>
+		</amp-accordion>
 		<?php
 	}
 

@@ -47,6 +47,10 @@ class Widget_Html extends Widget_Base {
 		 echo $this->get_settings( 'html' );
 	}
 
+	protected function render_amp() {
+		$this->render();
+	}
+
 	protected function _content_template() {
 		?>
 		{{{ settings.html }}}

@@ -369,6 +369,10 @@ class Widget_Icon_List extends Widget_Base {
 		<?php
 	}
 
+	protected function render_amp() {
+		$this->render();
+	}
+
 	protected function _content_template() {
 		?>
 		<ul class="elementor-icon-list-items">

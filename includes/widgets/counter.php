@@ -224,4 +224,30 @@ class Widget_Counter extends Widget_Base {
 		</div>
 		<?php
 	}
+
+	protected function render_amp() {
+		$settings = $this->get_settings();
+
+		$this->add_render_attribute( 'counter', [
+			'class' => 'elementor-counter-number',
+		] );
+
+		$number = $settings['ending_number'];
+
+		if ( ! empty( $settings['thousand_separator'] ) ) {
+			$number = number_format( $number );
+		}
+		?>
+		<div class="elementor-counter">
+			<div class="elementor-counter-number-wrapper">
+				<span class="elementor-counter-number-prefix"><?php echo $settings['prefix']; ?></span>
+				<span <?php echo $this->get_render_attribute_string( 'counter' ); ?>><?php echo $number; ?></span>
+				<span class="elementor-counter-number-suffix"><?php echo $settings['suffix']; ?></span>
+			</div>
+			<?php if ( $settings['title'] ) : ?>
+				<div class="elementor-counter-title"><?php echo $settings['title']; ?></div>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
 }

@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Modules\AMP\AMP;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Widget_Testimonial extends Widget_Base {
@@ -354,6 +356,21 @@ class Widget_Testimonial extends Widget_Base {
 			<?php endif; ?>
 		</div>
 	<?php
+	}
+
+	protected function render_amp() {
+		AMP::start_render_images();
+		$this->render();
+		$settings = $this->get_settings();
+
+		if ( ! empty( $settings['image_size']['size'] ) ) {
+			$settings['testimonial_image_size'] = [
+				'width' => $settings['image_size']['size'],
+				'height' => $settings['image_size']['size'],
+			];
+		}
+
+		echo @AMP::end_render_images( $settings, 'testimonial_image' );
 	}
 
 	protected function _content_template() {

@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Modules\AMP\AMP;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Widget_Alert extends Widget_Base {
@@ -221,11 +223,43 @@ class Widget_Alert extends Widget_Base {
 		}
 
 		if ( ! empty( $settings['show_dismiss'] ) && 'show' === $settings['show_dismiss'] ) {
-			$html .= '<button type="button" class="elementor-alert-dismiss">X</button></div>';
+			$html .= '<button type="button" class="elementor-alert-dismiss">X</button>';
 		}
 
 		echo $html;
+
+		echo '</div>';
 	}
+
+	protected function render_amp() {
+		AMP::instance()->add_component( 'user-notification' );
+
+		$settings = $this->get_settings();
+
+		if ( empty( $settings['alert_title'] ) ) {
+			return;
+		}
+
+		if ( ! empty( $settings['alert_type'] ) ) {
+			$this->add_render_attribute( 'wrapper', 'class', 'elementor-alert elementor-alert-' . $settings['alert_type'] );
+		}
+
+		echo '<amp-user-notification layout="nodisplay" id="amp-user-notification-' . $this->get_id() . '" ' . $this->get_render_attribute_string( 'wrapper' ) . ' role="alert">';
+		$html = sprintf( '<span class="elementor-alert-title">%1$s</span>', $settings['alert_title'] );
+
+		if ( ! empty( $settings['alert_description'] ) ) {
+			$html .= sprintf( '<span class="elementor-alert-description">%s</span>', $settings['alert_description'] );
+		}
+
+		if ( ! empty( $settings['show_dismiss'] ) && 'show' === $settings['show_dismiss'] ) {
+			$html .= '<button on="tap:amp-user-notification-' . $this->get_id() . '.dismiss" class="ampstart-btn caps ml1">' . __( 'Dismiss', '' ) . '</button>';
+		}
+
+		echo $html;
+
+		echo '</amp-user-notification>';
+	}
+
 
 	protected function _content_template() {
 		?>
@@ -239,8 +273,10 @@ class Widget_Alert extends Widget_Base {
 			}
 
 			if ( 'show' === settings.show_dismiss ) {
-				html += '<button type="button" class="elementor-alert-dismiss">X</button></div>';
+				html += '<button type="button" class="elementor-alert-dismiss">X</button>';
 			}
+
+			html += '</div>';
 
 			print( html );
 		}

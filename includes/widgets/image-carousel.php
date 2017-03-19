@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Modules\AMP\AMP;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Widget_Image_Carousel extends Widget_Base {
@@ -605,6 +607,48 @@ class Widget_Image_Carousel extends Widget_Base {
 				<?php echo implode( '', $slides ); ?>
 			</div>
 		</div>
+		<?php
+	}
+
+	protected function render_amp() {
+		AMP::$instance->add_component( 'carousel' );
+		$settings = $this->get_settings();
+		if ( empty( $settings['carousel'] ) )
+			return;
+
+		$slides = [];
+
+		foreach ( $settings['carousel'] as $attachment ) {
+			$image_url = Group_Control_Image_Size::get_attachment_image_src( $attachment['id'], 'thumbnail', $settings );
+
+			$image_html = '<amp-img width="400" height="300" src="' . esc_attr( $image_url ) . '" alt="' . esc_attr( Control_Media::get_image_alt( $attachment ) ) . '" />';
+
+			$link = $this->get_link_url( $attachment, $settings );
+
+			if ( $link ) {
+				$target = '';
+
+				if ( ! empty( $link['is_external'] ) ) {
+					$target = ' target="_blank"';
+				}
+
+				$image_html = sprintf( '<a href="%s"%s>%s</a>', $link['url'], $target, $image_html );
+			}
+
+			$image_caption = $this->get_image_caption( $attachment );
+
+			$slides[] = '<figure>' . $image_html . '<figcaption class="elementor-image-carousel-caption">' . $image_caption . '</figcaption></figure>';
+
+		}
+
+		if ( empty( $slides ) ) {
+			return;
+		}
+
+		?>
+		<amp-carousel height="300" type="carousel" layout="fixed-height" class="elementor-image-carousel-wrapper elementor-slick-slider">
+			<?php echo implode( '', $slides ); ?>
+		</amp-carousel>
 		<?php
 	}
 

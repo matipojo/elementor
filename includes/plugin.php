@@ -2,6 +2,7 @@
 namespace Elementor;
 
 use Elementor\Debug\Debug;
+use Elementor\Modules\AMP\AMP;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
@@ -54,6 +55,11 @@ class Plugin {
 	 * @var Under_Construction
 	 */
 	public $under_construction;
+
+	/**
+	 * @var AMP
+	 */
+	public $amp;
 
 	/**
 	 * @var Settings
@@ -194,6 +200,7 @@ class Plugin {
 		include( ELEMENTOR_PATH . 'includes/shapes.php' );
 		include( ELEMENTOR_PATH . 'includes/debug/debug.php' );
 		include( ELEMENTOR_PATH . 'includes/under-construction.php' );
+		include( ELEMENTOR_PATH . 'includes/modules/amp/amp.php' );
 
 		if ( is_admin() ) {
 			include( ELEMENTOR_PATH . 'includes/admin.php' );
@@ -227,6 +234,7 @@ class Plugin {
 		$this->templates_manager = new TemplateLibrary\Manager();
 
 		$this->under_construction = new Under_Construction();
+		$this->amp = Modules\AMP\AMP::instance();
 
 		if ( is_admin() ) {
 			new Admin();

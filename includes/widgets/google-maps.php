@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Modules\AMP\AMP;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Widget_Google_Maps extends Widget_Base {
@@ -111,6 +113,24 @@ class Widget_Google_Maps extends Widget_Base {
 
 		printf(
 			'<div class="elementor-custom-embed"><iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=%s&amp;t=m&amp;z=%d&amp;output=embed&amp;iwloc=near"></iframe></div>',
+			urlencode( $settings['address'] ),
+			absint( $settings['zoom']['size'] )
+		);
+	}
+
+	protected function render_amp() {
+		AMP::instance()->add_component( 'iframe' );
+		$settings = $this->get_settings();
+
+		if ( empty( $settings['address'] ) )
+			return;
+
+		if ( 0 === absint( $settings['zoom']['size'] ) )
+			$settings['zoom']['size'] = 10;
+
+		printf(
+			'<div class="elementor-custom-embed"><amp-iframe sandbox="allow-scripts allow-same-origin allow-popups" layout="responsive" frameborder="0" scrolling="no" width="480" height="%s" src="https://maps.google.com/maps?q=%s&amp;t=m&amp;z=%d&amp;output=embed&amp;iwloc=near"><div placeholder>&nbsp;</div></amp-iframe></div>',
+			$settings['height']['size'],
 			urlencode( $settings['address'] ),
 			absint( $settings['zoom']['size'] )
 		);

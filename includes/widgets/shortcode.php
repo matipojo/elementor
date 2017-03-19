@@ -55,6 +55,10 @@ class Widget_Shortcode extends Widget_Base {
 		<?php
 	}
 
+	protected function render_amp() {
+		$this->render();
+	}
+
 	public function render_plain_content() {
 		// In plain mode, render without shortcode
 		echo $this->get_settings( 'shortcode' );

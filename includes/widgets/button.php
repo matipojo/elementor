@@ -370,6 +370,10 @@ class Widget_Button extends Widget_Base {
 		<?php
 	}
 
+	protected function render_amp() {
+		$this->render();
+	}
+
 	protected function _content_template() {
 		?>
 		<div class="elementor-button-wrapper">

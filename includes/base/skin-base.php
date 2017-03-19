@@ -27,6 +27,8 @@ abstract class Skin_Base {
 
 	abstract public function render();
 
+	abstract public function render_amp();
+
 	public function _content_template() {}
 
 	protected function _register_controls_actions() {}

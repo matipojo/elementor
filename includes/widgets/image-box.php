@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Modules\AMP\AMP;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Widget_Image_Box extends Widget_Base {
@@ -412,6 +414,19 @@ class Widget_Image_Box extends Widget_Base {
 		$html .= '</div>';
 
 		echo $html;
+	}
+
+	public function amp_helper( $matches ) {
+		return '<amp-img' . untrailingslashit( $matches[2] ) . '></amp-img>';
+	}
+
+	protected function render_amp() {
+		AMP::start_render_images();
+		$this->render();
+		$settings = $this->get_settings();
+		$settings['layout'] = 'responsive';
+
+		echo AMP::end_render_images( $settings, 'image' );
 	}
 
 	protected function _content_template() {

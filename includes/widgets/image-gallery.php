@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Modules\AMP\AMP;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Widget_Image_Gallery extends Widget_Base {
@@ -283,6 +285,39 @@ class Widget_Image_Gallery extends Widget_Base {
 		<div class="elementor-image-gallery">
 			<?php echo do_shortcode( '[gallery ' . $this->get_render_attribute_string( 'shortcode' ) . ']' ); ?>
 		</div>
+		<?php
+	}
+
+	protected function render_amp() {
+		AMP::$instance->add_component( 'carousel' );
+		$settings = $this->get_settings();
+		if ( empty( $settings['wp_gallery'] ) )
+			return;
+
+		$ids = wp_list_pluck( $settings['wp_gallery'], 'id' );
+
+		foreach ( $ids as $attachment_id ) {
+			list( $url, $width, $height ) = Group_Control_Image_Size::get_attachment_image_src( $attachment_id, $settings['thumbnail_size'], $settings, true );
+
+			$image_html = sprintf( '<amp-img width="%s" height="%s" src="%s" alt="%s" />', $width, $height, esc_attr( $url ), esc_attr( Control_Media::get_image_alt( [ 'id' => $attachment_id ] ) ) );
+
+			if ( 'none' !== $settings['gallery_link'] ) {
+				$link = 'file' === $settings['gallery_link'] ? $url : wp_get_attachment_url( $attachment_id );
+				$image_html = sprintf( '<a target="_blank" href="%s">%s</a>', $link, $image_html );
+			}
+
+			$slides[] = '<figure>' . $image_html . '</figure>';
+
+		}
+
+		if ( empty( $slides ) ) {
+			return;
+		}
+
+		?>
+		<amp-carousel height="<?php echo $height ?>" type="carousel" layout="fixed-height" class="elementor-image-carousel-wrapper elementor-slick-slider">
+			<?php echo implode( '', $slides ); ?>
+		</amp-carousel>
 		<?php
 	}
 

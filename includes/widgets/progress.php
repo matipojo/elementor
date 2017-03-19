@@ -214,6 +214,10 @@ class Widget_Progress extends Widget_Base {
 		</div>
 	<?php }
 
+	protected function render_amp() {
+		$this->render();
+	}
+
 	protected function _content_template() {
 		?>
 		<# if ( settings.title ) { #>

@@ -190,6 +190,10 @@ class Widget_Heading extends Widget_Base {
 		echo $title_html;
 	}
 
+	protected function render_amp() {
+		$this->render();
+	}
+
 	protected function _content_template() {
 		?>
 		<#

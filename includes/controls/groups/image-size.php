@@ -19,6 +19,19 @@ class Group_Control_Image_Size extends Group_Control_Base {
 	 * @return string
 	 */
 	public static function get_attachment_image_html( $settings, $setting_key = 'image' ) {
+		$attributes = self::get_attachment_image_attributes( $settings, $setting_key );
+
+		$html = '<img ';
+		foreach ( $attributes as $name => $value ) {
+			$html .= sprintf( '%s="%s"', $name, $value );
+		}
+		$html .= '/>';
+
+		return $html;
+	}
+
+	public static function get_attachment_image_attributes( $settings, $setting_key = 'image' ) {
+		$attributes = [];
 		$id  = $settings[ $setting_key ]['id'];
 
 		// Old version of image settings
@@ -30,8 +43,6 @@ class Group_Control_Image_Size extends Group_Control_Base {
 
 		$image_class = ! empty( $settings['hover_animation'] ) ? 'elementor-animation-' . $settings['hover_animation'] : '';
 
-		$html = '';
-
 		// If is the new version - with image size
 		$image_sizes   = get_intermediate_image_sizes();
 
@@ -40,20 +51,26 @@ class Group_Control_Image_Size extends Group_Control_Base {
 		if ( ! empty( $id ) && in_array( $size, $image_sizes ) ) {
 			$image_class .= " attachment-$size size-$size";
 
-			$html .= wp_get_attachment_image( $id, $size, false, [ 'class' => trim( $image_class ) ] );
-		} else {
-			$image_src = self::get_attachment_image_src( $id, $setting_key, $settings );
+			$html = wp_get_attachment_image( $id, $size, false, [ 'class' => trim( $image_class ) ] );
+			$regex = '/((?:(?!\s|=).)*)\s*?=\s*?["\']?((?:(?<=")(?:(?<=\\\\)"|[^"])*|(?<=\')(?:(?<=\\\\)\'|[^\'])*)|(?:(?!"|\')(?:(?!\/>|>|\s).)+))/';
 
-			if ( ! $image_src && isset( $settings[ $setting_key ]['url'] ) ) {
-				$image_src = $settings[ $setting_key ]['url'] ;
+			preg_match_all( $regex, $html, $matches, PREG_SET_ORDER, 0 );
+			foreach ( $matches as $index => $match ) {
+				$attributes[ $match[1] ] = $match[2];
+			}
+		} else {
+			$attributes['src'] = self::get_attachment_image_src( $id, $setting_key, $settings );
+
+			if ( ! $attributes['src'] && isset( $settings[ $setting_key ]['url'] ) ) {
+				$attributes['src'] = $settings[ $setting_key ]['url'] ;
 			}
 
-			$image_class_html = ! empty( $image_class ) ? ' class="' . $image_class . '"' : '';
-
-			$html .= sprintf( '<img src="%s" title="%s" alt="%s"%s />', esc_attr( $image_src ), Control_Media::get_image_title( $settings[ $setting_key ] ), Control_Media::get_image_alt( $settings[ $setting_key ] ), $image_class_html );
+			$attributes['class'] = $image_class;
+			$attributes['title'] = Control_Media::get_image_title( $settings[ $setting_key ] );
+			$attributes['alt'] = Control_Media::get_image_alt( $settings[ $setting_key ] );
 		}
 
-		return $html;
+		return $attributes;
 	}
 
 	public static function get_all_image_sizes() {
@@ -157,7 +174,7 @@ class Group_Control_Image_Size extends Group_Control_Base {
 		return parent::prepare_fields( $fields );
 	}
 
-	public static function get_attachment_image_src( $attachment_id, $group_name, $instance ) {
+	public static function get_attachment_image_src( $attachment_id, $group_name, $instance, $return_array = false ) {
 		if ( empty( $attachment_id ) )
 			return false;
 
@@ -194,6 +211,10 @@ class Group_Control_Image_Size extends Group_Control_Base {
 		}
 
 		$image_src = wp_get_attachment_image_src( $attachment_id, $attachment_size );
+
+		if ( $return_array && ! empty( $image_src ) ) {
+			return $image_src;
+		}
 
 		return ! empty( $image_src[0] ) ? $image_src[0] : '';
 	}

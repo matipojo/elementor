@@ -2,6 +2,7 @@
 namespace Elementor;
 
 use Elementor\Debug\Debug;
+use Elementor\PageSettings\Manager as PageSettingsManager;
 use Elementor\Modules\AMP\AMP;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -52,9 +53,14 @@ class Plugin {
 	public $revisions_manager;
 
 	/**
-	 * @var Under_Construction
+	 * @var Maintenance_Mode
 	 */
-	public $under_construction;
+	public $maintenance_mode;
+
+	/**
+	 * @var PageSettingsManager
+	 */
+	public $page_settings_manager;
 
 	/**
 	 * @var AMP
@@ -173,6 +179,7 @@ class Plugin {
 		include( ELEMENTOR_PATH . 'includes/compatibility.php' );
 
 		include( ELEMENTOR_PATH . 'includes/db.php' );
+		include( ELEMENTOR_PATH . 'includes/base/controls-stack.php' );
 		include( ELEMENTOR_PATH . 'includes/managers/controls.php' );
 		include( ELEMENTOR_PATH . 'includes/managers/schemes.php' );
 		include( ELEMENTOR_PATH . 'includes/managers/elements.php' );
@@ -193,13 +200,14 @@ class Plugin {
 
 		include( ELEMENTOR_PATH . 'includes/managers/css-files.php' );
 		include( ELEMENTOR_PATH . 'includes/managers/revisions.php' );
+		include( ELEMENTOR_PATH . 'includes/page-settings/manager.php' );
 		include( ELEMENTOR_PATH . 'includes/css-file/css-file.php' );
 		include( ELEMENTOR_PATH . 'includes/css-file/post-css-file.php' );
 		include( ELEMENTOR_PATH . 'includes/css-file/global-css-file.php' );
 		include( ELEMENTOR_PATH . 'includes/conditions.php' );
 		include( ELEMENTOR_PATH . 'includes/shapes.php' );
 		include( ELEMENTOR_PATH . 'includes/debug/debug.php' );
-		include( ELEMENTOR_PATH . 'includes/under-construction.php' );
+		include( ELEMENTOR_PATH . 'includes/maintenance-mode.php' );
 		include( ELEMENTOR_PATH . 'includes/modules/amp/amp.php' );
 
 		if ( is_admin() ) {
@@ -221,6 +229,7 @@ class Plugin {
 		$this->skins_manager = new Skins_Manager();
 		$this->posts_css_manager = new Posts_CSS_Manager();
 		$this->revisions_manager = new Revisions_Manager();
+		$this->page_settings_manager = new PageSettingsManager();
 
 		$this->settings = new Settings();
 		$this->editor = new Editor();
@@ -233,7 +242,7 @@ class Plugin {
 
 		$this->templates_manager = new TemplateLibrary\Manager();
 
-		$this->under_construction = new Under_Construction();
+		$this->maintenance_mode = new Maintenance_Mode();
 		$this->amp = Modules\AMP\AMP::instance();
 
 		if ( is_admin() ) {

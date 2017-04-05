@@ -100,14 +100,6 @@
   .dialog-lightbox-close-button:hover {
     opacity: 1; }
 
-#wp-admin-bar-elementor-maintenance-on .ab-item:before {
-  content: "\f160";
-  top: 2px; }
-
-#wp-admin-bar-elementor-maintenance-edit .ab-item:before {
-  content: "\f464";
-  top: 2px; }
-
 .elementor-video-wrapper {
   position: relative;
   height: 0; }
@@ -453,7 +445,8 @@ body.elementor-editor-inactive #elementor-editor {
   font-size: 12px;
   color: #a4afb7;
   background: none;
-  float: left; }
+  float: left;
+  width: auto; }
 
 #elementor-deactivate-feedback-dialog-header i {
   color: #9b0a46;
@@ -501,6 +494,9 @@ body.elementor-editor-inactive #elementor-editor {
   font-size: 18px;
   color: #555d66; }
 
-.form-table:not(.elementor-under-construction-is-enabled) .elementor-default-hide {
+.form-table:not(.elementor-maintenance-mode-is-enabled) .elementor-default-hide {
   display: none; }
+
+.elementor-maintenance-mode-error {
+  color: red; }
 /*# sourceMappingURL=admin-rtl.css.map */

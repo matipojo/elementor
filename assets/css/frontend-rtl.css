@@ -101,14 +101,6 @@
   .dialog-lightbox-close-button:hover {
     opacity: 1; }
 
-#wp-admin-bar-elementor-maintenance-on .ab-item:before {
-  content: "\f160";
-  top: 2px; }
-
-#wp-admin-bar-elementor-maintenance-edit .ab-item:before {
-  content: "\f464";
-  top: 2px; }
-
 .elementor-video-wrapper {
   position: relative;
   height: 0; }
@@ -1346,6 +1338,8 @@
   .elementor-widget-video .elementor-custom-embed-image-overlay:hover .elementor-custom-embed-play i {
     opacity: 0.9;
     text-shadow: 3px 2px 30px rgba(0, 0, 0, 0.6); }
+  .elementor-widget-video .elementor-custom-embed-image-overlay img {
+    display: block; }
 
 .elementor-widget-video .elementor-custom-embed-play {
   position: absolute;
@@ -1629,6 +1623,8 @@
     background-color: #21759b; }
   .elementor-social-icon-xing {
     background-color: #026466; }
+  .elementor-social-icon-yelp {
+    background-color: #af0606; }
   .elementor-social-icon-youtube {
     background-color: #cd201f; }
 
@@ -1640,6 +1636,29 @@
 
 body.elementor-page .elementor-widget-menu-anchor {
   margin-bottom: 0; }
+
+.elementor-widget-text-editor.elementor-drop-cap-view-stacked .elementor-drop-cap {
+  background-color: #818a91;
+  color: #fff; }
+
+.elementor-widget-text-editor.elementor-drop-cap-view-framed .elementor-drop-cap {
+  color: #818a91;
+  border: 3px solid;
+  background-color: transparent; }
+
+.elementor-widget-text-editor:not(.elementor-drop-cap-view-default) .elementor-drop-cap {
+  margin-top: 8px; }
+  .elementor-widget-text-editor:not(.elementor-drop-cap-view-default) .elementor-drop-cap-letter {
+    width: 1em;
+    height: 1em; }
+
+.elementor-widget-text-editor .elementor-drop-cap {
+  float: right;
+  text-align: center;
+  line-height: 1;
+  font-size: 50px; }
+  .elementor-widget-text-editor .elementor-drop-cap-letter {
+    display: inline-block; }
 
 .slick-slider {
   position: relative;
@@ -2386,6 +2405,13 @@ button.swiper-pagination-bullet {
 
 .elementor-open-lightbox .fluid-width-video-wrapper {
   display: none; }
+
+.page-template-elementor_canvas.elementor-page:before {
+  display: none; }
+
+.elementor-post__thumbnail__link {
+  -webkit-transition: none;
+  transition: none; }
 
 @media (max-width: 767px) {
   body:not(.elementor-editor-active) .elementor-hidden-phone {

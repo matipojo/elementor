@@ -43,12 +43,14 @@ class AMP {
 				$attributes['width'] = $image[1];
 				$attributes['height'] = $image[2];
 			} elseif ( defined( 'AMP__DIR__' ) ) {
+				// Plugin AMP: https://github.com/automattic/amp-wp
 				require_once( AMP__DIR__ . '/includes/utils/class-amp-image-dimension-extractor.php' );
 				$images = \AMP_Image_Dimension_Extractor::extract( [ $attributes['src'] ] );
 				$values = current( $images );
 				$attributes['width'] = $values['width'];
 				$attributes['height'] = $values['height'];
 			} else {
+				// @fixme
 				$attributes['height'] = 300;
 				$attributes['height'] = 300;
 			}

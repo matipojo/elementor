@@ -509,6 +509,50 @@ class Widget_Video extends Widget_Base {
 	<?php
 	}
 
+	protected function render_amp() {
+		$settings = $this->get_active_settings();
+
+		add_filter( 'oembed_result', [ $this, 'filter_oembed_result' ], 50, 3 );
+
+		$video_link = 'youtube' === $settings['video_type'] ? $settings['link'] : $settings['vimeo_link'];
+
+		if ( empty( $video_link ) )
+			return;
+
+		$video_html = wp_oembed_get( $video_link, wp_embed_defaults() );
+
+		remove_filter( 'oembed_result', [ $this, 'filter_oembed_result' ], 50 );
+
+		if ( ! $video_html ) {
+			echo $video_link;
+
+			return;
+		}
+
+		?>
+		<div class="elementor-wrapper elementor-video-wrapper elementor-open-inline">
+			<?php
+			echo $video_html;
+
+			if ( $this->has_image_overlay() ) {
+				$this->add_render_attribute( 'image-overlay', 'class', 'elementor-custom-embed-image-overlay' );
+
+				if ( ! $settings['lightbox'] ) {
+					$this->add_render_attribute( 'image-overlay', 'style', 'background-image: url(' . $settings['image_overlay']['url'] . ');' );
+				}
+				?>
+				<div <?php echo $this->get_render_attribute_string( 'image-overlay' ); ?>>
+					<?php if ( 'yes' === $settings['show_play_icon'] ) : ?>
+						<div class="elementor-custom-embed-play">
+							<i class="fa fa-play-circle"></i>
+						</div>
+					<?php endif; ?>
+				</div>
+			<?php } ?>
+		</div>
+	<?php
+	}
+
 	public function filter_oembed_result( $html ) {
 		$settings = $this->get_settings();
 

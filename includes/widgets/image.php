@@ -331,10 +331,10 @@ class Widget_Image extends Widget_Base {
 
 	protected function render_amp() {
 		AMP::start_render_images();
-		$this->render();
-		$settings = $this->get_settings();
 
-		echo AMP::end_render_images( $settings, 'image' );
+		$this->render();
+
+		echo AMP::end_render_images( $this->get_settings(), 'image' );
 	}
 
 	protected function _content_template() {

@@ -128,6 +128,12 @@ WidgetView = BaseElementView.extend( {
 			elementorFrontend.getElements( 'window' ).jQuery( self.el ).html( htmlContent );
 
 			self.bindUIElements(); // Build again the UI elements since the content attached just now
+
+			// For Collection Element.
+			// self.trigger( 'attachElContent:after', this );
+			var $ = elementorFrontend.getElements( 'window' ).jQuery,
+				$cloned = $( self.el ).clone( true, true );
+			$( '.elementor-element-' + self.model.get( 'id' ) ).empty().append( $cloned );
 		} );
 
 		return this;

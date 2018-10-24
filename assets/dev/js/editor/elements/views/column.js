@@ -82,7 +82,7 @@ ColumnView = BaseElementView.extend( {
 
 		var elType = elementView.model.get( 'elType' );
 
-		if ( 'section' === elType ) {
+		if ( 'section' === elType || 'container' === elType ) {
 			return ! this.isInner();
 		}
 
@@ -143,6 +143,9 @@ ColumnView = BaseElementView.extend( {
 		BaseElementView.prototype.onCollectionChanged.apply( this, arguments );
 
 		this.changeChildContainerClasses();
+
+		// For Collection Element.
+		this.trigger( 'collection:change' );
 	},
 
 	onRender: function() {

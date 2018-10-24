@@ -95,6 +95,8 @@ BaseElementView = BaseContainer.extend( {
 			ChildView = require( 'elementor-elements/views/section' );
 		} else if ( 'column' === elType ) {
 			ChildView = require( 'elementor-elements/views/column' );
+		} else if ( 'container' === elType ) {
+			ChildView = require( 'elementor-elements/views/collection' );
 		} else {
 			ChildView = elementor.modules.elements.views.Widget;
 		}
@@ -362,7 +364,7 @@ BaseElementView = BaseContainer.extend( {
 
 		if ( 'widget' === itemData.elType ) {
 			itemData.widgetType = elementView.model.get( 'widgetType' );
-		} else if ( 'section' === itemData.elType ) {
+		} else if ( 'section' === itemData.elType || 'container' === itemData.elType ) {
 			itemData.isInner = true;
 		} else {
 			return;
@@ -380,7 +382,7 @@ BaseElementView = BaseContainer.extend( {
 		};
 
 		options.onAfterAdd = function( newModel, newView ) {
-			if ( 'section' === newView.getElementType() && newView.isInner() ) {
+			if ( ( 'section' === newView.getElementType() && newView.isInner() ) || 'container' === newView.getElementType() ) {
 				newView.addChildElement();
 			}
 		};

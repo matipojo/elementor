@@ -79,6 +79,14 @@ PanelElementsLayoutView = Marionette.LayoutView.extend( {
 			icon: sectionConfig.icon,
 		} );
 
+		elementsCollection.add( {
+			title: elementor.translate( 'container' ),
+			elType: 'container',
+			categories: [ 'basic' ],
+			keywords: [ 'row', 'columns', 'nested' ],
+			icon: sectionConfig.icon,
+		} );
+
 		// TODO: Change the array from server syntax, and no need each loop for initialize
 		_.each( elementor.config.widgets, function( widget ) {
 			if ( elementor.config.document.panel.widgets_settings[ widget.widget_type ] ) {

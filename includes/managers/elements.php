@@ -301,7 +301,7 @@ class Elements_Manager {
 	private function init_elements() {
 		$this->_element_types = [];
 
-		foreach ( [ 'section', 'column' ] as $element_name ) {
+		foreach ( [ 'section', 'column', 'collection' ] as $element_name ) {
 			$class_name = __NAMESPACE__ . '\Element_' . $element_name;
 
 			$this->register_element_type( new $class_name() );
@@ -389,6 +389,8 @@ class Elements_Manager {
 
 		require ELEMENTOR_PATH . 'includes/elements/column.php';
 		require ELEMENTOR_PATH . 'includes/elements/section.php';
+		require ELEMENTOR_PATH . 'includes/elements/container.php';
+		require ELEMENTOR_PATH . 'includes/elements/collection.php';
 		require ELEMENTOR_PATH . 'includes/elements/repeater.php';
 	}
 }

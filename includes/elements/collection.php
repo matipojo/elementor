@@ -33,21 +33,33 @@ class Element_Collection extends Element_Container {
 			]
 		);
 
-		$this->add_responsive_control(
-			'columns',
+		$this->add_control(
+			'items',
 			[
-				'label' => __( 'Columns', 'elementor' ),
+				'label' => __( 'Items', 'elementor' ),
 				'type' => Controls_Manager::NUMBER,
-				'default' => 1,
+				'default' => 3,
 			]
 		);
 
 		$this->add_responsive_control(
-			'rows',
+			'columns',
 			[
-				'label' => __( 'Rows', 'elementor' ),
-				'type' => Controls_Manager::NUMBER,
-				'default' => 2,
+				'label' => __( 'Columns', 'elementor-pro' ),
+				'type' => Controls_Manager::SELECT,
+				'default' => '3',
+				'tablet_default' => '2',
+				'mobile_default' => '1',
+				'options' => [
+					'1' => '1',
+					'2' => '2',
+					'3' => '3',
+					'4' => '4',
+					'5' => '5',
+					'6' => '6',
+				],
+				'prefix_class' => 'elementor-grid%s-',
+				'frontend_available' => true,
 			]
 		);
 
@@ -79,7 +91,7 @@ class Element_Collection extends Element_Container {
 			$this->print_shape_divider( 'bottom' );
 		}
 		?>
-		<div class="elementor-container elementor-collection">
+		<div class="elementor-container elementor-collection elementor-grid">
 		<?php
 	}
 
@@ -96,21 +108,13 @@ class Element_Collection extends Element_Container {
 
 	protected function _print_content() {
 		$settings = $this->get_settings();
-		$cols = max( 1, $settings['columns'] );
-		$rows = max( 1, $settings['rows'] );
-		$col_class = round(100 / $cols );
+		$items = max( 1, $settings['items'] );
 
-		foreach ( range( 1, $rows ) as $row ) {
-			echo '<div class="elementor-row">';
+		foreach ( range( 1, $items ) as $index ) {
+			echo '<div class="elementor-collection-item">';
 
-			foreach ( range( 1, $cols ) as $col ) {
-				echo '<div class="elementor-column elementor-col-' . $col_class . '">';
-
-				foreach ( $this->get_children() as $child ) {
-					$child->print_element();
-				}
-
-				echo '</div>';
+			foreach ( $this->get_children() as $child ) {
+				$child->print_element();
 			}
 
 			echo '</div>';
@@ -122,21 +126,11 @@ class Element_Collection extends Element_Container {
 		<div class="elementor-background-overlay"></div>
 		<div class="elementor-shape elementor-shape-top"></div>
 		<div class="elementor-shape elementor-shape-bottom"></div>
-		<div class="elementor-collection elementor-container">
+		<div class="elementor-container elementor-collection elementor-grid">
 			<#
-
-			var rows = Math.max( 1, settings.rows ),
-			cols = Math.max( 1, settings.columns ),
-			colClass = Math.round(100 / cols);
-
-			for ( var x in [...Array(rows).keys()] ) {#>
-			<div class="elementor-row">
-				<# for ( var x in [...Array(cols).keys()] ) {#>
-				<div class="elementor-column elementor-col-{{ colClass }}">
-					<div class="elementor-collection-item"></div>
-				</div>
-				<# } #>
-			</div>
+			var items = Math.max( 1, settings.items );
+			for ( var x in [...Array( items ).keys()] ) {#>
+			<div class="elementor-collection-item"></div>
 			<# } #>
 		</div>
 		<?php

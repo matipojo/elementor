@@ -382,7 +382,7 @@ BaseElementView = BaseContainer.extend( {
 		};
 
 		options.onAfterAdd = function( newModel, newView ) {
-			if ( ( 'section' === newView.getElementType() && newView.isInner() ) || 'container' === newView.getElementType() ) {
+			if ( ( 'section' === newView.getElementType() && newView.isInner() ) ) {
 				newView.addChildElement();
 			}
 		};

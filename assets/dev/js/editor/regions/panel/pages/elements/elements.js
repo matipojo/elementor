@@ -69,7 +69,8 @@ PanelElementsLayoutView = Marionette.LayoutView.extend( {
 
 	initElementsCollection: function() {
 		var elementsCollection = new PanelElementsElementsCollection(),
-			sectionConfig = elementor.config.elements.section;
+			sectionConfig = elementor.config.elements.section,
+			collectionConfig = elementor.config.elements.container;
 
 		elementsCollection.add( {
 			title: elementor.translate( 'inner_section' ),
@@ -80,11 +81,11 @@ PanelElementsLayoutView = Marionette.LayoutView.extend( {
 		} );
 
 		elementsCollection.add( {
-			title: elementor.translate( 'container' ),
+			title: elementor.translate( 'collection' ),
 			elType: 'container',
 			categories: [ 'basic' ],
 			keywords: [ 'row', 'columns', 'nested' ],
-			icon: sectionConfig.icon,
+			icon: collectionConfig.icon,
 		} );
 
 		// TODO: Change the array from server syntax, and no need each loop for initialize

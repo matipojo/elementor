@@ -15,6 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Element_Collection extends Element_Container {
 
+	public function get_icon() {
+		return 'eicon-post-list';
+	}
+
 	/**
 	 * Register section controls.
 	 *

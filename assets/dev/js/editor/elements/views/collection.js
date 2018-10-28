@@ -15,6 +15,12 @@ SectionView = BaseElementView.extend( {
 		return classes + ' elementor-section  elementor-collection-section  elementor-' + type + '-section';
 	},
 
+	onChildviewAfterWidgetAttachElContent: function( column, widget ) {
+		var $ = elementorFrontend.getElements( 'window' ).jQuery,
+			$cloned = $( widget.el ).clone( true, true );
+		$( '.elementor-element-' + widget.model.get( 'id' ) ).empty().append( $cloned );
+	},
+
 	tagName: function() {
 		return this.model.getSetting( 'html_tag' ) || 'section';
 	},

@@ -189,6 +189,11 @@ ColumnView = BaseElementView.extend( {
 		}
 	},
 
+	// For Collection Element.
+	onChildviewAfterAttachElContent: function( widget ) {
+		this.trigger( 'after:widget:attachElContent', widget );
+	},
+
 	onEditorInlineSizeInputChange: function( newValue, oldValue ) {
 		var errors = [],
 			columnSize = this.model.getSetting( '_column_size' );

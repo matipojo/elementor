@@ -12,7 +12,7 @@ SectionView = BaseElementView.extend( {
 		var classes = BaseElementView.prototype.className.apply( this, arguments ),
 			type = this.isInner() ? 'inner' : 'top';
 
-		return classes + ' elementor-section elementor-' + type + '-section';
+		return classes + ' elementor-section  elementor-collection-section  elementor-' + type + '-section';
 	},
 
 	tagName: function() {

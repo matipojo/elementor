@@ -1,0 +1,38 @@
+$collection-editor-info: #A3ABF7;
+.elementor-collection-section {
+
+	.elementor-editor-section-settings {
+		background-color: $collection-editor-info;
+
+		.elementor-editor-element-setting {
+
+			&:hover {
+				background-color: darken($collection-editor-info, 20%);
+			}
+
+			&:first-child {
+				&:before {
+					@include border-end-property(color, $collection-editor-info);
+				}
+
+				&:hover {
+					&:before {
+						@include border-end-property(color, darken($collection-editor-info, 20%));
+					}
+				}
+			}
+
+			&:last-child {
+				&:after {
+					@include border-start-property(color, $collection-editor-info);
+				}
+
+				&:hover {
+					&:after {
+						@include border-start-property(color, darken($collection-editor-info, 20%));
+					}
+				}
+			}
+		}
+	}
+}

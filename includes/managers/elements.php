@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Core\DynamicTags\Tag;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -47,6 +49,47 @@ class Elements_Manager {
 	 */
 	public function __construct() {
 		$this->require_files();
+
+		add_action( 'elementor/dynamic_tags/before_create', [ $this, 'tag_in_collection' ] );
+	}
+
+	/**
+	 * @param Tag $tag
+	 */
+	public function tag_in_collection( $tag ) {
+		$collection = $tag->get_settings( 'collection' );
+		if ( $collection ) {
+			$collection_id = $collection['id'];
+			$tag_index = $collection['index'];
+
+			if ( empty( $this->collections ) ) {
+				$this->collections = [];
+			}
+
+			if ( empty( $this->collections[ $collection_id ] ) ) {
+				$document = Plugin::$instance->documents->get_doc_or_auto_save( get_the_ID() );
+
+				if ( ! $document ) {
+					return;
+				}
+
+				$element = $document->find_element_recursive( $collection_id );
+
+				if ( ! $element ) {
+					return;
+				}
+
+
+				$this->collections[ $collection_id ] = ( new \WP_Query( [
+					'post_per_page' => $element['settings']['items'],
+				] ) )->posts;
+			}
+
+			global $post;
+			$post = $this->collections[ $collection_id ][ $tag_index ];
+
+			setup_postdata( $post );
+		}
 	}
 
 	/**

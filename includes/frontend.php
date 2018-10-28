@@ -468,6 +468,7 @@ class Frontend {
 			$elements_frontend_keys = [
 				'section' => $elements_manager->get_element_types( 'section' )->get_frontend_settings_keys(),
 				'column' => $elements_manager->get_element_types( 'column' )->get_frontend_settings_keys(),
+				'container' => $elements_manager->get_element_types( 'container' )->get_frontend_settings_keys(),
 			];
 
 			$elements_frontend_keys += Plugin::$instance->widgets_manager->get_widgets_frontend_settings_keys();

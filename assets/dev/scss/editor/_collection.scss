@@ -1,6 +1,11 @@
 $collection-editor-info: #A3ABF7;
 .elementor-collection-section {
 
+	.elementor-collection-item {
+
+		border: 1px dashed darken( $collection-editor-info, 7% );
+	}
+
 	.elementor-editor-section-settings {
 		background-color: $collection-editor-info;
 

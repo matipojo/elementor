@@ -16,9 +16,64 @@ SectionView = BaseElementView.extend( {
 	},
 
 	onChildviewAfterWidgetAttachElContent: function( column, widget ) {
-		var $ = elementorFrontend.getElements( 'window' ).jQuery,
-			$cloned = $( widget.el ).clone( true, true );
-		$( '.elementor-element-' + widget.model.get( 'id' ) ).empty().append( $cloned );
+		var self = this,
+			$cloned,
+			clonedModel = widget.model.clone(),
+			dynamic = clonedModel.get( 'settings' ).get( '__dynamic__' );
+
+		var $ = elementorFrontend.getElements( 'window' ).jQuery;
+
+		var renderWithTags = function( el ) {
+			// Add in entity data and template helpers
+			var data = widget.mixinTemplateHelpers( widget.serializeData() );
+
+			// Render and add to el
+			var html = Marionette.Renderer.render( widget.getTemplate(), data, widget );
+
+			// $cloned = widget.$el.clone( true, true );
+			// $cloned.html( html );
+			// Restore original settings.
+			widget.model.get( 'settings' ).set( '__dynamic__', dynamic, {
+				silent: true,
+			} );
+			$( el ).removeClass( 'elementor-loading' ).empty().append( html );
+		};
+
+		$( '.elementor-element-' + widget.model.get( 'id' ) ).each( function( index ) {
+			var widgetEl = this;
+			if ( dynamic ) {
+				var currentDynamic = {};
+
+				_( dynamic ).each( function( value, key ) {
+					var tagData = elementor.dynamicTags.tagTextToTagData( value );
+
+					tagData.settings.collection = {
+						id: self.model.get( 'id' ),
+						index: index,
+					};
+
+					tagData.settings = new Backbone.Model( tagData.settings );
+
+					currentDynamic[ key ] = elementor.dynamicTags.tagDataToTagText( tagData.id, tagData.name, tagData.settings );
+				} );
+
+				widget.model
+					.get( 'settings' )
+					.set( '__dynamic__', currentDynamic, {
+						silent: true,
+					} )
+					.parseDynamicSettings( widget.model.get( 'settings' ), {
+						onServerRequestEnd: function() {
+							renderWithTags( widgetEl );
+						},
+					} );
+
+				renderWithTags( widgetEl );
+			} else {
+				$cloned = $( widget.el ).clone( true, true );
+				$( this ).empty().append( $cloned );
+			}
+		} );
 	},
 
 	tagName: function() {
@@ -309,7 +364,9 @@ SectionView = BaseElementView.extend( {
 	onCollectionUpdate: function() {
 		var self = this;
 		_.delay( function() {
-			self.render();
+			if ( ! self.isDestroyed() ) {
+				self.render();
+			}
 		}, 100 );
 	},
 

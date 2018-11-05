@@ -59,7 +59,7 @@ class Revisions_Manager {
 	}
 
 	/**
-	 * @since  2.0.0
+	 * @since 2.0.0
 	 * @access public
 	 * @static
 	 *

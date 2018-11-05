@@ -85,7 +85,7 @@ abstract class Base extends Base_File {
 	 *
 	 * Retrieve the CSS file name.
 	 *
-	 * @since 1.6.0
+	 * @since 2.1.0
 	 * @access public
 	 * @abstract
 	 */
@@ -96,7 +96,7 @@ abstract class Base extends Base_File {
 	 *
 	 * Initializing Elementor CSS file.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 */
 	public function __construct( $file_name ) {
@@ -111,7 +111,7 @@ abstract class Base extends Base_File {
 	 * Whether to use external CSS file of not. When there are new schemes or settings
 	 * updates.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return bool True if the CSS requires an update, False otherwise.
@@ -127,7 +127,7 @@ abstract class Base extends Base_File {
 	 *
 	 * This method also sets the CSS status to be used later on in the render posses.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 */
 	public function update() {
@@ -156,6 +156,10 @@ abstract class Base extends Base_File {
 		$this->update_meta( $meta );
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function write() {
 		if ( $this->use_external_file() ) {
 			parent::write();
@@ -169,7 +173,7 @@ abstract class Base extends Base_File {
 	 *
 	 * This method is also responsible for loading the fonts.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 */
 	public function enqueue() {
@@ -250,7 +254,7 @@ abstract class Base extends Base_File {
 	 * Output the final CSS inside the `<style>` tags and all the frontend fonts in
 	 * use.
 	 *
-	 * @since 1.9.4
+	 * @since 2.1.0
 	 * @access public
 	 */
 	public function print_css() {
@@ -265,7 +269,7 @@ abstract class Base extends Base_File {
 	 *
 	 * This method recursively renders the CSS for all the selectors in the control.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @param array    $control        The controls.
@@ -365,7 +369,7 @@ abstract class Base extends Base_File {
 	 *
 	 * Retrieve the list of fonts.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @return array Fonts.
@@ -379,7 +383,7 @@ abstract class Base extends Base_File {
 	 *
 	 * Retrieve the CSS. If the CSS is empty, parse it again.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 * @deprecated 2.1.0 Use `CSS_File::get_content()` method instead
 	 *
@@ -394,7 +398,7 @@ abstract class Base extends Base_File {
 	 *
 	 * Retrieve the CSS file stylesheet instance.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @return Stylesheet The stylesheet object.
@@ -410,7 +414,7 @@ abstract class Base extends Base_File {
 	 *
 	 * This method recursively renders the CSS for all the child elements in the stack.
 	 *
-	 * @since 1.6.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @param Controls_Stack $controls_stack The controls stack.
@@ -451,7 +455,7 @@ abstract class Base extends Base_File {
 	 *
 	 * Retrieve the file handle ID.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 * @abstract
 	 *
@@ -464,12 +468,16 @@ abstract class Base extends Base_File {
 	 *
 	 * Parse the CSS.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 * @abstract
 	 */
 	abstract protected function render_css();
 
+	/**
+	 * @since 2.1.0
+	 * @access protected
+	 */
 	protected function get_default_meta() {
 		return array_merge( parent::get_default_meta(), [
 			'fonts' => array_unique( $this->fonts ),
@@ -482,7 +490,7 @@ abstract class Base extends Base_File {
 	 *
 	 * Retrieve the name of the stylesheet used by `wp_enqueue_style()`.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return array Name of the stylesheet.
@@ -496,7 +504,7 @@ abstract class Base extends Base_File {
 	 *
 	 * Retrieve the name of the stylesheet used by `wp_add_inline_style()`.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return string Name of the stylesheet.
@@ -511,7 +519,7 @@ abstract class Base extends Base_File {
 	 * Whether the CSS requires an update. When there are new schemes or settings
 	 * updates.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return bool True if the CSS requires an update, False otherwise.
@@ -525,7 +533,7 @@ abstract class Base extends Base_File {
 	 *
 	 * Parsing the CSS file.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 */
 	protected function parse_content() {
@@ -569,8 +577,8 @@ abstract class Base extends Base_File {
 	 *
 	 * Register new style rules for the control.
 	 *
-	 * @since 1.6.0
-	 * @access private
+	 * @since 2.1.0
+	 * @access protected
 	 *
 	 * @param array $control      The control.
 	 * @param array $values       Values array.
@@ -593,7 +601,7 @@ abstract class Base extends Base_File {
 	 *
 	 * It will retrieve the control name and return the style value.
 	 *
-	 * @since 1.6.0
+	 * @since 2.1.0
 	 * @access private
 	 *
 	 * @param array $control The control.
@@ -621,7 +629,7 @@ abstract class Base extends Base_File {
 	 * Initialize CSS file stylesheet by creating a new `Stylesheet` object and register new
 	 * breakpoints for the stylesheet.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access private
 	 */
 	private function init_stylesheet() {
@@ -640,8 +648,8 @@ abstract class Base extends Base_File {
 	 *
 	 * Register new style rules for the repeater control.
 	 *
-	 * @since 2.0.0
-	 * @access private
+	 * @since 2.1.0
+	 * @access protected
 	 *
 	 * @param Controls_Stack $controls_stack          The control stack.
 	 * @param array          $repeater_controls_items The repeater controls items.
@@ -668,8 +676,8 @@ abstract class Base extends Base_File {
 	 *
 	 * Register new style rules for the dynamic control.
 	 *
-	 * @since 2.0.0
-	 * @access private
+	 * @since 2.1.0
+	 * @access protected
 	 *
 	 * @param array  $control The control.
 	 * @param string $value   The value.

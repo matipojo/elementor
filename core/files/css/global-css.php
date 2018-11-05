@@ -31,7 +31,7 @@ class Global_CSS extends Base {
 	 *
 	 * Retrieve the CSS file name.
 	 *
-	 * @since 1.6.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @return string CSS file name.
@@ -45,7 +45,7 @@ class Global_CSS extends Base {
 	 *
 	 * Retrieve the handle ID for the global post CSS file.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return string CSS file handle ID.
@@ -59,7 +59,7 @@ class Global_CSS extends Base {
 	 *
 	 * Parse the CSS for all the widgets and all the scheme controls.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 */
 	protected function render_css() {
@@ -71,7 +71,7 @@ class Global_CSS extends Base {
 	 *
 	 * Retrieve the name of the stylesheet used by `wp_add_inline_style()`.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return string Name of the stylesheet.
@@ -86,7 +86,7 @@ class Global_CSS extends Base {
 	 * Whether the CSS requires an update. When there are new schemes or settings
 	 * updates.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return bool True if the CSS requires an update, False otherwise.
@@ -114,7 +114,7 @@ class Global_CSS extends Base {
 	 *
 	 * Parse the CSS for all the widgets and all the scheme controls.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access private
 	 */
 	private function render_schemes_css() {

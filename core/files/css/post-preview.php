@@ -32,7 +32,7 @@ class Post_Preview extends Post {
 	 * Initializing the CSS file of the post preview. Set the post ID and the
 	 * parent ID and initiate the stylesheet.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @param int $post_id Post ID.
@@ -45,6 +45,10 @@ class Post_Preview extends Post {
 		parent::__construct( $parent_id );
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function get_preview_id() {
 		return $this->preview_id;
 	}
@@ -54,7 +58,7 @@ class Post_Preview extends Post {
 	 *
 	 * Retrieve raw post data from the database.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return array Post data.
@@ -68,7 +72,7 @@ class Post_Preview extends Post {
 	 *
 	 * Retrieve the handle ID for the previewed post CSS file.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return string CSS file handle ID.
@@ -82,7 +86,7 @@ class Post_Preview extends Post {
 	 *
 	 * Retrieve the previewed post CSS file meta data.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @param string $property Optional. Custom meta data property. Default is

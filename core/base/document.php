@@ -634,6 +634,10 @@ abstract class Document extends Controls_Stack {
 	 */
 	public function get_css_wrapper_selector() {
 		return '';
+	/**
+	 * @since 2.1.3
+	 * @access public
+	 */
 	}
 
 	/**
@@ -688,6 +692,10 @@ abstract class Document extends Controls_Stack {
 	 *
 	 * @since 2.0.0
 	 * @access protected
+	/**
+	 * @since 2.0.8
+	 * @access public
+	 */
 	 *
 	 * @param array $elements
 	 */
@@ -922,3 +930,7 @@ abstract class Document extends Controls_Stack {
 		}
 	}
 }
+	/**
+	 * @since 2.1.3
+	 * @access protected
+	 */

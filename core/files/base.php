@@ -42,18 +42,32 @@ abstract class Base {
 	 */
 	private $content;
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 * @static
+	 */
 	public static function get_base_uploads_dir() {
 		$wp_upload_dir = self::get_wp_uploads_dir();
 
 		return $wp_upload_dir['basedir'] . '/' . self::UPLOADS_DIR;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 * @static
+	 */
 	public static function get_base_uploads_url() {
 		$wp_upload_dir = self::get_wp_uploads_dir();
 
 		return $wp_upload_dir['baseurl'] . '/' . self::UPLOADS_DIR;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function __construct( $file_name ) {
 		$this->set_file_name( $file_name );
 
@@ -62,24 +76,44 @@ abstract class Base {
 		$this->set_path();
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function set_files_dir( $files_dir ) {
 		$this->files_dir = $files_dir;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function set_file_name( $file_name ) {
 		$this->file_name = $file_name;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function get_file_name() {
 		return $this->file_name;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function get_url() {
 		$url = set_url_scheme( self::get_base_uploads_url() . $this->files_dir . $this->file_name );
 
 		return add_query_arg( [ 'ver' => $this->get_meta( 'time' ) ], $url );
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function get_content() {
 		if ( ! $this->content ) {
 			$this->content = $this->parse_content();
@@ -88,6 +122,10 @@ abstract class Base {
 		return $this->content;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function update() {
 		$this->update_file();
 
@@ -98,6 +136,10 @@ abstract class Base {
 		$this->update_meta( $meta );
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function update_file() {
 		$this->content = $this->parse_content();
 
@@ -108,10 +150,18 @@ abstract class Base {
 		}
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function write() {
 		return file_put_contents( $this->path, $this->content );
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 */
 	public function delete() {
 		if ( file_exists( $this->path ) ) {
 			unlink( $this->path );
@@ -149,6 +199,11 @@ abstract class Base {
 		return $meta;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access protected
+	 * @abstract
+	 */
 	abstract protected function parse_content();
 
 	/**
@@ -156,7 +211,7 @@ abstract class Base {
 	 *
 	 * Retrieve the file meta data.
 	 *
-	 * @since  2.1.0
+	 * @since 2.1.0
 	 * @access protected
 	 */
 	protected function load_meta() {
@@ -168,7 +223,7 @@ abstract class Base {
 	 *
 	 * Update the file meta data.
 	 *
-	 * @since  2.1.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @param array $meta New meta data.
@@ -182,19 +237,28 @@ abstract class Base {
 	 *
 	 * Delete the file meta data.
 	 *
-	 * @since  2.1.0
+	 * @since 2.1.0
 	 * @access protected
 	 */
 	protected function delete_meta() {
 		delete_option( static::META_KEY );
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access protected
+	 */
 	protected function get_default_meta() {
 		return [
 			'time' => 0,
 		];
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access private
+	 * @static
+	 */
 	private static function get_wp_uploads_dir() {
 		if ( ! self::$wp_uploads_dir ) {
 			self::$wp_uploads_dir = wp_upload_dir( null, false );
@@ -203,6 +267,10 @@ abstract class Base {
 		return self::$wp_uploads_dir;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access private
+	 */
 	private function set_path() {
 		$dir_path = self::get_base_uploads_dir() . $this->files_dir;
 

@@ -18,6 +18,10 @@ class Admin {
 	 */
 	private $feedback;
 
+	/**
+	 * @since 2.2.0
+	 * @access public
+	 */
 	public function maybe_redirect_to_getting_started() {
 		if ( ! get_transient( 'elementor_activation_redirect' ) ) {
 			return;
@@ -52,7 +56,7 @@ class Admin {
 	 *
 	 * Fired by `admin_enqueue_scripts` action.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function enqueue_scripts() {
@@ -113,7 +117,7 @@ class Admin {
 	 *
 	 * Fired by `admin_enqueue_scripts` action.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function enqueue_styles() {
@@ -152,7 +156,7 @@ class Admin {
 	 *
 	 * Fired by `edit_form_after_title` action.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 *
 	 * @param \WP_Post $post The current post object.
@@ -206,7 +210,7 @@ class Admin {
 	 *
 	 * Fired by `save_post` action.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 *
 	 * @param int $post_id Post ID.
@@ -230,7 +234,7 @@ class Admin {
 	 *
 	 * Fired by `post_row_actions` and `page_row_actions` filters.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 *
 	 * @param array    $actions An array of row action links.
@@ -257,7 +261,7 @@ class Admin {
 	 *
 	 * Fired by `display_post_states` filter.
 	 *
-	 * @since 1.8.0
+	 * @since 2.2.0
 	 * @access public
 	 *
 	 * @param array    $post_states An array of post display states.
@@ -279,7 +283,7 @@ class Admin {
 	 *
 	 * Fired by `admin_body_class` filter.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 *
 	 * @param string $classes Space-separated list of CSS classes.
@@ -307,7 +311,7 @@ class Admin {
 	 *
 	 * Fired by `plugin_action_links` filter.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 *
 	 * @param array $links An array of plugin action links.
@@ -331,7 +335,7 @@ class Admin {
 	 *
 	 * Fired by `plugin_row_meta` filter.
 	 *
-	 * @since 1.1.4
+	 * @since 2.2.0
 	 * @access public
 	 *
 	 * @param array  $plugin_meta An array of the plugin's metadata, including
@@ -361,7 +365,7 @@ class Admin {
 	 *
 	 * Fired by `admin_notices` action.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function admin_notices() {
@@ -455,7 +459,7 @@ class Admin {
 	 *
 	 * Fired by `admin_footer_text` filter.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 *
 	 * @param string $footer_text The content that will be printed.
@@ -485,7 +489,7 @@ class Admin {
 	 *
 	 * Fired by `wp_dashboard_setup` action.
 	 *
-	 * @since 1.9.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function register_dashboard_widgets() {
@@ -509,7 +513,7 @@ class Admin {
 	 *
 	 * Fired by `wp_add_dashboard_widget` function.
 	 *
-	 * @since 1.9.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function elementor_dashboard_overview_widget() {
@@ -607,7 +611,7 @@ class Admin {
 	 *
 	 * Retrieves the footer action links displayed in elementor dashboard widget.
 	 *
-	 * @since 1.9.0
+	 * @since 2.2.0
 	 * @access private
 	 */
 	private function get_dashboard_overview_widget_footer_actions() {
@@ -655,7 +659,7 @@ class Admin {
 	 *
 	 * Fired by `admin_action_elementor_new_post` action.
 	 *
-	 * @since 1.9.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function admin_action_new_post() {
@@ -700,12 +704,18 @@ class Admin {
 		die;
 	}
 
+	/**
+	 * @access public
+	 */
 	public function print_new_template_template() {
 		$this->print_library_layout_template();
 
 		include ELEMENTOR_PATH . 'includes/admin-templates/new-template.php';
 	}
 
+	/**
+	 * @access public
+	 */
 	public function enqueue_new_template_scripts() {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
@@ -721,6 +731,9 @@ class Admin {
 		);
 	}
 
+	/**
+	 * @access public
+	 */
 	public function init_new_template() {
 		if ( 'edit-elementor_library' !== get_current_screen()->id ) {
 			return;
@@ -736,7 +749,7 @@ class Admin {
 	 *
 	 * Initializing Elementor in WordPress admin.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function __construct() {
@@ -771,6 +784,9 @@ class Admin {
 		add_action( 'current_screen', [ $this, 'init_new_template' ] );
 	}
 
+	/**
+	 * @access private
+	 */
 	private function print_library_layout_template() {
 		include ELEMENTOR_PATH . 'includes/editor-templates/library-layout.php';
 	}

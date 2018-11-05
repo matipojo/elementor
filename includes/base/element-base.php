@@ -245,6 +245,11 @@ abstract class Element_Base extends Controls_Stack {
 		}
 	}
 
+	/**
+	 * @since 2.2.0
+	 * @access public
+	 * @static
+	 */
 	final public static function is_edit_buttons_enabled() {
 		return get_option( 'elementor_edit_buttons' );
 	}
@@ -526,6 +531,8 @@ abstract class Element_Base extends Controls_Stack {
 	 *
 	 * Returns null if one of the requested parameters isn't set.
 	 *
+	 * @since 2.2.6
+	 * @access public
 	 * @param string $element
 	 * @param string $key
 	 *

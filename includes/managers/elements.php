@@ -42,7 +42,7 @@ class Elements_Manager {
 	 *
 	 * Initializing Elementor elements manager.
 	 *
-	 * @since 1.0.0
+	 * @since 2.0.7
 	 * @access public
 	 */
 	public function __construct() {
@@ -381,7 +381,7 @@ class Elements_Manager {
 	 * Require Elementor element base class and column, section and repeater
 	 * elements.
 	 *
-	 * @since 1.0.0
+	 * @since 2.0.7
 	 * @access private
 	 */
 	private function require_files() {

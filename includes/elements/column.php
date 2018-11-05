@@ -89,7 +89,7 @@ class Element_Column extends Element_Base {
 	 *
 	 * Retrieve the element default edit tools. Used to set initial tools.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @access protected
 	 * @static
 	 *
@@ -835,7 +835,7 @@ class Element_Column extends Element_Base {
 	 *
 	 * Used to generate the edit tools HTML.
 	 *
-	 * @since 1.8.0
+	 * @since 2.1.0
 	 * @access protected
 	 */
 	protected function render_edit_tools() {

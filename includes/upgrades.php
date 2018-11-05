@@ -360,6 +360,11 @@ class Upgrades {
 		}
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access private
+	 * @static
+	 */
 	private static function upgrade_v210() {
 		global $wpdb;
 

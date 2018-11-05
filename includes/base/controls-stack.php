@@ -1053,6 +1053,10 @@ abstract class Controls_Stack {
 		return self::_get_items( $this->settings, $setting );
 	}
 
+	/**
+	 * @since 2.0.14
+	 * @access public
+	 */
 	public function get_parsed_dynamic_settings( $setting = null ) {
 		if ( null === $this->parsed_dynamic_settings ) {
 			$this->parsed_dynamic_settings = $this->parse_dynamic_settings( $this->get_settings() );

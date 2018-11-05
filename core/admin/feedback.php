@@ -16,7 +16,7 @@ class Feedback {
 	 *
 	 * Registers the feedback dialog scripts and enqueues them.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function enqueue_feedback_dialog_scripts() {
@@ -62,7 +62,7 @@ class Feedback {
 	 *
 	 * Fired by `admin_footer` filter.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function print_deactivate_feedback_dialog() {
@@ -133,7 +133,7 @@ class Feedback {
 	 *
 	 * Fired by `wp_ajax_elementor_deactivate_feedback` action.
 	 *
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @access public
 	 */
 	public function ajax_elementor_deactivate_feedback() {
@@ -157,6 +157,10 @@ class Feedback {
 		wp_send_json_success();
 	}
 
+	/**
+	 * @since 2.2.0
+	 * @access public
+	 */
 	public function admin_notices() {
 		$notice_id = 'rate_us_feedback';
 		if ( User::is_user_notice_viewed( $notice_id ) ) {
@@ -211,6 +215,10 @@ class Feedback {
 		<?php
 	}
 
+	/**
+	 * @since 2.2.0
+	 * @access public
+	 */
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_feedback_dialog_scripts' ] );
 

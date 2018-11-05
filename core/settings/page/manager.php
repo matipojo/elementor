@@ -54,9 +54,9 @@ class Manager extends BaseManager {
 	 *
 	 * Retrieves page data for any given a page ID.
 	 *
-	 * @since      1.6.0
+	 * @since 2.1.2
+	 * @access public
 	 * @deprecated 1.6.0
-	 * @access     public
 	 * @static
 	 *
 	 * @param int $id Page ID.

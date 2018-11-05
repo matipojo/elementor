@@ -24,7 +24,7 @@ class Manager {
 	 *
 	 * Initializing the Elementor files manager.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 */
 	public function __construct() {
@@ -38,7 +38,7 @@ class Manager {
 	 *
 	 * Fired by `deleted_post` action.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @param string $post_id Post ID.
@@ -61,7 +61,7 @@ class Manager {
 	 *
 	 * Fired by `wxr_export_skip_postmeta` filter.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @param bool   $skip     Whether to skip the current post meta.
@@ -83,7 +83,7 @@ class Manager {
 	 * Delete all meta containing files data. And delete the actual
 	 * files from the upload directory.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 */
 	public function clear_cache() {
@@ -125,7 +125,7 @@ class Manager {
 	 *
 	 * Register filters and actions for the files manager.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access private
 	 */
 	private function register_actions() {

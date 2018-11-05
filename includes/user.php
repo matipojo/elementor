@@ -40,6 +40,11 @@ class User {
 		add_action( 'elementor/ajax/register_actions', [ __CLASS__, 'register_ajax_actions' ] );
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 * @static
+	 */
 	public static function register_ajax_actions() {
 		Plugin::$instance->ajax->register_ajax_action( 'introduction_viewed', [ __CLASS__, 'set_introduction_viewed' ] );
 	}
@@ -95,6 +100,7 @@ class User {
 	 *
 	 * Whether the current user role is not excluded by Elementor Settings.
 	 *
+	 * @since 2.1.7
 	 * @access public
 	 * @static
 	 *
@@ -212,6 +218,11 @@ class User {
 		wp_die();
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 * @static
+	 */
 	public static function set_introduction_viewed() {
 		$user_introduction_meta = self::get_introduction_meta();
 
@@ -224,12 +235,22 @@ class User {
 		update_user_meta( get_current_user_id(), self::INTRODUCTION_KEY, $user_introduction_meta );
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 * @static
+	 */
 	public static function is_should_view_introduction() {
 		$user_introduction_meta = self::get_introduction_meta();
 
 		return empty( $user_introduction_meta[ self::INTRODUCTION_VERSION ] );
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access private
+	 * @static
+	 */
 	private static function get_introduction_meta() {
 		return get_user_meta( get_current_user_id(), self::INTRODUCTION_KEY, true );
 	}

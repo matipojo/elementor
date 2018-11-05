@@ -150,6 +150,8 @@ class Frontend {
 	}
 
 	/**
+	 * @since 2.0.12
+	 * @access public
 	 * @param string|array $class
 	 */
 	public function add_body_class( $class ) {
@@ -609,7 +611,7 @@ class Frontend {
 	 *
 	 * Fired by `wp_head` action.
 	 *
-	 * @since 1.0.0
+	 * @since 2.0.7
 	 * @access private
 	 *
 	 * @param array $google_fonts Optional. Google fonts to print in the frontend.
@@ -1006,6 +1008,10 @@ class Frontend {
 		$this->content_removed_filters = [];
 	}
 
+	/**
+	 * @since 2.0.9
+	 * @access public
+	 */
 	public function has_elementor_in_page() {
 		return $this->_has_elementor_in_page;
 	}

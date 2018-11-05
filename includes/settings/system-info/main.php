@@ -85,8 +85,8 @@ class Main {
 	 * @access private
 	 */
 	private function require_files() {
-		require __DIR__ . '/classes/abstracts/base-reporter.php';
-		require __DIR__ . '/helpers/model-helper.php';
+		require_once __DIR__ . '/classes/abstracts/base-reporter.php';
+		require_once __DIR__ . '/helpers/model-helper.php';
 	}
 
 	/**

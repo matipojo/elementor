@@ -224,6 +224,10 @@ class Manager {
 		return $tags[ $tag_name ];
 	}
 
+	/**
+	 * @since 2.0.9
+	 * @access public
+	 */
 	public function get_tags() {
 		if ( ! did_action( 'elementor/dynamic_tags/register_tags' ) ) {
 			/**
@@ -258,6 +262,7 @@ class Manager {
 	}
 
 	/**
+	 * @since 2.0.9
 	 * @access public
 	 *
 	 * @param string $tag_name
@@ -328,7 +333,7 @@ class Manager {
 	}
 
 	/**
-	 * @since  2.0.0
+	 * @since 2.0.0
 	 * @access public
 	 *
 	 * @throws \Exception If post ID is missing.
@@ -403,6 +408,8 @@ class Manager {
 	}
 
 	/**
+	 * @since 2.1.0
+	 * @access public
 	 * @param Post $css_file
 	 */
 	public function after_enqueue_post_css( $css_file ) {

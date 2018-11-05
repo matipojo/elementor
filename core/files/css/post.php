@@ -40,7 +40,7 @@ class Post extends Base {
 	 *
 	 * Initializing the CSS file of the post. Set the post ID and initiate the stylesheet.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @param int $post_id Post ID.
@@ -56,7 +56,7 @@ class Post extends Base {
 	 *
 	 * Retrieve the CSS file name.
 	 *
-	 * @since 1.6.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @return string CSS file name.
@@ -70,7 +70,7 @@ class Post extends Base {
 	 *
 	 * Retrieve the ID of current post.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @return int Post ID.
@@ -84,7 +84,7 @@ class Post extends Base {
 	 *
 	 * Retrieve the unique selector for any given element.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @param Element_Base $element The element.
@@ -100,7 +100,7 @@ class Post extends Base {
 	 *
 	 * Retrieve the post CSS file meta data.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return array Post CSS file meta data.
@@ -114,7 +114,7 @@ class Post extends Base {
 	 *
 	 * Update the global CSS file meta data.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @param array $meta New meta data.
@@ -128,7 +128,7 @@ class Post extends Base {
 	 *
 	 * Delete the file meta data.
 	 *
-	 * @since  2.1.0
+	 * @since 2.1.0
 	 * @access protected
 	 */
 	protected function delete_meta() {
@@ -140,7 +140,7 @@ class Post extends Base {
 	 *
 	 * Retrieve raw post data from the database.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return array Post data.
@@ -154,7 +154,7 @@ class Post extends Base {
 	 *
 	 * Parse the CSS for all the elements.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 */
 	protected function render_css() {
@@ -181,7 +181,7 @@ class Post extends Base {
 	 * This method ensures that the post was actually built with elementor before
 	 * enqueueing the post CSS file.
 	 *
-	 * @since 1.2.2
+	 * @since 2.1.0
 	 * @access public
 	 */
 	public function enqueue() {
@@ -199,7 +199,7 @@ class Post extends Base {
 	 *
 	 * This method recursively renders the CSS for all the child elements in the stack.
 	 *
-	 * @since 1.6.0
+	 * @since 2.1.0
 	 * @access public
 	 *
 	 * @param Controls_Stack $controls_stack The controls stack.
@@ -223,7 +223,7 @@ class Post extends Base {
 	 *
 	 * Retrieve the name of the stylesheet used by `wp_enqueue_style()`.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return array Name of the stylesheet.
@@ -237,7 +237,7 @@ class Post extends Base {
 	 *
 	 * Retrieve the name of the stylesheet used by `wp_add_inline_style()`.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return string Name of the stylesheet.
@@ -251,7 +251,7 @@ class Post extends Base {
 	 *
 	 * Retrieve the handle ID for the post CSS file.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @return string CSS file handle ID.
@@ -265,7 +265,7 @@ class Post extends Base {
 	 *
 	 * Parse the CSS for any given element.
 	 *
-	 * @since 1.2.0
+	 * @since 2.1.0
 	 * @access protected
 	 *
 	 * @param Element_Base $element The element.

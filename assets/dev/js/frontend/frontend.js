@@ -1,4 +1,7 @@
 /* global elementorFrontendConfig */
+import HotKeys from '../../../../core/common/assets/js/utils/hot-keys';
+import environment from '../../../../core/common/assets/js/utils/environment';
+
 ( function( $ ) {
 	var elements = {},
 		EventManager = require( '../utils/hooks' ),
@@ -22,11 +25,22 @@
 
 		var initElements = function() {
 			elements.window = window;
+
 			elements.$window = $( window );
+
 			elements.$document = $( document );
-			elements.$body = $( 'body' );
+
+			elements.$body = $( document.body );
+
 			elements.$elementor = elements.$document.find( '.elementor' );
+
 			elements.$wpAdminBar = elements.$document.find( '#wpadminbar' );
+		};
+
+		var initHotKeys = function() {
+			self.hotKeys = new HotKeys();
+
+			self.hotKeys.bindListener( elements.$window );
 		};
 
 		var bindEvents = function() {
@@ -41,17 +55,15 @@
 			};
 
 			self.modules = {
+				utils: {
+					Module: require( 'elementor-utils/module' ),
+					ViewModule: require( 'elementor-utils/view-module' ),
+				},
 				StretchElement: require( 'elementor-frontend/modules/stretch-element' ),
 				Masonry: require( 'elementor-utils/masonry' ),
 			};
 
 			self.elementsHandler = new ElementsHandler( $ );
-		};
-
-		var initHotKeys = function() {
-			self.hotKeys = require( 'elementor-utils/hot-keys' );
-
-			self.hotKeys.bindListener( elements.$window );
 		};
 
 		var getSiteSettings = function( settingType, settingName ) {
@@ -65,16 +77,16 @@
 		};
 
 		var addIeCompatibility = function() {
-			var isIE = 'Microsoft Internet Explorer' === navigator.appName || !! navigator.userAgent.match( /Trident/g ) || !! navigator.userAgent.match( /MSIE/g ) || !! navigator.userAgent.match( /rv:11/ ),
-				el = document.createElement( 'div' ),
+			var el = document.createElement( 'div' ),
 				supportsGrid = 'string' === typeof el.style.grid;
 
-			if ( ! isIE && supportsGrid ) {
+			if ( ! environment.ie && supportsGrid ) {
 				return;
 			}
+
 			elements.$body.addClass( 'elementor-msie' );
 
-			var msieCss = '<link rel="stylesheet" id="elementor-frontend-css-msie" href="' + elementorFrontend.config.urls.assets + 'css/frontend-msie.min.css?' + elementorFrontend.config.version + '" type="text/css" />';
+			var msieCss = '<link rel="stylesheet" id="elementor-frontend-css-msie" href="' + self.config.urls.assets + 'css/frontend-msie.min.css?' + self.config.version + '" type="text/css" />';
 
 			elements.$body.append( msieCss );
 		};
@@ -107,20 +119,20 @@
 			return elements;
 		};
 
-		this.getDialogsManager = function() {
-			if ( ! dialogsManager ) {
-				dialogsManager = new DialogsManager.Instance();
-			}
-
-			return dialogsManager;
-		};
-
 		this.getPageSettings = function( settingName ) {
 			return getSiteSettings( 'page', settingName );
 		};
 
 		this.getGeneralSettings = function( settingName ) {
 			return getSiteSettings( 'general', settingName );
+		};
+
+		this.getDialogsManager = function() {
+			if ( ! dialogsManager ) {
+				dialogsManager = new DialogsManager.Instance();
+			}
+
+			return dialogsManager;
 		};
 
 		this.isEditMode = function() {
@@ -174,7 +186,7 @@
 
 		this.addListenerOnce = function( listenerID, event, callback, to ) {
 			if ( ! to ) {
-				to = self.getElements( '$window' );
+				to = elements.$window;
 			}
 
 			if ( ! self.isEditMode() ) {
@@ -196,7 +208,7 @@
 
 		this.removeListeners = function( listenerID, event, callback, from ) {
 			if ( ! from ) {
-				from = self.getElements( '$window' );
+				from = elements.$window;
 			}
 
 			if ( from instanceof jQuery ) {

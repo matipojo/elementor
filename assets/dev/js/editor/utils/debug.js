@@ -114,7 +114,7 @@ var Debug = function() {
 		elements.$window.off( 'error', onError );
 
 		jQuery.ajax( {
-			url: ElementorConfig.ajaxurl,
+			url: elementorCommon.config.ajax.url,
 			method: 'POST',
 			data: {
 				action: 'elementor_debug_log',

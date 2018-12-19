@@ -44,6 +44,11 @@ abstract class Library_Document extends Document {
 		return $properties;
 	}
 
+	public function print_admin_column_type() {
+		$admin_filter_url = admin_url( '/edit.php?post_type=elementor_library&elementor_library_type=' . $this->get_name() );
+		printf( '<a href="%s">%s</a>', $admin_filter_url, $this->get_title() );
+	}
+
 	/**
 	 * Save document type.
 	 *
@@ -52,8 +57,8 @@ abstract class Library_Document extends Document {
 	 * @since 2.0.0
 	 * @access public
 	 */
-	public function save_type() {
-		parent::save_type();
+	public function save_template_type() {
+		parent::save_template_type();
 
 		wp_set_object_terms( $this->post->ID, $this->get_name(), self::TAXONOMY_TYPE_SLUG );
 	}

@@ -190,7 +190,6 @@ class Widget_Video extends Widget_Base {
 				'dynamic' => [
 					'active' => true,
 					'categories' => [
-						TagsModule::POST_META_CATEGORY,
 						TagsModule::MEDIA_CATEGORY,
 					],
 				],
@@ -285,7 +284,7 @@ class Widget_Video extends Widget_Base {
 				'label_on' => __( 'Show', 'elementor' ),
 				'default' => 'yes',
 				'condition' => [
-					'video_type' => [ 'youtube', 'dailymotion' ],
+					'video_type' => [ 'dailymotion' ],
 				],
 			]
 		);
@@ -330,12 +329,11 @@ class Widget_Video extends Widget_Base {
 
 		// YouTube.
 		$this->add_control(
-			'rel',
+			'yt_privacy',
 			[
-				'label' => __( 'Suggested Videos', 'elementor' ),
+				'label' => __( 'Privacy Mode', 'elementor' ),
 				'type' => Controls_Manager::SWITCHER,
-				'label_off' => __( 'Hide', 'elementor' ),
-				'label_on' => __( 'Show', 'elementor' ),
+				'description' => __( 'When you turn on privacy mode, YouTube won\'t store information about visitors on your website unless they play the video.', 'elementor' ),
 				'condition' => [
 					'video_type' => 'youtube',
 				],
@@ -343,11 +341,14 @@ class Widget_Video extends Widget_Base {
 		);
 
 		$this->add_control(
-			'yt_privacy',
+			'rel',
 			[
-				'label' => __( 'Privacy Mode', 'elementor' ),
-				'type' => Controls_Manager::SWITCHER,
-				'description' => __( 'When you turn on privacy mode, YouTube won\'t store information about visitors on your website unless they play the video.', 'elementor' ),
+				'label' => __( 'Suggested Videos', 'elementor' ),
+				'type' => Controls_Manager::SELECT,
+				'options' => [
+					'' => __( 'Current Video Channel', 'elementor' ),
+					'yes' => __( 'Any Video', 'elementor' ),
+				],
 				'condition' => [
 					'video_type' => 'youtube',
 				],
@@ -873,7 +874,6 @@ class Widget_Video extends Widget_Base {
 				'loop',
 				'controls',
 				'mute',
-				'showinfo',
 				'rel',
 				'modestbranding',
 			];
@@ -947,6 +947,10 @@ class Widget_Video extends Widget_Base {
 		return ! empty( $settings['image_overlay']['url'] ) && 'yes' === $settings['show_image_overlay'];
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access private
+	 */
 	private function get_embed_options() {
 		$settings = $this->get_settings_for_display();
 
@@ -963,6 +967,10 @@ class Widget_Video extends Widget_Base {
 		return $embed_options;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access private
+	 */
 	private function get_hosted_params() {
 		$settings = $this->get_settings_for_display();
 
@@ -970,25 +978,29 @@ class Widget_Video extends Widget_Base {
 
 		foreach ( [ 'autoplay', 'loop', 'controls' ] as $option_name ) {
 			if ( $settings[ $option_name ] ) {
-				$video_params[] = $option_name;
+				$video_params[ $option_name ] = '';
 			}
 		}
 
 		if ( $settings['mute'] ) {
-			$video_params[] = 'muted';
+			$video_params['muted'] = 'muted';
 		}
 
 		if ( ! $settings['download_button'] ) {
-			$video_params[] = 'controlsList="nodownload"';
+			$video_params['controlsList'] = 'nodownload';
 		}
 
 		if ( $settings['poster']['url'] ) {
-			$video_params[] = 'poster="' . $settings['poster']['url'] . '"';
+			$video_params['poster'] = $settings['poster']['url'];
 		}
 
 		return $video_params;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access private
+	 */
 	private function get_hosted_video_url() {
 		$settings = $this->get_settings_for_display();
 
@@ -998,7 +1010,9 @@ class Widget_Video extends Widget_Base {
 			return '';
 		}
 
-		$video_url .= '#t=';
+		if ( $settings['start'] || $settings['end'] ) {
+			$video_url .= '#t=';
+		}
 
 		if ( $settings['start'] ) {
 			$video_url .= $settings['start'];
@@ -1011,12 +1025,16 @@ class Widget_Video extends Widget_Base {
 		return $video_url;
 	}
 
+	/**
+	 * @since 2.1.0
+	 * @access private
+	 */
 	private function render_hosted_video() {
 		$video_params = $this->get_hosted_params();
 
 		$video_url = $this->get_hosted_video_url();
 		?>
-		<video class="elementor-video" src="<?php echo esc_url( $video_url ); ?>" <?php echo implode( ' ', $video_params ); ?>></video>
+		<video class="elementor-video" src="<?php echo esc_url( $video_url ); ?>" <?php echo Utils::render_html_attributes( $video_params ); ?>></video>
 		<?php
 	}
 }

@@ -502,7 +502,8 @@ abstract class Element_Container extends Element_Base {
 							'name' => 'background_background',
 							'operator' => '!==',
 							'value' => '',
-						], [
+						],
+						[
 							'name' => 'border_border',
 							'operator' => '!==',
 							'value' => '',
@@ -1042,7 +1043,7 @@ abstract class Element_Container extends Element_Base {
 		if ( $has_background_overlay ) :
 			?>
 			<div class="elementor-background-overlay"></div>
-		<?php
+			<?php
 		endif;
 
 		if ( $settings['shape_divider_top'] ) {

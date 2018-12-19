@@ -79,14 +79,13 @@ class Elements_Manager {
 					return;
 				}
 
-
 				$this->collections[ $collection_id ] = ( new \WP_Query( [
 					'post_per_page' => $element['settings']['items'],
 				] ) )->posts;
 			}
 
 			global $post;
-			$post = $this->collections[ $collection_id ][ $tag_index ];
+			$post = $this->collections[ $collection_id ][ $tag_index ]; // WPCS: override ok.
 
 			setup_postdata( $post );
 		}

@@ -7,11 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-/**
- * @var Editor $this
- */
-$document = Plugin::$instance->documents->get( $this->get_post_id() );
-
+$document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_post_id() );
 ?>
 <script type="text/template" id="tmpl-elementor-panel">
 	<div id="elementor-mode-switcher"></div>
@@ -25,12 +21,6 @@ $document = Plugin::$instance->documents->get( $this->get_post_id() );
 
 <script type="text/template" id="tmpl-elementor-panel-menu">
 	<div id="elementor-panel-page-menu-content"></div>
-	<div id="elementor-panel-page-menu-footer">
-		<a href="<?php echo esc_url( $document->get_exit_to_dashboard_url() ); ?>" id="elementor-panel-exit-to-dashboard" class="elementor-button elementor-button-default">
-			<i class="fa fa-wordpress"></i>
-			<?php echo __( 'Exit To Dashboard', 'elementor' ); ?>
-		</a>
-	</div>
 </script>
 
 <script type="text/template" id="tmpl-elementor-panel-menu-group">

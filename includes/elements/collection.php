@@ -49,7 +49,7 @@ class Element_Collection extends Element_Container {
 		$this->add_responsive_control(
 			'columns',
 			[
-				'label' => __( 'Columns', 'elementor-pro' ),
+				'label' => __( 'Columns', 'elementor' ),
 				'type' => Controls_Manager::SELECT,
 				'default' => '1',
 				'tablet_default' => '1',
@@ -72,7 +72,7 @@ class Element_Collection extends Element_Container {
 		$this->start_controls_section(
 			'section_design_layout',
 			[
-				'label' => __( 'Layout', 'elementor-pro' ),
+				'label' => __( 'Layout', 'elementor' ),
 				'tab' => Controls_Manager::TAB_STYLE,
 			]
 		);
@@ -80,7 +80,7 @@ class Element_Collection extends Element_Container {
 		$this->add_control(
 			'column_gap',
 			[
-				'label' => __( 'Columns Gap', 'elementor-pro' ),
+				'label' => __( 'Columns Gap', 'elementor' ),
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
 					'size' => 30,
@@ -102,7 +102,7 @@ class Element_Collection extends Element_Container {
 		$this->add_control(
 			'row_gap',
 			[
-				'label' => __( 'Rows Gap', 'elementor-pro' ),
+				'label' => __( 'Rows Gap', 'elementor' ),
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
 					'size' => 35,
@@ -138,7 +138,7 @@ class Element_Collection extends Element_Container {
 		if ( $has_background_overlay ) :
 			?>
 			<div class="elementor-background-overlay"></div>
-		<?php
+			<?php
 		endif;
 
 		if ( $settings['shape_divider_top'] ) {

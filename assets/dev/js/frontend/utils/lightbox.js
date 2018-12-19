@@ -98,7 +98,7 @@ LightboxModule = ViewModule.extend( {
 		modal.onHide = function() {
 			DialogsManager.getWidgetType( 'lightbox' ).prototype.onHide.apply( modal, arguments );
 
-			modal.getElements( 'widgetContent' ).removeClass( 'animated' );
+			modal.getElements( 'message' ).removeClass( 'animated' );
 		};
 
 		switch ( options.type ) {
@@ -144,11 +144,7 @@ LightboxModule = ViewModule.extend( {
 			modal = this.getModal();
 
 		if ( 'hosted' === options.videoType ) {
-			var videoParams = { src: options.url, autoplay: '' };
-
-			options.videoParams.forEach( function( param ) {
-				videoParams[ param ] = '';
-			} );
+			var videoParams = jQuery.extend( { src: options.url, autoplay: '' }, options.videoParams );
 
 			$videoElement = jQuery( '<video>', videoParams );
 		} else {
@@ -323,7 +319,7 @@ LightboxModule = ViewModule.extend( {
 	},
 
 	isLightboxLink: function( element ) {
-		if ( 'A' === element.tagName && ! /\.(png|jpe?g|gif|svg)$/i.test( element.href ) ) {
+		if ( 'A' === element.tagName && ( element.hasAttribute( 'download' ) || ! /\.(png|jpe?g|gif|svg)(\?.*)?$/i.test( element.href ) ) ) {
 			return false;
 		}
 

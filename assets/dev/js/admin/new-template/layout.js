@@ -1,5 +1,6 @@
-var BaseModalLayout = require( 'elementor-templates/views/base-modal-layout' ),
-	NewTemplateView = require( 'elementor-admin/new-template/view' );
+import BaseModalLayout from '../../../../../core/common/assets/js/views/modal/layout';
+
+var NewTemplateView = require( 'elementor-admin/new-template/view' );
 
 module.exports = BaseModalLayout.extend( {
 
@@ -11,7 +12,7 @@ module.exports = BaseModalLayout.extend( {
 
 	getLogoOptions: function() {
 		return {
-			title: elementorAdmin.config.i18n.new_template,
+			title: elementorAdmin.translate( 'new_template' ),
 		};
 	},
 
@@ -21,10 +22,6 @@ module.exports = BaseModalLayout.extend( {
 		this.showLogo();
 
 		this.showContentView();
-	},
-
-	getDialogsManager: function() {
-		return elementorAdmin.getDialogsManager();
 	},
 
 	showContentView: function() {

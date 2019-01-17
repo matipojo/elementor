@@ -18,6 +18,84 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Upgrades {
 
 	/**
+	 * Upgrade Elementor 0.2.5
+	 *
+	 * Change the video widget `link` to `vimeo_link` if the value is a vimeo URL.
+	 *
+	 * @since  2.4.2
+	 * @static
+	 * @access public
+	 *
+	 * @param Updater $updater
+	 *
+	 * @return bool
+	 */
+	public static function _v_0_2_5( $updater ) {
+		global $wpdb;
+
+		// upgrade `video` widget settings (merge providers).
+		$post_ids = $updater->query_col(
+			'SELECT `post_id` FROM `' . $wpdb->postmeta . '` WHERE `meta_key` = "_elementor_data" AND (
+			`meta_value` LIKE \'%vimeo%\'
+			);'
+		);
+
+		if ( empty( $post_ids ) ) {
+			return false;
+		}
+
+		foreach ( $post_ids as $post_id ) {
+			$do_update = false;
+
+			$document = Plugin::$instance->documents->get( $post_id );
+
+			if ( ! $document ) {
+				continue;
+			}
+
+			$data = $document->get_elements_data();
+
+			if ( empty( $data ) ) {
+				continue;
+			}
+
+			$data = Plugin::$instance->db->iterate_data( $data, function ( $element ) use ( & $do_update ) {
+				if ( empty( $element['widgetType'] ) || 'video' !== $element['widgetType'] ) {
+					return $element;
+				}
+
+				if ( ! empty( $element['settings']['link'] ) ) {
+					$is_vimeo = preg_match( '/^https?:\/\/(?:www\.)?vimeo\.com/', $element['settings']['link'] );
+
+					if ( $is_vimeo && ( empty( $element['settings']['vimeo_url'] ) || /* default value */ 'https://vimeo.com/235215203' === $element['settings']['vimeo_url'] ) ) {
+						$element['settings']['vimeo_link'] = $element['settings']['link'];
+						$element['settings']['vimeo_url'] = $element['settings']['link'];
+						$element['settings']['video_type'] = 'vimeo';
+						$do_update = true;
+					}
+				}
+
+				return $element;
+			} );
+
+			// Only update if needed.
+			if ( ! $do_update ) {
+				continue;
+			}
+
+			// We need the `wp_slash` in order to avoid the unslashing during the `update_post_meta`
+			$json_value = wp_slash( wp_json_encode( $data ) );
+
+			update_metadata( 'post', $post_id, '_elementor_data', $json_value );
+
+			// Clear WP cache for next step.
+			wp_cache_flush();
+		} // End foreach().
+
+		return $updater->should_run_again( $post_ids );
+	}
+
+	/**
 	 * Upgrade Elementor 0.3.2
 	 *
 	 * Change the image widget link URL, setting is to `custom` link.

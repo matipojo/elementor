@@ -111,7 +111,6 @@ class Widget_Common extends Widget_Base {
 			[
 				'label' => __( 'Entrance Animation', 'elementor' ),
 				'type' => Controls_Manager::ANIMATION,
-				'default' => '',
 				'prefix_class' => 'animated ',
 				'label_block' => false,
 				'frontend_available' => true,
@@ -169,10 +168,8 @@ class Widget_Common extends Widget_Base {
 			[
 				'label' => __( 'CSS Classes', 'elementor' ),
 				'type' => Controls_Manager::TEXT,
-				'default' => '',
 				'prefix_class' => '',
 				'title' => __( 'Add your custom class WITHOUT the dot. e.g: my-class', 'elementor' ),
-				'label_block' => false,
 			]
 		);
 
@@ -267,7 +264,7 @@ class Widget_Common extends Widget_Base {
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'_border_radius',
 			[
 				'label' => __( 'Border Radius', 'elementor' ),
@@ -304,7 +301,7 @@ class Widget_Common extends Widget_Base {
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'_border_radius_hover',
 			[
 				'label' => __( 'Border Radius', 'elementor' ),

@@ -1,7 +1,6 @@
-var ViewModule = require( 'elementor-utils/view-module' ),
-	NewTemplateLayout = require( 'elementor-admin/new-template/layout' );
+var NewTemplateLayout = require( 'elementor-admin/new-template/layout' );
 
-var NewTemplateModule = ViewModule.extend( {
+var NewTemplateModule = elementorModules.ViewModule.extend( {
 
 	getDefaultSettings: function() {
 		return {
@@ -21,16 +20,24 @@ var NewTemplateModule = ViewModule.extend( {
 
 	bindEvents: function() {
 		this.elements.$addButton.on( 'click', this.onAddButtonClick );
+
+		elementorCommon.elements.$window.on( 'hashchange', this.showModalByHash.bind( this ) );
+	},
+
+	showModalByHash: function() {
+		if ( '#add_new' === location.hash ) {
+			this.layout.showModal();
+
+			location.hash = '';
+		}
 	},
 
 	onInit: function() {
-		ViewModule.prototype.onInit.apply( this, arguments );
+		elementorModules.ViewModule.prototype.onInit.apply( this, arguments );
 
 		this.layout = new NewTemplateLayout();
 
-		if ( '#add_new' === location.hash ) {
-			this.layout.showModal();
-		}
+		this.showModalByHash();
 	},
 
 	onAddButtonClick: function( event ) {

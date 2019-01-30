@@ -248,7 +248,7 @@ helpers = {
 		}
 
 		var $scrolled = $parent,
-			$elementorFrontendWindow = elementorFrontend.getElements( '$window' );
+			$elementorFrontendWindow = elementorFrontend.elements.$window;
 
 		if ( ! $parent ) {
 			$parent = $elementorFrontendWindow;

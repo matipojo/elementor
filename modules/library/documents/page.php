@@ -32,7 +32,7 @@ class Page extends Library_Document {
 		$properties = parent::get_properties();
 
 		$properties['support_wp_page_templates'] = true;
-		$properties['group'] = 'pages';
+
 		return $properties;
 	}
 
@@ -83,5 +83,13 @@ class Page extends Library_Document {
 		Post::register_hide_title_control( $this );
 
 		Post::register_style_controls( $this );
+	}
+
+	protected function get_remote_library_config() {
+		$config = parent::get_remote_library_config();
+
+		$config['type'] = 'page';
+
+		return $config;
 	}
 }

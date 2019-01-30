@@ -1,7 +1,4 @@
-var ViewModule = require( 'elementor-utils/view-module' ),
-	MaintenanceModeModule;
-
-MaintenanceModeModule = ViewModule.extend( {
+module.exports = elementorModules.ViewModule.extend( {
 	getDefaultSettings: function() {
 		return {
 			selectors: {
@@ -87,9 +84,8 @@ MaintenanceModeModule = ViewModule.extend( {
 	},
 
 	onInit: function() {
-		ViewModule.prototype.onInit.apply( this, arguments );
+		elementorModules.ViewModule.prototype.onInit.apply( this, arguments );
+
 		elementorCommon.elements.$window.on( 'elementor/admin/init', this.onAdminInit );
 	},
 } );
-
-module.exports = MaintenanceModeModule;

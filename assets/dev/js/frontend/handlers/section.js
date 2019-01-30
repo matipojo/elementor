@@ -116,7 +116,7 @@ var BackgroundVideo = HandlerModule.extend( {
 			},
 		} );
 
-		elementorFrontend.getElements( '$window' ).on( 'resize', self.changeVideoSize );
+		elementorFrontend.elements.$window.on( 'resize', self.changeVideoSize );
 	},
 
 	activate: function() {
@@ -187,7 +187,7 @@ var StretchedSection = HandlerModule.extend( {
 	},
 
 	initStretch: function() {
-		this.stretchElement = new elementorFrontend.modules.StretchElement( {
+		this.stretchElement = new elementorModules.frontend.tools.StretchElement( {
 			element: this.$element,
 			selectors: {
 				container: this.getStretchContainer(),
@@ -325,28 +325,35 @@ var HandlesPosition = HandlerModule.extend( {
     },
 
     getOffset: function() {
-        return this.$element.offset().top;
-    },
+		if ( 'body' === elementor.config.document.container ) {
+			return this.$element.offset().top;
+		}
+
+		var $container = jQuery( elementor.config.document.container );
+		return this.$element.offset().top - $container.offset().top;
+	},
 
     setHandlesPosition: function() {
         var self = this;
 
-        if ( self.isFirst() ) {
-            var offset = self.getOffset(),
-                $handlesElement = self.$element.find( '> .elementor-element-overlay > .elementor-editor-section-settings' ),
-                insideHandleClass = 'elementor-section--handles-inside';
+        if ( ! self.isFirst() ) {
+			return;
+        }
 
-            if ( offset < 25 ) {
-                self.$element.addClass( insideHandleClass );
+        var offset = self.getOffset(),
+            $handlesElement = self.$element.find( '> .elementor-element-overlay > .elementor-editor-section-settings' ),
+            insideHandleClass = 'elementor-section--handles-inside';
 
-                if ( offset < -5 ) {
-                    $handlesElement.css( 'top', -offset );
-                } else {
-                    $handlesElement.css( 'top', '' );
-                }
+		if ( offset < 25 ) {
+            self.$element.addClass( insideHandleClass );
+
+            if ( offset < -5 ) {
+                $handlesElement.css( 'top', -offset );
             } else {
-                self.$element.removeClass( insideHandleClass );
+                $handlesElement.css( 'top', '' );
             }
+        } else {
+            self.$element.removeClass( insideHandleClass );
         }
     },
 

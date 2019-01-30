@@ -1,7 +1,6 @@
 import environment from '../../../../../../core/common/assets/js/utils/environment';
 
-var BaseSettingsModel = require( 'elementor-elements/models/base-settings' ),
-	ControlsCSSParser = require( 'elementor-editor-utils/controls-css-parser' ),
+var ControlsCSSParser = require( 'elementor-editor-utils/controls-css-parser' ),
 	Validator = require( 'elementor-validator/base' ),
 	BaseContainer = require( 'elementor-views/base-container' ),
 	BaseElementView;
@@ -154,7 +153,7 @@ BaseElementView = BaseContainer.extend( {
 						shortcut: controlSign + '+⇧+V',
 						callback: this.pasteStyle.bind( this ),
 						isEnabled: function() {
-							return !! elementor.getStorage( 'transfer' );
+							return !! elementorCommon.storage.get( 'transfer' );
 						},
 					}, {
 						name: 'resetStyle',
@@ -195,7 +194,7 @@ BaseElementView = BaseContainer.extend( {
 	},
 
 	startTransport: function( type ) {
-		elementor.setStorage( 'transfer', {
+		elementorCommon.storage.set( 'transfer', {
 			type: type,
 			elementsType: this.getElementType(),
 			elements: [ this.model.toJSON( { copyHtmlCache: true } ) ],
@@ -215,7 +214,7 @@ BaseElementView = BaseContainer.extend( {
 	},
 
 	isPasteEnabled: function() {
-		var transferData = elementor.getStorage( 'transfer' );
+		var transferData = elementorCommon.storage.get( 'transfer' );
 
 		if ( ! transferData || this.isCollectionFilled() ) {
 			return false;
@@ -233,18 +232,18 @@ BaseElementView = BaseContainer.extend( {
 	},
 
 	duplicate: function() {
-		var oldTransport = elementor.getStorage( 'transfer' );
+		var oldTransport = elementorCommon.storage.get( 'transfer' );
 
 		this.copy();
 
 		this.paste();
 
-		elementor.setStorage( 'transfer', oldTransport );
+		elementorCommon.storage.set( 'transfer', oldTransport );
 	},
 
 	pasteStyle: function() {
 		var self = this,
-			transferData = elementor.getStorage( 'transfer' ),
+			transferData = elementorCommon.storage.get( 'transfer' ),
 			sourceElement = transferData.elements[ 0 ],
 			sourceSettings = sourceElement.settings,
 			editModel = self.getEditModel(),
@@ -552,15 +551,15 @@ BaseElementView = BaseContainer.extend( {
 		var self = this;
 
 		_.defer( function() {
-			elementorFrontend.elementsHandler.runReadyTrigger( self.$el );
+			elementorFrontend.elementsHandler.runReadyTrigger( self.el );
 
 			if ( ! elementorFrontend.isEditMode() ) {
 				return;
 			}
 
-			// In edit mode - handle an external elements which loaded by another elements like shortcode etc.
+			// In edit mode - handle an external elements that loaded by another elements like shortcode etc.
 			self.$el.find( '.elementor-element.elementor-' + self.model.get( 'elType' ) + ':not(.elementor-element-edit-mode)' ).each( function() {
-				elementorFrontend.elementsHandler.runReadyTrigger( jQuery( this ) );
+				elementorFrontend.elementsHandler.runReadyTrigger( this );
 			} );
 		} );
 	},
@@ -579,7 +578,7 @@ BaseElementView = BaseContainer.extend( {
 		}
 
 		// Make sure is correct model
-		if ( settings instanceof BaseSettingsModel ) {
+		if ( settings instanceof elementorModules.editor.elements.models.BaseSettings ) {
 			var hasChanged = settings.hasChanged(),
 				isContentChanged = ! hasChanged,
 				isRenderRequired = ! hasChanged;
@@ -759,7 +758,7 @@ BaseElementView = BaseContainer.extend( {
 			return;
 		}
 
-		elementorFrontend.getElements( 'window' ).document.activeElement.blur();
+		elementorFrontend.elements.window.document.activeElement.blur();
 	},
 
 	onDestroy: function() {

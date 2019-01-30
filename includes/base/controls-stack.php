@@ -386,7 +386,7 @@ abstract class Controls_Stack extends Base_Object {
 				$args = array_replace_recursive( $target_section_args, $args );
 
 				if ( null !== $target_tab ) {
-					$args = array_merge( $args, $target_tab );
+					$args = array_replace_recursive( $target_tab, $args );
 				}
 			} elseif ( empty( $args['section'] ) && ( ! $options['overwrite'] || is_wp_error( Plugin::$instance->controls_manager->get_control_from_stack( $this->get_unique_name(), $id ) ) ) ) {
 				wp_die( sprintf( '%s::%s: Cannot add a control outside of a section (use `start_controls_section`).', get_called_class(), __FUNCTION__ ) );
@@ -461,7 +461,7 @@ abstract class Controls_Stack extends Base_Object {
 			$section_controls = $this->get_section_controls( $control_id );
 
 			foreach ( $section_controls as $section_control_id => $section_control ) {
-				$this->update_control( $section_control_id, $section_args );
+				$this->update_control( $section_control_id, $section_args, $options );
 			}
 		}
 
@@ -1323,9 +1323,9 @@ abstract class Controls_Stack extends Base_Object {
 	 * @access public
 	 *
 	 * @param string $section_id Section ID.
-	 * @param array  $args       Section arguments.
+	 * @param array  $args       Section arguments Optional.
 	 */
-	public function start_controls_section( $section_id, array $args ) {
+	public function start_controls_section( $section_id, array $args = [] ) {
 		$section_name = $this->get_name();
 
 		/**
@@ -1489,22 +1489,26 @@ abstract class Controls_Stack extends Base_Object {
 	 * @access public
 	 *
 	 * @param string $tabs_id Tabs ID.
+	 * @param array  $args    Tabs arguments.
 	 */
-	public function start_controls_tabs( $tabs_id ) {
+	public function start_controls_tabs( $tabs_id, array $args = [] ) {
 		if ( null !== $this->current_tab ) {
 			wp_die( sprintf( 'Elementor: You can\'t start tabs before the end of the previous tabs "%s".', $this->current_tab['tabs_wrapper'] ) ); // XSS ok.
 		}
 
-		$this->add_control(
-			$tabs_id,
-			[
-				'type' => Controls_Manager::TABS,
-			]
-		);
+		$args['type'] = Controls_Manager::TABS;
+
+		$this->add_control( $tabs_id, $args );
 
 		$this->current_tab = [
 			'tabs_wrapper' => $tabs_id,
 		];
+
+		foreach ( [ 'condition', 'conditions' ] as $key ) {
+			if ( ! empty( $args[ $key ] ) ) {
+				$this->current_tab[ $key ] = $args[ $key ];
+			}
+		}
 
 		if ( $this->injection_point ) {
 			$this->injection_point['tab'] = $this->current_tab;

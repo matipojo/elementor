@@ -1,7 +1,5 @@
 ( function( $ ) {
-	var ViewModule = require( 'elementor-utils/view-module' );
-
-	var ElementorAdmin = ViewModule.extend( {
+	var ElementorAdmin = elementorModules.ViewModule.extend( {
 
 		maintenanceMode: null,
 
@@ -47,7 +45,19 @@
 				event.preventDefault();
 
 				if ( self.isElementorMode() ) {
-					self.elements.$switchModeInput.val( '' );
+					elementorCommon.dialogsManager.createWidget( 'confirm', {
+						message: self.translate( 'back_to_wordpress_editor_message' ),
+						headerMessage: self.translate( 'back_to_wordpress_editor_header' ),
+						strings: {
+							confirm: self.translate( 'yes' ),
+							cancel: self.translate( 'cancel' ),
+						},
+						defaultOption: 'confirm',
+						onConfirm: function() {
+							self.elements.$switchModeInput.val( '' );
+							self.toggleStatus();
+						},
+					} ).show();
 				} else {
 					self.elements.$switchModeInput.val( true );
 
@@ -68,9 +78,8 @@
 
 						location.href = self.elements.$goToEditLink.attr( 'href' );
 					} );
+					self.toggleStatus();
 				}
-
-				self.toggleStatus();
 			} );
 
 			self.elements.$goToEditLink.on( 'click', function() {
@@ -195,7 +204,7 @@
 		},
 
 		onInit: function() {
-			ViewModule.prototype.onInit.apply( this, arguments );
+			elementorModules.ViewModule.prototype.onInit.apply( this, arguments );
 
 			this.initTemplatesImport();
 
@@ -249,17 +258,19 @@
 		},
 
 		goToSettingsTab: function( tabName ) {
-			var $activePage = this.elements.$settingsFormPages.filter( '#' + tabName );
+			const $pages = this.elements.$settingsFormPages;
 
-			if ( ! $activePage.length ) {
+			if ( ! $pages.length ) {
 				return;
 			}
+
+			const $activePage = $pages.filter( '#' + tabName );
 
 			this.elements.$activeSettingsPage.removeClass( 'elementor-active' );
 
 			this.elements.$activeSettingsTab.removeClass( 'nav-tab-active' );
 
-			var $activeTab = this.elements.$settingsTabs.filter( '#elementor-settings-' + tabName );
+			const $activeTab = this.elements.$settingsTabs.filter( '#elementor-settings-' + tabName );
 
 			$activePage.addClass( 'elementor-active' );
 

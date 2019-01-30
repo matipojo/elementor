@@ -27,6 +27,7 @@
 	.elementor-control-title {
 		font-size: 12px;
 		line-height: 1;
+		@include margin-end(5px);
 	}
 
 	.elementor-control-spinner {
@@ -194,23 +195,6 @@
 		width: 100% !important;
 		outline: none;
 
-		&:not(.select2-container--open):not(.select2-container--focus) {
-
-			.select2-selection--single,
-			.select2-selection--multiple {
-				border-color: $editor-lightest;
-			}
-		}
-
-		&.select2-container--open,
-		&.select2-container--focus {
-
-			.select2-selection--single,
-			.select2-selection--multiple {
-				border-color: $editor-light;
-			}
-		}
-
 		&.select2-container--default {
 
 			.select2-selection--multiple {
@@ -355,12 +339,13 @@
 		> .elementor-control-field {
 
 			> .elementor-control-title {
-				width: 45%;
 				flex-shrink: 0;
 			}
 
 			> .elementor-control-input-wrapper {
 				width: 55%;
+				flex-shrink: 1;
+				@include margin-start(auto);
 			}
 		}
 	}
@@ -492,7 +477,7 @@
 
 .elementor-control-responsive-switchers {
 	display: flex;
-	margin: 0 5px;
+	@include margin-end(5px);
 
 	.elementor-responsive-switcher {
 		$icon-size: 18px;
@@ -504,11 +489,14 @@
 		background-color: $editor-light;
 		cursor: pointer;
 		position: relative;
-		@include margin-start(5px);
 		color: #fff;
 		font-size: 8px;
 		text-align: center;
 		transition: background-color .5s;
+
+		&:not(:first-child) {
+			@include margin-start(5px);
+		}
 
 		&:hover {
 			background-color: $editor-lighter;
@@ -530,7 +518,7 @@
 	}
 }
 
-.elementor-device-desktop #elementor-panel .elementor-panel-controls-stack:not(.elementor-responsive-switchers-open) .elementor-responsive-switcher {
+.elementor-device-desktop #elementor-panel .elementor-controls-stack:not(.elementor-responsive-switchers-open) .elementor-responsive-switcher {
 	background: $editor-lighter;
 
 	&:not(.elementor-responsive-switcher-desktop) {
@@ -634,5 +622,7 @@
 @import "controls/popover-toggle";
 
 @import "controls/button";
+
+@import "controls/number";
 
 @import "controls/control-group-css-filters";

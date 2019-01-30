@@ -21,9 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 </script>
 
 <script type="text/template" id="tmpl-elementor-template-library-header-menu">
-	<div id="elementor-template-library-menu-pre-made-blocks" class="elementor-template-library-menu-item" data-template-source="remote" data-template-type="block"><?php echo __( 'Blocks', 'elementor' ); ?></div>
-	<div id="elementor-template-library-menu-pre-made-pages" class="elementor-template-library-menu-item" data-template-source="remote" data-template-type="page"><?php echo __( 'Pages', 'elementor' ); ?></div>
-	<div id="elementor-template-library-menu-my-templates" class="elementor-template-library-menu-item" data-template-source="local"><?php echo __( 'My Templates', 'elementor' ); ?></div>
+	<# screens.forEach( ( screen ) => { #>
+		<div class="elementor-template-library-menu-item" data-template-source="{{{ screen.source }}}"{{{ screen.type ? ' data-template-type="' + screen.type + '"' : '' }}}>{{{ screen.title }}}</div>
+	<# } ); #>
 </script>
 
 <script type="text/template" id="tmpl-elementor-template-library-header-preview">
@@ -69,18 +69,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<input type="radio" id="elementor-template-library-order-popular" class="elementor-template-library-order-input" name="elementor-template-library-order" value="popularityIndex">
 						<label for="elementor-template-library-order-popular" class="elementor-template-library-order-label"><?php echo __( 'Popular', 'elementor' ); ?></label>
 					</div>
-				<# } else { #>
-					<div id="elementor-template-library-filter">
-						<select id="elementor-template-library-filter-subtype" class="elementor-template-library-filter-select" data-elementor-filter="subtype">
-							<option></option>
-							<# elementor.templates.getConfig( 'categories' ).forEach( function( category ) {
-								var selected = category === elementor.templates.getFilter( 'subtype' ) ? ' selected' : '';
-								#>
-								<option value="{{ category }}"{{{ selected }}}>{{{ category }}}</option>
-							<# } ); #>
-						</select>
-					</div>
-				<# } #>
+				<# } else {
+					var config = elementor.templates.getConfig( activeType );
+					if ( config.categories ) { #>
+						<div id="elementor-template-library-filter">
+							<select id="elementor-template-library-filter-subtype" class="elementor-template-library-filter-select" data-elementor-filter="subtype">
+								<option></option>
+								<# config.categories.forEach( function( category ) {
+									var selected = category === elementor.templates.getFilter( 'subtype' ) ? ' selected' : '';
+									#>
+									<option value="{{ category }}"{{{ selected }}}>{{{ category }}}</option>
+								<# } ); #>
+							</select>
+						</div>
+					<# }
+				} #>
 				<div id="elementor-template-library-my-favorites">
 					<# var checked = elementor.templates.getFilter( 'favorite' ) ? ' checked' : ''; #>
 					<input id="elementor-template-library-filter-my-favorites" type="checkbox"{{{ checked }}}>

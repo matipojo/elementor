@@ -17,27 +17,37 @@ TemplateLibraryImportView = Marionette.ItemView.extend( {
 	droppedFiles: null,
 
 	submitForm: function() {
-		var layout = elementor.templates.getLayout(),
-			data = new FormData();
+		let file;
 
 		if ( this.droppedFiles ) {
-			data.append( 'file', this.droppedFiles[ 0 ] );
+			file = this.droppedFiles[ 0 ];
 
 			this.droppedFiles = null;
 		} else {
-			data.append( 'file', this.ui.fileInput[ 0 ].files[ 0 ] );
+			file = this.ui.fileInput[ 0 ].files[ 0 ];
 
 			this.ui.uploadForm[ 0 ].reset();
 		}
 
-		var options = {
-			data: data,
-			processData: false,
-			contentType: false,
+		const fileReader = new FileReader();
+
+		fileReader.onload = ( event ) => this.importTemplate( file.name, event.target.result.replace( /^[^,]+,/, '' ) );
+
+		fileReader.readAsDataURL( file );
+	},
+
+	importTemplate: function( fileName, fileData ) {
+		const layout = elementor.templates.getLayout();
+
+		const options = {
+			data: {
+				fileName: fileName,
+				fileData: fileData,
+			},
 			success: ( successData ) => {
 				elementor.templates.getTemplatesCollection().add( successData );
 
-				elementor.templates.setTemplatesPage( 'local' );
+				elementor.templates.setScreen( 'local' );
 			},
 			error: ( errorData ) => {
 				elementor.templates.showErrorDialog( errorData );
@@ -49,7 +59,7 @@ TemplateLibraryImportView = Marionette.ItemView.extend( {
 			},
 		};
 
-		elementor.ajax.send( 'import_template', options );
+		elementorCommon.ajax.addRequest( 'import_template', options );
 
 		layout.showLoadingView();
 	},

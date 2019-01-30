@@ -646,14 +646,6 @@ class Controls_Manager {
 	 * @return bool True if control added, False otherwise.
 	 */
 	public function add_control_to_stack( Controls_Stack $element, $control_id, $control_data, $options = [] ) {
-		if ( ! is_array( $options ) ) {
-			_deprecated_argument( __FUNCTION__, '1.7.0', sprintf( 'Use `[ \'overwrite\' => %s ]` instead.', var_export( $options, true ) ) );
-
-			$options = [
-				'overwrite' => $options,
-			];
-		}
-
 		$default_options = [
 			'overwrite' => false,
 			'index' => null,
@@ -727,7 +719,7 @@ class Controls_Manager {
 	 * @access public
 	 *
 	 * @param string $stack_id   Stack ID.
-	 * @param string $control_id The ID of the control to remove.
+	 * @param array|string $control_id The ID of the control to remove.
 	 *
 	 * @return bool|\WP_Error True if the stack was removed, False otherwise.
 	 */
@@ -868,19 +860,18 @@ class Controls_Manager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param Element_Base $element The element.
-	 * @param string $tab The panel tab.
+	 * @param Controls_Stack $controls_stack.
 	 */
-	public function add_custom_css_controls( $element, $tab = self::TAB_ADVANCED ) {
-		$element->start_controls_section(
+	public function add_custom_css_controls( Controls_Stack $controls_stack ) {
+		$controls_stack->start_controls_section(
 			'section_custom_css_pro',
 			[
 				'label' => __( 'Custom CSS', 'elementor' ),
-				'tab' => $tab,
+				'tab' => self::TAB_ADVANCED,
 			]
 		);
 
-		$element->add_control(
+		$controls_stack->add_control(
 			'custom_css_pro',
 			[
 				'type' => self::RAW_HTML,
@@ -902,6 +893,6 @@ class Controls_Manager {
 			]
 		);
 
-		$element->end_controls_section();
+		$controls_stack->end_controls_section();
 	}
 }

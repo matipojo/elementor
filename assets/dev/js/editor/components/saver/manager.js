@@ -1,6 +1,4 @@
-var Module = require( 'elementor-utils/module' );
-
-module.exports = Module.extend( {
+module.exports = elementorModules.Module.extend( {
 	autoSaveTimer: null,
 
 	autosaveInterval: elementor.config.autosave_interval * 1000,
@@ -71,7 +69,7 @@ module.exports = Module.extend( {
 
 	discard: function() {
 		var self = this;
-		elementor.ajax.addRequest( 'discard_changes', {
+		elementorCommon.ajax.addRequest( 'discard_changes', {
 			success: function() {
 				self.setFlagEditorChange( false );
 				location.href = elementor.config.document.urls.exit_to_dashboard;
@@ -113,11 +111,39 @@ module.exports = Module.extend( {
 
 	setWorkSaver: function() {
 		var self = this;
-		elementor.$window.on( 'beforeunload', function() {
+		elementorCommon.elements.$window.on( 'beforeunload', function() {
 			if ( self.isEditorChanged() ) {
 				return elementor.translate( 'before_unload_alert' );
 			}
 		} );
+	},
+
+	defaultSave: function() {
+		const postStatus = elementor.settings.page.model.get( 'post_status' );
+
+		switch ( postStatus ) {
+			case 'publish':
+			case 'future':
+			case 'private':
+				this.update();
+
+				break;
+			case 'draft':
+				if ( elementor.config.current_user_can_publish ) {
+					this.publish();
+				} else {
+					this.savePending();
+				}
+
+				break;
+			case 'pending': // User cannot change post status
+			case undefined: // TODO: as a contributor it's undefined instead of 'pending'.
+				if ( elementor.config.current_user_can_publish ) {
+					this.publish();
+				} else {
+					this.update();
+				}
+		}
 	},
 
 	saveEditor: function( options ) {
@@ -145,7 +171,7 @@ module.exports = Module.extend( {
 
 		settings.post_status = options.status;
 
-		elementor.ajax.addRequest( 'save_builder', {
+		elementorCommon.ajax.addRequest( 'save_builder', {
 			data: {
 				status: options.status,
 				elements: elements,
@@ -196,7 +222,7 @@ module.exports = Module.extend( {
 				if ( _.isString( data ) ) {
 					message = data;
 				} else if ( data.statusText ) {
-					message = elementor.ajax.createErrorMessage( data );
+					message = elementor.createAjaxErrorMessage( data );
 
 					if ( 0 === data.readyState ) {
 						message += ' ' + elementor.translate( 'saving_disabled' );
@@ -210,6 +236,8 @@ module.exports = Module.extend( {
 				} );
 			},
 		} );
+
+		this.trigger( 'save', options );
 	},
 
 	afterAjax: function() {

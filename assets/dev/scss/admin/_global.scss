@@ -2,8 +2,7 @@
 // Dashboard Icon
 #adminmenu {
 
-	#toplevel_page_elementor,
-	#toplevel_page_edit-post_type-elementor_library {
+	#toplevel_page_elementor {
 
 		div.wp-menu-image:before {
 			content: "\e801";
@@ -19,6 +18,18 @@
 
 		.dashicons.dashicons-star-filled {
 			height: auto;
+		}
+	}
+
+	#menu-posts-elementor_library {
+
+		.wp-menu-image {
+
+			&:before {
+				content: '\e1037';
+				font-family: eicons;
+				font-size: 18px;
+			}
 		}
 	}
 }
@@ -55,7 +66,8 @@
 
 	i {
 		@include margin-end(3px);
-		font-size: 19px;
+		font-size: 125%;
+		font-style: normal;
 	}
 }
 
@@ -130,7 +142,7 @@ body {
 		}
 	}
 
-	.gutenberg {
+	.block-editor {
 
 		#elementor-switch-mode {
 			margin: 0 15px;
@@ -142,7 +154,6 @@ body {
 				line-height: 1;
 
 				i {
-					font-size: 125%;
 					@include padding-end(5px);
 				}
 			}

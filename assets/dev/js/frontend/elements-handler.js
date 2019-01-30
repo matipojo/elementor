@@ -30,33 +30,14 @@ ElementsHandler = function( $ ) {
 		} );
 	};
 
-	var runElementsHandlers = function() {
-		var $elements;
-
-		if ( elementorFrontend.isEditMode() ) {
-			// Elements outside from the Preview
-			$elements = jQuery( '.elementor-element', '.elementor:not(.elementor-edit-mode)' );
-		} else {
-			$elements = $( '.elementor-element' );
-		}
-
-		$elements.each( function() {
-			self.runReadyTrigger( $( this ) );
-		} );
-	};
-
 	var init = function() {
-		if ( ! elementorFrontend.isEditMode() ) {
-			self.initHandlers();
-		}
+		self.initHandlers();
 	};
 
 	this.initHandlers = function() {
 		addGlobalHandlers();
 
 		addElementsHandlers();
-
-		runElementsHandlers();
 	};
 
 	this.getHandlers = function( handlerName ) {
@@ -67,19 +48,18 @@ ElementsHandler = function( $ ) {
 		return handlers;
 	};
 
-	this.runReadyTrigger = function( $scope ) {
-		var elementType = $scope.attr( 'data-element_type' );
+	this.runReadyTrigger = function( scope ) {
+		// Initializing the `$scope` as frontend jQuery instance
+		const $scope = jQuery( scope ),
+			elementType = $scope.attr( 'data-element_type' );
 
 		if ( ! elementType ) {
 			return;
 		}
 
-		// Initializing the `$scope` as frontend jQuery instance
-		$scope = jQuery( $scope );
-
 		elementorFrontend.hooks.doAction( 'frontend/element_ready/global', $scope, $ );
 
-		var isWidgetType = ( -1 === [ 'section', 'column' ].indexOf( elementType ) );
+		const isWidgetType = ( -1 === [ 'section', 'column' ].indexOf( elementType ) );
 
 		if ( isWidgetType ) {
 			elementorFrontend.hooks.doAction( 'frontend/element_ready/widget', $scope, $ );

@@ -8,11 +8,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 foreach ( $reports as $report_name => $report ) : ?>
-	<div class="elementor-system-info-section">
+	<div class="elementor-system-info-section elementor-system-info-<?php echo esc_attr( $report_name ); ?>">
 		<table class="widefat">
 			<thead>
 			<tr>
-				<th style="width: 15%;"><?php echo $report['label']; ?></th>
+				<th><?php echo $report['label']; ?></th>
 				<th></th>
 				<th></th>
 			</tr>
@@ -55,9 +55,10 @@ foreach ( $reports as $report_name => $report ) : ?>
 					endforeach;
 				else :
 					$warning_class = ! empty( $field['warning'] ) ? ' class="elementor-warning"' : '';
+					$log_label = ! empty( $field['label'] ) ? $field['label'] . ':' : '';
 					?>
 					<tr<?php echo $warning_class; ?>>
-						<td><?php echo $field['label']; ?>:</td>
+						<td><?php echo $log_label; ?></td>
 						<td><?php echo $field['value']; ?></td>
 						<td><?php
 						if ( ! empty( $field['recommendation'] ) ) {

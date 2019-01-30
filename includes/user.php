@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Core\Common\Modules\Ajax\Module as Ajax;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -22,8 +24,6 @@ class User {
 
 	const INTRODUCTION_KEY = 'elementor_introduction';
 
-	const INTRODUCTION_VERSION = 2;
-
 	/**
 	 * Init.
 	 *
@@ -40,8 +40,13 @@ class User {
 		add_action( 'elementor/ajax/register_actions', [ __CLASS__, 'register_ajax_actions' ] );
 	}
 
-	public static function register_ajax_actions() {
-		Plugin::$instance->ajax->register_ajax_action( 'introduction_viewed', [ __CLASS__, 'set_introduction_viewed' ] );
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 * @static
+	 */
+	public static function register_ajax_actions( Ajax $ajax ) {
+		$ajax->register_ajax_action( 'introduction_viewed', [ __CLASS__, 'set_introduction_viewed' ] );
 	}
 
 	/**
@@ -95,6 +100,7 @@ class User {
 	 *
 	 * Whether the current user role is not excluded by Elementor Settings.
 	 *
+	 * @since 2.1.7
 	 * @access public
 	 * @static
 	 *
@@ -173,6 +179,7 @@ class User {
 	 */
 	public static function is_user_notice_viewed( $notice_id ) {
 		$notices = self::get_user_notices();
+
 		if ( empty( $notices ) || empty( $notices[ $notice_id ] ) ) {
 			return false;
 		}
@@ -212,25 +219,31 @@ class User {
 		wp_die();
 	}
 
-	public static function set_introduction_viewed() {
+	/**
+	 * @since 2.1.0
+	 * @access public
+	 * @static
+	 */
+	public static function set_introduction_viewed( array $data ) {
 		$user_introduction_meta = self::get_introduction_meta();
+
+		$user_introduction_meta[ $data['introductionKey'] ] = true;
+
+		update_user_meta( get_current_user_id(), self::INTRODUCTION_KEY, $user_introduction_meta );
+	}
+
+	/**
+	 * @since 2.1.0
+	 * @access private
+	 * @static
+	 */
+	public static function get_introduction_meta() {
+		$user_introduction_meta = get_user_meta( get_current_user_id(), self::INTRODUCTION_KEY, true );
 
 		if ( ! $user_introduction_meta ) {
 			$user_introduction_meta = [];
 		}
 
-		$user_introduction_meta[ self::INTRODUCTION_VERSION ] = true;
-
-		update_user_meta( get_current_user_id(), self::INTRODUCTION_KEY, $user_introduction_meta );
-	}
-
-	public static function is_should_view_introduction() {
-		$user_introduction_meta = self::get_introduction_meta();
-
-		return empty( $user_introduction_meta[ self::INTRODUCTION_VERSION ] );
-	}
-
-	private static function get_introduction_meta() {
-		return get_user_meta( get_current_user_id(), self::INTRODUCTION_KEY, true );
+		return $user_introduction_meta;
 	}
 }

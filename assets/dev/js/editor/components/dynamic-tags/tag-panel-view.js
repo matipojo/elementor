@@ -1,5 +1,4 @@
-var TagControlsStack = require( 'elementor-dynamic-tags/tag-controls-stack' ),
-	SettingsModel = require( 'elementor-elements/models/base-settings' );
+var TagControlsStack = require( 'elementor-dynamic-tags/tag-controls-stack' );
 
 module.exports = Marionette.ItemView.extend( {
 
@@ -60,7 +59,7 @@ module.exports = Marionette.ItemView.extend( {
 			},
 		};
 
-		var settingsPopup = elementor.dialogsManager.createWidget( 'buttons', settingsPopupOptions );
+		var settingsPopup = elementorCommon.dialogsManager.createWidget( 'buttons', settingsPopupOptions );
 
 		this.getSettingsPopup = function() {
 			return settingsPopup;
@@ -89,6 +88,8 @@ module.exports = Marionette.ItemView.extend( {
 		this.tagControlsStack = new TagControlsStack( {
 			model: this.model,
 			controls: this.model.controls,
+			name: this.options.name,
+			controlName: this.options.controlName,
 			el: this.getSettingsPopup().getElements( 'message' )[ 0 ],
 		} );
 
@@ -96,7 +97,7 @@ module.exports = Marionette.ItemView.extend( {
 	},
 
 	initModel: function() {
-		this.model = new SettingsModel( this.getOption( 'settings' ), {
+		this.model = new elementorModules.editor.elements.models.BaseSettings( this.getOption( 'settings' ), {
 			controls: this.getTagConfig().controls,
 		} );
 	},

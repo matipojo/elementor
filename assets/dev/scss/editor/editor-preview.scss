@@ -78,8 +78,9 @@ html.elementor-html {
 			transition: all .1s;
 		}
 
-		&.elementor-element-editable, &.elementor-element-edit-mode:hover {
-			outline: 1px solid $editor-info;
+		&.elementor-element-editable,
+		&.elementor-element-edit-mode:hover {
+			box-shadow: 0 0 0 1px $editor-info;
 		}
 
 		&:not(:hover) {
@@ -880,14 +881,5 @@ html.elementor-html {
 	.elementor-element-empty,
 	.elementor-widget-empty {
 		display: none;
-	}
-}
-
-.elementor.elementor-edit-area-active {
-
-	.elementor-hidden-desktop,
-	.elementor-hidden-tablet,
-	.elementor-hidden-phone {
-		display: block;
 	}
 }

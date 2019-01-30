@@ -1,7 +1,6 @@
 <?php
 namespace Elementor\Testing\Modules\Library\Documents;
 
-use Elementor\Core\Base\Document;
 use Elementor\Modules\Library\Documents\Page;
 use Elementor\Testing\Elementor_Test_Base;
 
@@ -19,7 +18,6 @@ class Elementor_Test_Page extends Elementor_Test_Base {
 		$properties = Page::get_properties();
 
 		$this->assertTrue( $properties['support_wp_page_templates'] );
-		$this->assertEquals( $properties['group'], 'pages' );
 	}
 
 	public function test_should_return_name() {

@@ -1,16 +1,12 @@
 ( function( $ ) {
-	var ViewModule = require( 'elementor-utils/view-module' );
-
-	var ElementorAdmin = ViewModule.extend( {
+	var ElementorAdmin = elementorModules.ViewModule.extend( {
 
 		maintenanceMode: null,
 
-		config: ElementorAdminConfig,
+		config: elementorAdminConfig,
 
 		getDefaultElements: function() {
 			var elements = {
-				$window: $( window ),
-				$body: $( 'body' ),
 				$switchMode: $( '#elementor-switch-mode' ),
 				$goToEditLink: $( '#elementor-go-to-edit-page-link' ),
 				$switchModeInput: $( '#elementor-switch-mode-input' ),
@@ -37,7 +33,7 @@
 		toggleStatus: function() {
 			var isElementorMode = this.isElementorMode();
 
-			this.elements.$body
+			elementorCommon.elements.$body
 				.toggleClass( 'elementor-editor-active', isElementorMode )
 				.toggleClass( 'elementor-editor-inactive', ! isElementorMode );
 		},
@@ -49,7 +45,19 @@
 				event.preventDefault();
 
 				if ( self.isElementorMode() ) {
-					self.elements.$switchModeInput.val( '' );
+					elementorCommon.dialogsManager.createWidget( 'confirm', {
+						message: self.translate( 'back_to_wordpress_editor_message' ),
+						headerMessage: self.translate( 'back_to_wordpress_editor_header' ),
+						strings: {
+							confirm: self.translate( 'yes' ),
+							cancel: self.translate( 'cancel' ),
+						},
+						defaultOption: 'confirm',
+						onConfirm: function() {
+							self.elements.$switchModeInput.val( '' );
+							self.toggleStatus();
+						},
+					} ).show();
 				} else {
 					self.elements.$switchModeInput.val( true );
 
@@ -66,13 +74,12 @@
 					self.animateLoader();
 
 					$( document ).on( 'heartbeat-tick.autosave', function() {
-						self.elements.$window.off( 'beforeunload.edit-post' );
+						elementorCommon.elements.$window.off( 'beforeunload.edit-post' );
 
 						location.href = self.elements.$goToEditLink.attr( 'href' );
 					} );
+					self.toggleStatus();
 				}
-
-				self.toggleStatus();
 			} );
 
 			self.elements.$goToEditLink.on( 'click', function() {
@@ -147,7 +154,7 @@
 							$this.addClass( 'success' );
 						}
 
-						self.getDialogsManager().createWidget( 'alert', {
+						elementorCommon.dialogsManager.createWidget( 'alert', {
 								message: response.data,
 							} ).show();
 					} );
@@ -173,12 +180,12 @@
 
 				var $this = $( this );
 
-				self.getDialogsManager().createWidget( 'confirm', {
-					headerMessage: self.config.i18n.rollback_to_previous_version,
-					message: self.config.i18n.rollback_confirm,
+				elementorCommon.dialogsManager.createWidget( 'confirm', {
+					headerMessage: self.translate( 'rollback_to_previous_version' ),
+					message: self.translate( 'rollback_confirm' ),
 					strings: {
-						confirm: self.config.i18n.yes,
-						cancel: self.config.i18n.cancel,
+						confirm: self.translate( 'yes' ),
+						cancel: self.translate( 'cancel' ),
 					},
 					onConfirm: function() {
 						$this.addClass( 'loading' );
@@ -196,26 +203,8 @@
 			} ).trigger( 'change' );
 		},
 
-		setMarionetteTemplateCompiler: function() {
-			if ( 'undefined' !== typeof Marionette ) {
-				Marionette.TemplateCache.prototype.compileTemplate = function( rawTemplate, options ) {
-					options = {
-						evaluate: /<#([\s\S]+?)#>/g,
-						interpolate: /{{{([\s\S]+?)}}}/g,
-						escape: /{{([^}]+?)}}(?!})/g,
-					};
-
-					return _.template( rawTemplate, options );
-				};
-			}
-		},
-
 		onInit: function() {
-			ViewModule.prototype.onInit.apply( this, arguments );
-
-			this.setMarionetteTemplateCompiler();
-
-			this.initDialogsManager();
+			elementorModules.ViewModule.prototype.onInit.apply( this, arguments );
 
 			this.initTemplatesImport();
 
@@ -226,20 +215,8 @@
 			this.roleManager.init();
 		},
 
-		initDialogsManager: function() {
-			var dialogsManager;
-
-			this.getDialogsManager = function() {
-				if ( ! dialogsManager ) {
-					dialogsManager = new DialogsManager.Instance();
-				}
-
-				return dialogsManager;
-			};
-		},
-
 		initTemplatesImport: function() {
-			if ( ! this.elements.$body.hasClass( 'post-type-elementor_library' ) ) {
+			if ( ! elementorCommon.elements.$body.hasClass( 'post-type-elementor_library' ) ) {
 				return;
 			}
 
@@ -281,17 +258,19 @@
 		},
 
 		goToSettingsTab: function( tabName ) {
-			var $activePage = this.elements.$settingsFormPages.filter( '#' + tabName );
+			const $pages = this.elements.$settingsFormPages;
 
-			if ( ! $activePage.length ) {
+			if ( ! $pages.length ) {
 				return;
 			}
+
+			const $activePage = $pages.filter( '#' + tabName );
 
 			this.elements.$activeSettingsPage.removeClass( 'elementor-active' );
 
 			this.elements.$activeSettingsTab.removeClass( 'nav-tab-active' );
 
-			var $activeTab = this.elements.$settingsTabs.filter( '#elementor-settings-' + tabName );
+			const $activeTab = this.elements.$settingsTabs.filter( '#elementor-settings-' + tabName );
 
 			$activePage.addClass( 'elementor-active' );
 
@@ -302,6 +281,10 @@
 			this.elements.$activeSettingsPage = $activePage;
 
 			this.elements.$activeSettingsTab = $activeTab;
+		},
+
+		translate: function( stringKey, templateArgs ) {
+			return elementorCommon.translate( stringKey, null, templateArgs, this.config.i18n );
 		},
 
 		roleManager: {
@@ -375,6 +358,6 @@
 	$( function() {
 		window.elementorAdmin = new ElementorAdmin();
 
-		elementorAdmin.elements.$window.trigger( 'elementor/admin/init' );
+		elementorCommon.elements.$window.trigger( 'elementor/admin/init' );
 	} );
 }( jQuery ) );

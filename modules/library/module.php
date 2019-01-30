@@ -34,28 +34,6 @@ class Module extends BaseModule {
 	}
 
 	/**
-	 * Localize settings.
-	 *
-	 * Add new localized settings for the library module.
-	 *
-	 * Fired by `elementor/editor/localize_settings` filter.
-	 *
-	 * @since 2.0.0
-	 * @access public
-	 *
-	 * @param array $settings Localized settings.
-	 *
-	 * @return array Localized settings.
-	 */
-	public function localize_settings( $settings ) {
-		$settings = array_replace_recursive( $settings, [
-			'i18n' => [],
-		] );
-
-		return $settings;
-	}
-
-	/**
 	 * Library module constructor.
 	 *
 	 * Initializing Elementor library module.
@@ -65,14 +43,8 @@ class Module extends BaseModule {
 	 */
 	public function __construct() {
 		Plugin::$instance->documents
+			->register_document_type( 'not-supported', Documents\Not_Supported::get_class_full_name() )
 			->register_document_type( 'page', Documents\Page::get_class_full_name() )
-			->register_document_type( 'section', Documents\Section::get_class_full_name() )
-			->register_group( 'blocks', [
-				'label' => __( 'Blocks', 'elementor' ),
-			] )->register_group( 'pages', [
-				'label' => __( 'Pages', 'elementor' ),
-			] );
-
-		add_filter( 'elementor/editor/localize_settings', [ $this, 'localize_settings' ] );
+			->register_document_type( 'section', Documents\Section::get_class_full_name() );
 	}
 }

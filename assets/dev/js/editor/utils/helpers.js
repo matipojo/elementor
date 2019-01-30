@@ -11,6 +11,9 @@ helpers = {
 				container: {
 					column: null,
 				},
+				flex_container: {
+					column: null,
+				},
 			},
 		},
 	},

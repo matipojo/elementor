@@ -349,6 +349,8 @@ class Elements_Manager {
 			$this->register_element_type( new $class_name() );
 		}
 
+		$this->register_element_type( new Element_Flex_Container() );
+
 		/**
 		 * After elements registered.
 		 *
@@ -433,6 +435,7 @@ class Elements_Manager {
 		require ELEMENTOR_PATH . 'includes/elements/section.php';
 		require ELEMENTOR_PATH . 'includes/elements/container.php';
 		require ELEMENTOR_PATH . 'includes/elements/collection.php';
+		require ELEMENTOR_PATH . 'includes/elements/flex-container.php';
 		require ELEMENTOR_PATH . 'includes/elements/repeater.php';
 	}
 }

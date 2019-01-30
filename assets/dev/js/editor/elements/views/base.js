@@ -98,6 +98,8 @@ BaseElementView = BaseContainer.extend( {
 			ChildView = require( 'elementor-elements/views/column' );
 		} else if ( 'container' === elType ) {
 			ChildView = require( 'elementor-elements/views/collection' );
+		} else if ( 'flex_container' === elType ) {
+			ChildView = require( 'elementor-elements/views/flex-container' );
 		} else {
 			ChildView = elementor.modules.elements.views.Widget;
 		}
@@ -355,7 +357,7 @@ BaseElementView = BaseContainer.extend( {
 
 		if ( 'widget' === itemData.elType ) {
 			itemData.widgetType = elementView.model.get( 'widgetType' );
-		} else if ( 'section' === itemData.elType || 'container' === itemData.elType ) {
+		} else if ( 'section' === itemData.elType || 'container' === itemData.elType || 'flex_container' === itemData.elType ) {
 			itemData.isInner = true;
 		} else {
 			return;

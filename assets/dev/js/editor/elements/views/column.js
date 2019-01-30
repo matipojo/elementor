@@ -82,7 +82,7 @@ ColumnView = BaseElementView.extend( {
 
 		var elType = elementView.model.get( 'elType' );
 
-		if ( 'section' === elType || 'container' === elType ) {
+		if ( 'section' === elType || 'container' === elType || 'flex_container' === elType ) {
 			return ! this.isInner();
 		}
 

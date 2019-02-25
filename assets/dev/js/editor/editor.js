@@ -3,11 +3,14 @@ import Heartbeat from './utils/heartbeat';
 import Navigator from './regions/navigator/navigator';
 import HotkeysScreen from './components/hotkeys/hotkeys';
 import environment from '../../../../core/common/assets/js/utils/environment.js';
+import Document from './document';
 
 const App = Marionette.Application.extend( {
 	loaded: false,
 
 	previewLoadedOnce: false,
+
+	currentDocument: null,
 
 	helpers: require( 'elementor-editor-utils/helpers' ),
 	imagesManager: require( 'elementor-editor-utils/images-manager' ),
@@ -149,6 +152,10 @@ const App = Marionette.Application.extend( {
 		},
 	},
 
+	getDocument() {
+		return this.currentDocument;
+	},
+
 	userCan: function( capability ) {
 		return -1 === this.config.user.restrictions.indexOf( capability );
 	},
@@ -285,6 +292,12 @@ const App = Marionette.Application.extend( {
 
 		this.elementsModel = new Backbone.Model( {
 			elements: this.elements,
+		} );
+
+		this.currentDocument = new Document( {
+			type: this.config.document.type,
+			elements: this.elements,
+			settings: this.config.settings.page.settings,
 		} );
 	},
 

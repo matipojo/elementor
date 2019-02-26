@@ -1,19 +1,53 @@
-import AddSectionBase from "./views/add-section/base";
-
-class DocumentElements extends elementorModules.Module {
+class Elements extends elementorModules.Module {
 	constructor( args ) {
 		super( ...args );
 
+		this.document = args.document;
 		this.elements = args.elements;
+
+		this.registerCommands();
 	}
 
-	addSection( settings, position = null ) {
-		return elementor.getPreviewView().addChildElement( {
-			elType: 'section',
-			settings: settings,
-		}, {
-			at: position,
+	registerCommands() {
+		elementorCommon.commands.register( 'document/elements/addSection', ( settings, at ) => {
+			return this.addSection( settings, at );
 		} );
+
+		elementorCommon.commands.register( 'document/elements/reset', () => {
+			return this.reset();
+		} );
+
+		elementorCommon.commands.register( 'document/elements/add', ( element ) => {
+			return this.add( element );
+		} );
+	}
+
+	addSection( columns = 1, settings = {}, at = null ) {
+		this.add( 'section', settings, {
+			at: at,
+		} );
+
+		for ( let i = 0; i < columns; i++ ) {
+			this.addColumn();
+		}
+
+		return this;
+	}
+
+	addColumn( settings = {}, at = null ) {
+		this.add( 'column', settings, {
+			at: at,
+		} );
+
+		return this;
+	}
+
+	addWidget( type, settings, at = null ) {
+		this.add( [ 'widget', type ], settings, {
+			at: at,
+		} );
+
+		return this;
 	}
 
 	add( type, settings, position = {} ) {
@@ -21,24 +55,42 @@ class DocumentElements extends elementorModules.Module {
 
 		if ( position.element ) {
 			targetElement = this.elements.find( position.element );
+		} else if ( this.document.selection.get().length ) {
+			const selection = this.document.selection.get();
+			targetElement = selection[ 0 ];
 		} else {
 			targetElement = elementor.getPreviewView();
+		}
+
+		if ( ! targetElement ) {
+			throw Error( 'Empty target element.' );
 		}
 
 		if ( ! position.at ) {
 			position.at = targetElement.children.length + 1;
 		}
 
+		if ( ! Array.isArray( type ) ) {
+			type = [ type ];
+		}
+
 		const element = {
-			elType: type,
+			elType: type[ 0 ],
 			settings: settings,
 		};
+
+		if ( type[ 1 ] ) {
+			// TODO: widgetType => subType.
+			element.widgetType = type[ 1 ];
+		}
 
 		const newElement = targetElement.addChildElement( element, {
 			at: position.at,
 		} );
 
-		return newElement;
+		this.document.selection.set( newElement );
+
+		return this;
 	}
 
 	update( element, settings ) {
@@ -104,17 +156,48 @@ class DocumentElements extends elementorModules.Module {
 	}
 }
 
-class DocumentSelection extends elementorModules.Module {
+class Selection extends elementorModules.Module {
+	constructor( args ) {
+		super( ...args );
+
+		this.document = args.document;
+		this.elements = [];
+
+		this.registerCommands();
+	}
+
+	registerCommands() {
+		elementorCommon.commands.register( 'document/selection/get', () => {
+			return this.get();
+		} );
+
+		elementorCommon.commands.register( 'document/selection/reset', () => {
+			return this.reset();
+		} );
+
+		elementorCommon.commands.register( 'document/selection/add', ( element ) => {
+			return this.add( element );
+		} );
+	}
+
+	get() {
+		return this.elements;
+	}
+
+	set( element ) {
+		this.reset().add( element );
+
+		return this;
+	}
+
 	reset() {
-		elementorCommon.commands.run( 'document/selection/reset' );
+		this.elements = [];
 
 		return this;
 	}
 
 	add( element ) {
-		elementorCommon.commands.run( 'document/selection/add', {
-			element: element,
-		} );
+		this.elements.push( element );
 
 		return this;
 	}
@@ -211,7 +294,7 @@ class DocumentSelection extends elementorModules.Module {
 	}
 }
 
-class DocumentSettings extends elementorModules.Module {
+class Settings extends elementorModules.Module {
 	constructor( args ) {
 		super( ...args );
 
@@ -223,10 +306,12 @@ export default class Document extends elementorModules.Module {
 	constructor( args ) {
 		super( ...args );
 
+		args.document = this;
+
 		this.type = args.type;
-		this.elements = new DocumentElements( args );
-		this.settings = new DocumentSettings( args );
-		this.selection = new DocumentSelection();
+		this.elements = new Elements( args );
+		this.settings = new Settings( args );
+		this.selection = new Selection( args );
 
 		this.status = 'saved';
 
@@ -234,9 +319,6 @@ export default class Document extends elementorModules.Module {
 	}
 
 	registerCommands() {
-		elementorCommon.commands.register( 'document/elements/add', ( type, settings, position ) => {
-			return elementor.getDocument().elements.add( type, settings, position );
-		} );
 	}
 }
 

@@ -10,28 +10,52 @@ class Elements extends elementorModules.Module {
 		return this.document.selection;
 	}
 
-	getById( id ) {
-		const findRecursive = function( elements ) {
-			const element = elements.filter( function( model ) {
-				if ( id === model.get( 'id' ) ) {
+	findRecursive( elements, id ) {
+		for ( let x in elements.models ) {
+			let model = elements.models[ x ];
+
+			if ( id === model.get( 'id' ) ) {
+				return model;
+			}
+
+			if ( model.get( 'elements' ) ) {
+				model = this.findRecursive( model.get( 'elements' ), id );
+				if ( model ) {
 					return model;
 				}
-
-				if ( model.get( 'elements' ) ) {
-					return findRecursive( model.get( 'elements' ).models );
-				}
-			} );
-
-			return element;
-		};
-
-		const model = findRecursive( this.elements );
-
-		if ( ! model ) {
-			throw Error( 'Can\'t find model #' + id );
+			}
 		}
 
-		return elementor.sections.currentView.children.findByModel( model );
+		return false;
+	}
+
+	findViewRecursive( parent, id ) {
+		for ( let x in parent._views ) {
+			let view = parent._views[ x ];
+
+			if ( id === view.model.id ) {
+				return view;
+			}
+
+			if ( view.children ) {
+				view = this.findViewRecursive( view.children, id );
+				if ( view ) {
+					return view;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	getById( id ) {
+		const view = this.findViewRecursive( elementor.sections.currentView.children, id );
+
+		if ( ! view ) {
+			throw Error( 'Can\'t find view #' + id );
+		}
+
+		return view;
 	}
 
 	addSection( columns = 1, settings, args ) {

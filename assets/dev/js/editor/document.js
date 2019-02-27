@@ -11,7 +11,25 @@ class Elements extends elementorModules.Module {
 	}
 
 	getById( id ) {
-		const model = this.elements.findWhere( { id: id } );
+		const findRecursive = function( elements ) {
+			const element = elements.filter( function( model ) {
+				if ( id === model.get( 'id' ) ) {
+					return model;
+				}
+
+				if ( model.get( 'elements' ) ) {
+					return findRecursive( model.get( 'elements' ).models );
+				}
+			} );
+
+			return element;
+		};
+
+		const model = findRecursive( this.elements );
+
+		if ( ! model ) {
+			throw Error( 'Can\'t find model #' + id );
+		}
 
 		return elementor.sections.currentView.children.findByModel( model );
 	}
@@ -129,10 +147,6 @@ class Elements extends elementorModules.Module {
 	update( settings ) {
 		const element = this.getSelected();
 
-		if ( ! element ) {
-			throw Error( 'Empty target element.' );
-		}
-
 		element.get( 'settings' ).set( settings );
 
 		return this;
@@ -150,13 +164,22 @@ class Elements extends elementorModules.Module {
 		} );
 	}
 
-	move( element, to ) {
-		const updatedElement = elementorCommon.commands.run( 'document/elements/move', {
-			element: element,
-			to: to,
+	move( targetElement, args = {} ) {
+		const element = this.getSelected();
+
+		targetElement.addChildElement( element.model.clone(), {
+			at: args.at,
+			trigger: {
+				beforeAdd: 'drag:before:update',
+				afterAdd: 'drag:after:update',
+			},
+			onBeforeAdd: function() {
+				element._isRendering = true;
+				element.collection.remove( element.model );
+			},
 		} );
 
-		return updatedElement;
+		return this;
 	}
 
 	remove( element ) {
@@ -381,7 +404,7 @@ export default class Document extends elementorModules.Module {
 		if ( ! selector || document === selector ) {
 			element = this.elements.elements;
 		} else if ( 'string' === typeof selector ) {
-			element = this.elements.getById( id );
+			element = this.elements.getById( selector );
 		} else {
 			element = selector;
 		}
@@ -451,7 +474,7 @@ class Test extends elementorModules.Module {
 
 		/////////////////////////////////////////////////////////////////////
 
-		$e( heading ).appendTo( $e( section ).select().children().first() );
+		$e( heading ).appendTo( section );
 
 		document.elements.move( heading2, {
 			element: section.elements.get( 2 ),

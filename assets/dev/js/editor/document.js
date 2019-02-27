@@ -4,60 +4,91 @@ class Elements extends elementorModules.Module {
 
 		this.document = args.document;
 		this.elements = args.elements;
-
-		this.registerCommands();
 	}
 
-	registerCommands() {
-		elementorCommon.commands.register( 'document/elements/addSection', ( settings, at ) => {
-			return this.addSection( settings, at );
-		} );
-
-		elementorCommon.commands.register( 'document/elements/reset', () => {
-			return this.reset();
-		} );
-
-		elementorCommon.commands.register( 'document/elements/add', ( element ) => {
-			return this.add( element );
-		} );
+	select() {
+		return this.document.selection;
 	}
 
-	addSection( columns = 1, settings = {}, at = null ) {
-		this.add( 'section', settings, {
-			at: at,
-		} );
+	getById( id ) {
+		const model = this.elements.findWhere( { id: id } );
+
+		return elementor.sections.currentView.children.findByModel( model );
+	}
+
+	addSection( columns = 1, settings, args ) {
+		// Temp: decrease columns because the editor adds one automatically.
+		columns--;
+
+		this.add( 'section', settings, args );
+
+		const section = this.getSelected();
 
 		for ( let i = 0; i < columns; i++ ) {
 			this.addColumn();
 		}
 
-		return this;
-	}
-
-	addColumn( settings = {}, at = null ) {
-		this.add( 'column', settings, {
-			at: at,
-		} );
+		// Keep the section as current element instead of the column.
+		this[ 0 ] = section;
 
 		return this;
 	}
 
-	addWidget( type, settings, at = null ) {
-		this.add( [ 'widget', type ], settings, {
-			at: at,
-		} );
+	addColumn( settings, args ) {
+		this.add( 'column', settings, args );
+
+		this[ 0 ] = this.getSelected();
 
 		return this;
 	}
 
-	add( type, settings, position = {} ) {
+	addWidget( type, settings, args ) {
+		this.add( [ 'widget', type ], settings, args );
+
+		this[ 0 ] = this.getSelected();
+
+		return this;
+	}
+
+	getSelected() {
+		const selection = this.document.selection.get();
+
+		if ( ! selection.length ) {
+			throw Error( 'No Selected Element.' );
+		}
+
+		return selection[ 0 ];
+	}
+
+	useSelected() {
+		this.selected = this.getSelected();
+		this[ 0 ] = this.selected;
+
+		return this;
+	}
+
+	addToSelected( type, settings, args ) {
+		const selection = this.document.selection.get();
+
+		if ( ! selection.length ) {
+			throw Error( 'No Selected Element.' );
+		}
+
+		args.toElement = selection[ 0 ];
+
+		this.add( type, settings, args );
+
+		return this;
+	}
+
+	add( type, settings, args = {} ) {
 		let targetElement;
 
-		if ( position.element ) {
-			targetElement = this.elements.find( position.element );
-		} else if ( this.document.selection.get().length ) {
-			const selection = this.document.selection.get();
-			targetElement = selection[ 0 ];
+		if ( args.targetElement ) {
+			targetElement = args.targetElement;
+		} else if ( this.selected ) {
+			targetElement = this.selected;
+			this.selected = null;
 		} else {
 			targetElement = elementor.getPreviewView();
 		}
@@ -66,8 +97,8 @@ class Elements extends elementorModules.Module {
 			throw Error( 'Empty target element.' );
 		}
 
-		if ( ! position.at ) {
-			position.at = targetElement.children.length + 1;
+		if ( ! args.at ) {
+			args.at = targetElement.children.length + 1;
 		}
 
 		if ( ! Array.isArray( type ) ) {
@@ -85,21 +116,26 @@ class Elements extends elementorModules.Module {
 		}
 
 		const newElement = targetElement.addChildElement( element, {
-			at: position.at,
+			at: args.at,
 		} );
 
 		this.document.selection.set( newElement );
 
+		this.document.lastCreated = newElement;
+
 		return this;
 	}
 
-	update( element, settings ) {
-		const updatedElement = elementorCommon.commands.run( 'document/elements/update', {
-			element: element,
-			settings: settings,
-		} );
+	update( settings ) {
+		const element = this.getSelected();
 
-		return updatedElement;
+		if ( ! element ) {
+			throw Error( 'Empty target element.' );
+		}
+
+		element.get( 'settings' ).set( settings );
+
+		return this;
 	}
 
 	duplicate( element ) {
@@ -178,6 +214,27 @@ class Selection extends elementorModules.Module {
 		elementorCommon.commands.register( 'document/selection/add', ( element ) => {
 			return this.add( element );
 		} );
+	}
+
+	children() {
+		const children = this.get()[ 0 ].children;
+		this.set( children );
+
+		return this;
+	}
+
+	first() {
+		const element = this.children().getSelected()[ 0 ];
+		this.set( element );
+
+		return this;
+	}
+
+	last() {
+		const element = this.get()[ 0 ].children.last();
+		this.set( element );
+
+		return this;
 	}
 
 	get() {
@@ -318,51 +375,83 @@ export default class Document extends elementorModules.Module {
 		this.registerCommands();
 	}
 
+	get( selector ) {
+		let element;
+
+		if ( ! selector || document === selector ) {
+			element = this.elements.elements;
+		} else if ( 'string' === typeof selector ) {
+			element = this.elements.getById( id );
+		} else {
+			element = selector;
+		}
+
+		this.selection.set( element );
+		return this.elements.useSelected();
+	}
+
 	registerCommands() {
 	}
 }
+
+window.$e = function( selector ) {
+	return elementor.getDocument().get( selector );
+};
 
 class Test extends elementorModules.Module {
 	constructor( ...args ) {
 		super( ...args );
 
-		const document = elementor.getDocument(),
-			section = document.elements.add( 'section', {
-				columns: 2,
-			}, {
+		const section = elementor.getDocument().elements.add( 'section', {}, {
 				at: 1,
-			} ),
-			heading = document.elements.add( 'heading', {
+			} ).getSelected(),
+			heading = elementor.getDocument().elements.add( [ 'widget', 'heading' ], {
 				title: 'Hi, I\'m an Heading',
 			}, {
-				element: section.elements.get( 2 ),
+				toElement: section.children.findByIndex( 0 ),
 				at: 1,
-			} );
+			} ).getSelected();
 
-		document.elements.update( section, {
+		$e().addSection( 1, {
+			background_background: 'classic',
+			background_color: '#7a7a7a',
+		} ).useSelected().addWidget( 'heading' );
+
+		$e().useSelected().update( {
 			background_type: 'color',
-			background: {
-				color: '#494949',
-			},
+			background_color: '#490049',
 		} );
 
-		document.elements.update( heading, {
+		$e( '3786d77' ).update( {
+			background_type: 'color',
+			background_color: '#000049',
+		} );
+
+		$e( section ).update( {
+			background_type: 'color',
+			background_color: '#000049',
+		} );
+
+		$e( heading ).update( {
 			title: 'Hi, I\'m a changed Heading',
 			text_color: '#ffffff',
 		} );
 
-		const heading2 = document.elements.add( 'heading', {
+		const heading2 = $e( document ).add( 'heading', {
 			title: 'Second Heading',
 		}, {
-			element: section.elements.get( 2 ),
 			at: 1,
 		} );
 
-		document.elements.move( section.elements.get( 2 ), {
-			element: section,
+		const heading3 = $e( section ).add( 'heading', {
+			title: 'Second Heading',
+		}, {
 			at: 1,
 		} );
 
+		/////////////////////////////////////////////////////////////////////
+
+		$e( heading ).appendTo( $e( section ).select().children().first() );
 
 		document.elements.move( heading2, {
 			element: section.elements.get( 2 ),

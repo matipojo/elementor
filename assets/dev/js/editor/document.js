@@ -1,9 +1,31 @@
-class Elements extends elementorModules.Module {
-	constructor( args ) {
-		super( ...args );
+var History = {
+	get( target, propKey ) {
+		if ( ! target[ propKey ] ) {
+			return;
+		}
 
-		this.document = args.document;
-		this.elements = args.elements;
+		const origMethod = target[ propKey ];
+		return ( ...args ) => {
+			let result = origMethod.apply( target, args );
+			// console.log( propKey );
+			if ( this[ propKey ] ) {
+				this[ propKey ].apply( this, args );
+			}
+
+			return result;
+		};
+	},
+	create: function( obj, prop ) {
+		console.log( 'add' );
+	},
+};
+
+class Elements extends elementorModules.Module {
+	constructor( data ) {
+		super( data );
+
+		this.document = data.document;
+		this.elements = data.elements;
 	}
 
 	select() {
@@ -58,16 +80,16 @@ class Elements extends elementorModules.Module {
 		return view;
 	}
 
-	addSection( columns = 1, settings, args ) {
+	createSection( columns = 1, settings, args ) {
 		// Temp: decrease columns because the editor adds one automatically.
 		columns--;
 
-		this.add( 'section', settings, args );
+		this.create( 'section', settings, args );
 
 		const section = this.getSelected();
 
 		for ( let i = 0; i < columns; i++ ) {
-			this.addColumn();
+			this.createColumn();
 		}
 
 		// Keep the section as current element instead of the column.
@@ -76,16 +98,16 @@ class Elements extends elementorModules.Module {
 		return this;
 	}
 
-	addColumn( settings, args ) {
-		this.add( 'column', settings, args );
+	createColumn( settings, args ) {
+		this.create( 'column', settings, args );
 
 		this[ 0 ] = this.getSelected();
 
 		return this;
 	}
 
-	addWidget( type, settings, args ) {
-		this.add( [ 'widget', type ], settings, args );
+	createWidget( type, settings, args ) {
+		this.create( [ 'widget', type ], settings, args );
 
 		this[ 0 ] = this.getSelected();
 
@@ -118,12 +140,12 @@ class Elements extends elementorModules.Module {
 
 		args.toElement = selection[ 0 ];
 
-		this.add( type, settings, args );
+		this.create( type, settings, args );
 
 		return this;
 	}
 
-	add( type, settings, args = {} ) {
+	create( type, settings, args = {} ) {
 		let targetElement;
 
 		if ( args.targetElement ) {
@@ -139,7 +161,7 @@ class Elements extends elementorModules.Module {
 			throw Error( 'Empty target element.' );
 		}
 
-		if ( ! args.at ) {
+		if ( 'undefined' === typeof args.at ) {
 			args.at = targetElement.children.length + 1;
 		}
 
@@ -165,7 +187,7 @@ class Elements extends elementorModules.Module {
 
 		this.document.lastCreated = newElement;
 
-		return this;
+		return newElement;
 	}
 
 	update( settings ) {
@@ -177,7 +199,7 @@ class Elements extends elementorModules.Module {
 	}
 
 	duplicate( element ) {
-		const duplicatedElement = this.add( element.type, element.settings, element.getPosition() );
+		const duplicatedElement = this.create( element.type, element.settings, element.getPosition() );
 
 		return duplicatedElement;
 	}
@@ -191,7 +213,7 @@ class Elements extends elementorModules.Module {
 	move( targetElement, args = {} ) {
 		const element = this.getSelected();
 
-		targetElement.addChildElement( element.model.clone(), {
+		targetElement.addChildElement( element.model.toJSON(), {
 			at: args.at,
 			trigger: {
 				beforeAdd: 'drag:before:update',
@@ -199,7 +221,7 @@ class Elements extends elementorModules.Module {
 			},
 			onBeforeAdd: function() {
 				element._isRendering = true;
-				element.collection.remove( element.model );
+				element._parent.collection.remove( element.model );
 			},
 		} );
 
@@ -259,7 +281,7 @@ class Selection extends elementorModules.Module {
 		} );
 
 		elementorCommon.commands.register( 'document/selection/add', ( element ) => {
-			return this.add( element );
+			return this.create( element );
 		} );
 	}
 
@@ -406,6 +428,13 @@ class Settings extends elementorModules.Module {
 	}
 }
 
+class eQuery {
+	constructor( selector ) {
+		this.selector = selector;
+		// this.context = elementor.getDocument().get( selector );
+	}
+}
+
 export default class Document extends elementorModules.Module {
 	constructor( args ) {
 		super( ...args );
@@ -413,11 +442,14 @@ export default class Document extends elementorModules.Module {
 		args.document = this;
 
 		this.type = args.type;
-		this.elements = new Elements( args );
+
+		this.elements = new Proxy( new Elements( args ), History );
 		this.settings = new Settings( args );
 		this.selection = new Selection( args );
 
 		this.status = 'saved';
+
+		this.registerEQuery();
 
 		this.registerCommands();
 	}
@@ -439,88 +471,111 @@ export default class Document extends elementorModules.Module {
 
 	registerCommands() {
 	}
-}
 
-window.$e = function( selector ) {
-	return elementor.getDocument().get( selector );
-};
+	registerEQuery() {
+		const self = this;
+
+		window.$e = function( selector ) {
+			return new Proxy( new eQuery( selector ), {
+				get( target, propKey ) {
+					console.log( propKey );
+					return ( ...args ) => {
+						console.log( args );
+						if ( self.elements[ propKey ] ) {
+							if ( this.context ) {
+								self.selection.set( this.context );
+								self.elements.useSelected();
+							}
+
+							this.context = self.elements[ propKey ].apply( self.elements, args );
+							return this;
+						}
+					};
+				},
+			} );
+		};
+	}
+}
 
 class Test extends elementorModules.Module {
 	constructor( ...args ) {
 		super( ...args );
 
-		const section = elementor.getDocument().elements.add( 'section', {}, {
-				at: 1,
-			} ).getSelected(),
-			heading = elementor.getDocument().elements.add( [ 'widget', 'heading' ], {
+// Create a section at end of document.
+		$e().create( 'section' );
+
+// Create a section with settings.
+		$e().create( 'section', {
+			background: {
+				type: 'classic',
+				color: '#7a7a7a',
+			},
+		} );
+
+// Create a section in a specific position.
+		$e().create( 'section', {}, {
+			at: 0,
+		} );
+
+// Create a section and add a widget.
+		$e().create( 'section' ).create( 'column' ).create( [ 'widget', 'heading' ] );
+
+// Separated actions.
+		const $eColumn = $e().create( 'section' ).create( 'column' ),
+			$eHeading = $eColumn.create( [ 'widget', 'heading' ], {
 				title: 'Hi, I\'m an Heading',
-			}, {
-				toElement: section.children.findByIndex( 0 ),
-				at: 1,
-			} ).getSelected();
+			} );
 
-		$e().addSection( 1, {
-			background_background: 'classic',
-			background_color: '#7a7a7a',
-		} ).useSelected().addWidget( 'heading' );
+// Add a widget at top of the column.
+		$eColumn.create( [ 'widget', 'button' ],
+			{
+				title: 'Click Me',
+			},
+			{
+				at: 0,
+			}
+		);
 
-		$e().useSelected().update( {
-			background_type: 'color',
-			background_color: '#490049',
+// Update widget settings.
+		$eHeading.settings( {
+			title: 'I\'m a Changed title',
 		} );
 
-		$e( '3786d77' ).update( {
-			background_type: 'color',
-			background_color: '#000049',
+// Select element by ID.
+		$e( '#3786d77' ).settings( {
+			background: {
+				type: 'image',
+				id: 123,
+			},
 		} );
 
-		$e( section ).update( {
-			background_type: 'color',
-			background_color: '#000049',
-		} );
+// Move widget.
+		$eHeading.moveTo( $eColumn, 0 );
 
-		$e( heading ).update( {
-			title: 'Hi, I\'m a changed Heading',
-			text_color: '#ffffff',
-		} );
+// Drag from panel.
+		const draggedWidgetType = 'video',
+			$eTarget = $e( '#nj4fksj' ),
+			$eVideo = $eTarget.create( draggedWidgetType );
 
-		const heading2 = $e( document ).add( 'heading', {
-			title: 'Second Heading',
-		}, {
-			at: 1,
-		} );
+// Copy elements.
+		$eHeading.add( $eVideo ).copy();
 
-		const heading3 = $e( section ).add( 'heading', {
-			title: 'Second Heading',
-		}, {
-			at: 1,
-		} );
+// Create another column.
+		const $eColumn2 = $eColumn.parent().create( 'column' );
 
-		/////////////////////////////////////////////////////////////////////
+// Paste.
+		$eColumn2.paste();
 
-		$e( heading ).appendTo( section );
+// Remove.
+		$eVideo.remove();
 
-		document.elements.move( heading2, {
-			element: section.elements.get( 2 ),
-			at: 1,
-		} );
+// Paste Style.
+		$eHeading.copy();
+		$eColumn2.find( 'heading' ).pasteStyle();
 
-		document.selection
-			.add( heading )
-			.add( heading2 )
-			.add( section.elements.get( 2 ) )
-			.copy()
-			.reset()
-			.add( section )
-			.paste()
-			.resetStyle();
+// Paste Style directly.
+		$eColumn2.find( 'heading' ).pasteStyle( $eHeading );
 
-		document.elements.pasteStyle( heading2 );
-
-		document.elements.remove( heading2 );
-
-		document.elements.remove( section.elements.get( 2 ).elements.get( 1 ) );
-
-		document.save();
+		$e.save();
 	}
 }

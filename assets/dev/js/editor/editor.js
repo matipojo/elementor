@@ -293,12 +293,6 @@ const App = Marionette.Application.extend( {
 		this.elementsModel = new Backbone.Model( {
 			elements: this.elements,
 		} );
-
-		this.currentDocument = new Document( {
-			type: this.config.document.type,
-			elements: this.elements,
-			settings: this.config.settings.page.settings,
-		} );
 	},
 
 	initPreview: function() {
@@ -846,6 +840,12 @@ const App = Marionette.Application.extend( {
 		var Preview = require( 'elementor-views/preview' );
 
 		this.sections.show( new Preview( { model: this.elementsModel } ) );
+
+		this.currentDocument = new Document( {
+			type: this.config.document.type,
+			elements: this.sections.currentView,
+			settings: this.config.settings.page.settings,
+		} );
 
 		this.$previewContents.children().addClass( 'elementor-html' );
 

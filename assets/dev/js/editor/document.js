@@ -6,30 +6,63 @@ var History = {
 
 		const origMethod = target[ propKey ];
 		return ( ...args ) => {
-			let result = origMethod.apply( target, args );
-			// console.log( propKey );
 			if ( this[ propKey ] ) {
-				this[ propKey ].apply( this, args );
+				this[ propKey ].apply( this, [ args, target ] );
+			}
+
+			let result = origMethod.apply( target, args );
+
+			if ( this[ propKey ] ) {
+				elementor.history.history.endItem();
 			}
 
 			return result;
 		};
 	},
-	create: function( obj, prop ) {
-		console.log( 'add' );
+
+	getModelLabel( type ) {
+		if ( ! Array.isArray( type ) ) {
+			type = [ type ];
+		}
+
+		if ( type[ 1 ] ) {
+			const config = elementor.config.widgets[ type[ 1 ] ];
+			return config ? config.title : type[ 1 ];
+		}
+
+		const config = elementor.config.elements[ type[ 0 ] ];
+		return config ? config.title : type[ 0 ];
+	},
+
+	create( args, target ) {
+		elementor.history.history.startItem( {
+			type: 'add',
+			title: 1 === target.getSelection().length ? this.getModelLabel( args[ 0 ] ) : 'Elements',
+			elementType: args[ 0 ],
+		} );
+	},
+
+	moveTo( args, target ) {
+		let title;
+
+		if ( 1 === target.getSelection().length ) {
+			const model = target.getSelection()[ 0 ].model;
+			title = this.getModelLabel( [ model.get( 'elType' ), model.get( 'widgetType' ) ] );
+		} else {
+			title = 'Elements';
+		}
+
+		elementor.history.history.startItem( {
+			type: 'move',
+			title: title,
+		} );
 	},
 };
 
-class Elements extends elementorModules.Module {
+class Elements {
 	constructor( data ) {
-		super( data );
-
 		this.document = data.document;
 		this.elements = data.elements;
-	}
-
-	select() {
-		return this.document.selection;
 	}
 
 	findRecursive( elements, id ) {
@@ -80,89 +113,15 @@ class Elements extends elementorModules.Module {
 		return view;
 	}
 
-	createSection( columns = 1, settings, args ) {
-		// Temp: decrease columns because the editor adds one automatically.
-		columns--;
-
-		this.create( 'section', settings, args );
-
-		const section = this.getSelected();
-
-		for ( let i = 0; i < columns; i++ ) {
-			this.createColumn();
-		}
-
-		// Keep the section as current element instead of the column.
-		this[ 0 ] = section;
-
-		return this;
-	}
-
-	createColumn( settings, args ) {
-		this.create( 'column', settings, args );
-
-		this[ 0 ] = this.getSelected();
-
-		return this;
-	}
-
-	createWidget( type, settings, args ) {
-		this.create( [ 'widget', type ], settings, args );
-
-		this[ 0 ] = this.getSelected();
-
-		return this;
-	}
-
-	getSelected() {
-		const selection = this.document.selection.get();
-
-		if ( ! selection.length ) {
-			throw Error( 'No Selected Element.' );
-		}
-
-		return selection[ 0 ];
-	}
-
-	useSelected() {
-		this.selected = this.getSelected();
-		this[ 0 ] = this.selected;
-
-		return this;
-	}
-
-	addToSelected( type, settings, args ) {
-		const selection = this.document.selection.get();
-
-		if ( ! selection.length ) {
-			throw Error( 'No Selected Element.' );
-		}
-
-		args.toElement = selection[ 0 ];
-
-		this.create( type, settings, args );
-
-		return this;
+	getSelection() {
+		return this.document.selection.get();
 	}
 
 	create( type, settings, args = {} ) {
-		let targetElement;
+		const targetElements = this.getSelection();
 
-		if ( args.targetElement ) {
-			targetElement = args.targetElement;
-		} else if ( this.selected ) {
-			targetElement = this.selected;
-			this.selected = null;
-		} else {
-			targetElement = elementor.getPreviewView();
-		}
-
-		if ( ! targetElement ) {
+		if ( ! targetElements ) {
 			throw Error( 'Empty target element.' );
-		}
-
-		if ( 'undefined' === typeof args.at ) {
-			args.at = targetElement.children.length + 1;
 		}
 
 		if ( ! Array.isArray( type ) ) {
@@ -179,113 +138,123 @@ class Elements extends elementorModules.Module {
 			element.widgetType = type[ 1 ];
 		}
 
-		const newElement = targetElement.addChildElement( element, {
-			at: args.at,
+		const newElements = [];
+
+		this.getSelection().forEach( ( targetElement ) => {
+			// Check typeof because at can be 0.
+			const at = 'number' === typeof args.at ? args.at : targetElement.children.length + 1;
+			newElements.push( targetElement.addChildElement( element, { at: at } ) );
 		} );
 
-		this.document.selection.set( newElement );
-
-		this.document.lastCreated = newElement;
-
-		return newElement;
+		return newElements;
 	}
 
-	update( settings ) {
-		const element = this.getSelected();
+	settings( settings ) {
+		this.getSelection().forEach( ( element ) => element.model.get( 'settings' ).set( settings ) );
 
-		element.get( 'settings' ).set( settings );
-
-		return this;
+		return true;
 	}
 
-	duplicate( element ) {
-		const duplicatedElement = this.create( element.type, element.settings, element.getPosition() );
+	moveTo( $eElement, args = {} ) {
+		const newElements = [];
 
-		return duplicatedElement;
-	}
-
-	copy( element ) {
-		elementorCommon.commands.run( 'editor/clipboard/copy', {
-			element: element,
-		} );
-	}
-
-	move( targetElement, args = {} ) {
-		const element = this.getSelected();
-
-		targetElement.addChildElement( element.model.toJSON(), {
-			at: args.at,
-			trigger: {
-				beforeAdd: 'drag:before:update',
-				afterAdd: 'drag:after:update',
-			},
-			onBeforeAdd: function() {
-				element._isRendering = true;
-				element._parent.collection.remove( element.model );
-			},
+		this.getSelection().forEach( ( element ) => {
+			// $eElement.context[ 0 ], currently support move once only.
+			newElements.push( $eElement.context[ 0 ].addChildElement( element.model.toJSON(), {
+				at: args.at,
+				onBeforeAdd: () => {
+					element._isRendering = true;
+					element._parent.collection.remove( element.model );
+				},
+			} ) );
 		} );
 
-		return this;
+		return $e( '', newElements );
 	}
 
-	remove( element ) {
-		const parent = elementorCommon.commands.run( 'document/elements/remove', {
-			element: element,
+	duplicate() {
+		const newElements = [];
+
+		this.getSelection().forEach( ( element ) => {
+			const parent = $e( '', element._parent ),
+				model = element.model.attributes;
+
+			newElements.push( parent.create( [ model.elType, model.widgetType ], model.settings, {
+				at: parent.context.collection.indexOf( element.model ) + 1,
+			} ) );
 		} );
 
-		return parent;
+		return newElements;
 	}
 
-	paste( element ) {
-		const pastedElement = elementorCommon.commands.run( 'document/elements/paste', {
-			element: element,
-		} );
+	copy() {
+		const models = this.getSelection().map( ( element ) => element.model );
 
-		return pastedElement;
+		elementorCommon.storage.set( 'clipboard', models );
 	}
 
-	pasteStyle( element ) {
-		const updatedElement = elementorCommon.commands.run( 'document/elements/pasteStyle', {
-			element: element,
+	paste() {
+		const clipboardModels = elementorCommon.storage.get( 'clipboard' ),
+			newElements = [];
+
+		this.getSelection().forEach( ( element ) => {
+			let index;
+			if ( element._parent.collection ) {
+				index = element._parent.collection.indexOf( element.model );
+			} else if ( element.collection ) {
+				// Page Container.
+				index = element.collection.length;
+			}
+
+			clipboardModels.forEach( ( model ) => {
+				index++;
+
+				newElements.push( element.addChildElement( model, { at: index, clone: true } ) );
+			} );
 		} );
 
+		return newElements;
+	}
+
+	parent() {
+		const parents = [];
+
+		this.getSelection().forEach( ( element ) => parents.push( element._parent ) );
+
+		return parents;
+	}
+
+	add( $eElement ) {
+		const elements = this.getSelection().concat( $eElement.context );
+
+		return $e( '', elements );
+	}
+
+	remove() {
+		this.getSelection().forEach( ( element ) => element.removeElement() );
+
+		this.document.selection.reset();
+
+		return true;
+	}
+
+	pasteStyle() {
 		return updatedElement;
 	}
 
-	resetStyle( element ) {
-		const updatedElement = elementorCommon.commands.run( 'document/elements/resetStyle', {
-			element: element,
-		} );
-
+	resetStyle() {
 		return updatedElement;
 	}
 }
 
-class Selection extends elementorModules.Module {
+class Selection {
 	constructor( args ) {
-		super( ...args );
-
 		this.document = args.document;
 		this.elements = [];
-
-		this.registerCommands();
-	}
-
-	registerCommands() {
-		elementorCommon.commands.register( 'document/selection/get', () => {
-			return this.get();
-		} );
-
-		elementorCommon.commands.register( 'document/selection/reset', () => {
-			return this.reset();
-		} );
-
-		elementorCommon.commands.register( 'document/selection/add', ( element ) => {
-			return this.create( element );
-		} );
 	}
 
 	children() {
+		// TODO
 		const children = this.get()[ 0 ].children;
 		this.set( children );
 
@@ -293,13 +262,15 @@ class Selection extends elementorModules.Module {
 	}
 
 	first() {
-		const element = this.children().getSelected()[ 0 ];
+		// TODO
+		const element = this.children().getSelection()[ 0 ];
 		this.set( element );
 
 		return this;
 	}
 
 	last() {
+		// TODO
 		const element = this.get()[ 0 ].children.last();
 		this.set( element );
 
@@ -310,8 +281,12 @@ class Selection extends elementorModules.Module {
 		return this.elements;
 	}
 
-	set( element ) {
-		this.reset().add( element );
+	set( elements ) {
+		if ( ! Array.isArray( elements ) ) {
+			elements = [ elements ];
+		}
+
+		this.reset().addMultiple( elements );
 
 		return this;
 	}
@@ -329,109 +304,51 @@ class Selection extends elementorModules.Module {
 	}
 
 	addMultiple( elements ) {
-		elementorCommon.commands.run( 'document/selection/addMultiple', {
-			elements: elements,
-		} );
-
-		return this;
-	}
-
-	addRange( element, fromIndex, toIndex ) {
-		elementorCommon.commands.run( 'document/selection/addRange', {
-			element: element,
-			fromIndex: fromIndex,
-			toIndex: toIndex,
-		} );
-
-		return this;
-	}
-
-	update( settings ) {
-		elementorCommon.commands.run( 'document/selection/update', {
-			settings: settings,
-		} );
-
-		return this;
-	}
-
-	duplicate() {
-		const duplicatedElements = elementorCommon.commands.run( 'document/selection/duplicate' );
-
-		this.reset().addMultiple( duplicatedElements );
-
-		return this;
-	}
-
-	move( to ) {
-		const selectedElements = elementorCommon.commands.run( 'document/selection/get' );
-
-		elementorCommon.commands.run( 'document/selection/move', {
-			elements: selectedElements,
-			to: to,
-		} );
+		elements.forEach( ( element ) => this.add( element ) );
 
 		return this;
 	}
 
 	remove() {
-		const selectedElements = elementorCommon.commands.run( 'document/selection/get' );
-
-		elementorCommon.commands.run( 'document/selection/remove', {
-			elements: selectedElements,
-		} );
-
-		return this;
-	}
-
-	copy() {
-		const selectedElements = elementorCommon.commands.run( 'document/selection/get' );
-
-		elementorCommon.commands.run( 'document/clipboard/add', {
-			elements: selectedElements,
-		} );
-
-		return this;
-	}
-
-	paste( to ) {
-		const copiedElements = elementorCommon.commands.run( 'document/clipboard/get' );
-
-		elementorCommon.commands.run( 'document/selection/paste', {
-			elements: copiedElements,
-			to: to,
-		} );
-
-		return this;
-	}
-
-	pasteStyle() {
-		elementorCommon.commands.run( 'document/selection/pasteStyle', {
-			from: elementorCommon.commands.run( 'document/clipboard/get' ),
-			to: elementorCommon.commands.run( 'document/selection/get' ),
-		} );
-
-		return this;
-	}
-
-	resetStyle() {
-		elementorCommon.commands.run( 'document/selection/resetStyle' );
-
+		// TODO
 		return this;
 	}
 }
 
-class Settings extends elementorModules.Module {
+class Settings {
 	constructor( args ) {
-		super( ...args );
-
 		this.settings = args.settings;
 	}
 }
 
 class eQuery {
-	constructor( selector ) {
+	constructor( selector, context ) {
 		this.selector = selector;
-		// this.context = elementor.getDocument().get( selector );
+
+		if ( 'undefined' === typeof selector ) {
+			this.context = [ elementor.getPreviewView() ];
+		} else if ( 'string' === typeof selector && '#' === selector[ 0 ] ) {
+			this.context = elementor.getDocument().elements.getById( selector.replace( '#', '' ) );
+		} else {
+			this.context = context;
+		}
+	}
+
+	createSection( columns = 1, settings, args ) {
+		// Temp: decrease columns because the editor adds one automatically.
+		columns--;
+
+		const $eSection = this.create( 'section', settings, args );
+
+		for ( let i = 0; i < columns; i++ ) {
+			$eSection.create( 'column' );
+		}
+
+		return $eSection;
+	}
+
+	createWidget( type, settings, args ) {
+		return this.create( [ 'widget', type ], settings, args );
 	}
 }
 
@@ -450,50 +367,43 @@ export default class Document extends elementorModules.Module {
 		this.status = 'saved';
 
 		this.registerEQuery();
-
-		this.registerCommands();
-	}
-
-	get( selector ) {
-		let element;
-
-		if ( ! selector || document === selector ) {
-			element = this.elements.elements;
-		} else if ( 'string' === typeof selector ) {
-			element = this.elements.getById( selector );
-		} else {
-			element = selector;
-		}
-
-		this.selection.set( element );
-		return this.elements.useSelected();
-	}
-
-	registerCommands() {
 	}
 
 	registerEQuery() {
-		const self = this;
+		const proxyHandler = {
+				get: ( target, propKey, receiver ) => {
+					if ( propKey in target ) {
+						return target[ propKey ];
+					}
 
-		window.$e = function( selector ) {
-			return new Proxy( new eQuery( selector ), {
-				get( target, propKey ) {
-					console.log( propKey );
-					return ( ...args ) => {
-						console.log( args );
-						if ( self.elements[ propKey ] ) {
-							if ( this.context ) {
-								self.selection.set( this.context );
-								self.elements.useSelected();
+					if ( this.elements[ propKey ] ) {
+						return ( ...args ) => {
+							if ( target.context ) {
+								this.selection.set( target.context );
 							}
 
-							this.context = self.elements[ propKey ].apply( self.elements, args );
-							return this;
-						}
-					};
+							const results = this.elements[ propKey ].apply( this.elements, args );
+
+							// Update
+							if ( 'boolean' === typeof results ) {
+								return receiver;
+							}
+
+							// Move/Add keep context for current element.
+							if ( results instanceof eQuery ) {
+								target.context = results.context;
+
+								return results;
+							}
+
+							// Create
+							return $e( '', results );
+						};
+					}
 				},
-			} );
-		};
+			};
+
+		window.$e = ( selector, context ) => new Proxy( new eQuery( selector, context ), proxyHandler );
 	}
 }
 
@@ -501,33 +411,34 @@ class Test extends elementorModules.Module {
 	constructor( ...args ) {
 		super( ...args );
 
-// Create a section at end of document.
+		// Create a section at end of document.
 		$e().create( 'section' );
 
-// Create a section with settings.
+		// Create a section with settings.
 		$e().create( 'section', {
-			background: {
-				type: 'classic',
-				color: '#7a7a7a',
-			},
+			background_background: 'classic',
+			background_color: '#7a7a7a',
 		} );
 
-// Create a section in a specific position.
+		// Create a section in a specific position.
 		$e().create( 'section', {}, {
 			at: 0,
 		} );
 
-// Create a section and add a widget.
+		$e( '#akjxzk' ).moveTo( $e( '#bccdsd' ) );
+
+		// Create a section and add a widget.
 		$e().create( 'section' ).create( 'column' ).create( [ 'widget', 'heading' ] );
 
-// Separated actions.
-		const $eColumn = $e().create( 'section' ).create( 'column' ),
-			$eHeading = $eColumn.create( [ 'widget', 'heading' ], {
+		// Separated actions.
+		let $eSection = $e().create( 'section' ),
+			$eColumn2 = $eSection.create( 'column' ),
+			$eHeading = $eColumn2.create( [ 'widget', 'heading' ], {
 				title: 'Hi, I\'m an Heading',
 			} );
 
-// Add a widget at top of the column.
-		$eColumn.create( [ 'widget', 'button' ],
+		// Add a widget at top of the column.
+		$eColumn2.create( [ 'widget', 'button' ],
 			{
 				title: 'Click Me',
 			},
@@ -536,45 +447,54 @@ class Test extends elementorModules.Module {
 			}
 		);
 
-// Update widget settings.
+		// Update widget settings.
 		$eHeading.settings( {
 			title: 'I\'m a Changed title',
 		} );
 
-// Select element by ID.
-		$e( '#3786d77' ).settings( {
-			background: {
-				type: 'image',
-				id: 123,
+		// Select element by ID.
+		$e( '#3fe3306' ).settings( {
+			_background_background: 'classic',
+			_background_image: {
+				url: 'http://localhost/elementor/wp-content/uploads/2019/02/library.jpg',
+				id: 22589,
 			},
 		} );
 
-// Move widget.
-		$eHeading.moveTo( $eColumn, 0 );
+		let $eColumn3 = $eSection.create( 'column' );
 
-// Drag from panel.
-		const draggedWidgetType = 'video',
-			$eTarget = $e( '#nj4fksj' ),
-			$eVideo = $eTarget.create( draggedWidgetType );
+		// Move widget.
+		$eHeading.moveTo( $eColumn3, 0 );
 
-// Copy elements.
+		// Drag from panel.
+		let $eVideo = $eColumn3.create( [ 'widget', 'video' ] );
+
+		/////////////////////////////////////////////////
+
+		// Copy elements.
 		$eHeading.add( $eVideo ).copy();
 
-// Create another column.
-		const $eColumn2 = $eColumn.parent().create( 'column' );
-
-// Paste.
+		// Paste.
 		$eColumn2.paste();
 
-// Remove.
+		// Remove.
 		$eVideo.remove();
 
-// Paste Style.
+		// Paste Style.
 		$eHeading.copy();
-		$eColumn2.find( 'heading' ).pasteStyle();
 
-// Paste Style directly.
-		$eColumn2.find( 'heading' ).pasteStyle( $eHeading );
+		$eColumn3.find( 'heading' ).pasteStyle();
+
+		// Paste Style directly.
+		$eColumn3.find( 'heading' ).pasteStyle( $eHeading );
+
+		$e.settings( {
+			_background_background: 'classic',
+			_background_image: {
+				url: 'http://localhost/elementor/wp-content/uploads/2019/02/library.jpg',
+				id: 22589,
+			},
+		} );
 
 		$e.save();
 	}

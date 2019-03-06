@@ -1,3 +1,11 @@
+class Container {
+	constructor( data ) {
+		this.document = data.document;
+		this.elements = data.elements;
+		this.settings = data.settings;
+	}
+}
+
 var History = {
 	get( target, propKey ) {
 		if ( ! target[ propKey ] ) {
@@ -133,6 +141,11 @@ class Elements {
 			settings: settings,
 		};
 
+		if ( args.id ) {
+			element.id = args.id;
+			delete args.id;
+		}
+
 		if ( type[ 1 ] ) {
 			// TODO: widgetType => subType.
 			element.widgetType = type[ 1 ];
@@ -142,8 +155,11 @@ class Elements {
 
 		this.getSelection().forEach( ( targetElement ) => {
 			// Check typeof because at can be 0.
-			const at = 'number' === typeof args.at ? args.at : targetElement.children.length + 1;
-			newElements.push( targetElement.addChildElement( element, { at: at } ) );
+			if ( 'number' !== typeof args.at ) {
+				args.at = targetElement.children.length + 1;
+			}
+
+			newElements.push( targetElement.addChildElement( element, args ) );
 		} );
 
 		return newElements;
@@ -159,42 +175,36 @@ class Elements {
 		const newElements = [];
 
 		this.getSelection().forEach( ( element ) => {
-			// $eElement.context[ 0 ], currently support move once only.
-			newElements.push( $eElement.context[ 0 ].addChildElement( element.model.toJSON(), {
-				at: args.at,
-				onBeforeAdd: () => {
-					element._isRendering = true;
-					element._parent.collection.remove( element.model );
-				},
-			} ) );
+			const model = element.model.toJSON();
+
+			args.id = model.id;
+			args.onBeforeAdd = () => {
+				element._isRendering = true;
+				element._parent.collection.remove( element.model );
+			};
+
+			newElements.push( $eElement.create( [ model.elType, model.widgetType ], model.settings, args ) );
 		} );
 
 		return $e( '', newElements );
 	}
 
 	duplicate() {
-		const newElements = [];
+		this.copy( 'duplicate' );
 
-		this.getSelection().forEach( ( element ) => {
-			const parent = $e( '', element._parent ),
-				model = element.model.attributes;
-
-			newElements.push( parent.create( [ model.elType, model.widgetType ], model.settings, {
-				at: parent.context.collection.indexOf( element.model ) + 1,
-			} ) );
-		} );
-
-		return newElements;
+		return $e( '', this.getSelection()._parent ).paste( 'duplicate' );
 	}
 
-	copy() {
+	copy( storageKey = 'clipboard' ) {
 		const models = this.getSelection().map( ( element ) => element.model );
 
-		elementorCommon.storage.set( 'clipboard', models );
+		elementorCommon.storage.set( storageKey, models );
+
+		return true;
 	}
 
-	paste() {
-		const clipboardModels = elementorCommon.storage.get( 'clipboard' ),
+	paste( storageKey = 'clipboard' ) {
+		const clipboardModels = elementorCommon.storage.get( storageKey ),
 			newElements = [];
 
 		this.getSelection().forEach( ( element ) => {
@@ -208,8 +218,9 @@ class Elements {
 
 			clipboardModels.forEach( ( model ) => {
 				index++;
+				const $eTarget = element.model.id === model.id ? $e( '', element._parent ) : $e( '', element );
 
-				newElements.push( element.addChildElement( model, { at: index, clone: true } ) );
+				newElements.push( $eTarget.create( [ model.elType, model.widgetType ], model.settings, { at: index, clone: true } ) );
 			} );
 		} );
 
@@ -330,6 +341,9 @@ class eQuery {
 		} else if ( 'string' === typeof selector && '#' === selector[ 0 ] ) {
 			this.context = elementor.getDocument().elements.getById( selector.replace( '#', '' ) );
 		} else {
+			if ( ! Array.isArray( context ) ) {
+				context = [ context ];
+			}
 			this.context = context;
 		}
 	}
@@ -412,27 +426,35 @@ class Test extends elementorModules.Module {
 		super( ...args );
 
 		// Create a section at end of document.
-		$e().create( 'section' );
+		$e().create( 'section' ); // Page -> Sections -> Last
+		$e().copy(); // Page -> Sections -> All
+		$e().duplicate(); // Page -> Sections -> All
+		$e().paste(); // Page -> Sections -> Last
+		$e().remove(); // Page -> Sections -> All
+		$e().settings(); // Page -> Settings Model
 
 		// Create a section with settings.
-		$e().create( 'section', {
+		let $eSection;
+
+		$eSection = $e().create( 'section', {
 			background_background: 'classic',
 			background_color: '#7a7a7a',
 		} );
 
 		// Create a section in a specific position.
-		$e().create( 'section', {}, {
+		$eSection = $e().create( 'section', {}, {
 			at: 0,
 		} );
 
-		$e( '#akjxzk' ).moveTo( $e( '#bccdsd' ) );
+		// Select & Move by id. e.g. $e( '#akjxzk' ).moveTo( $e( '#bccdsd' ));
+		// buggy! because the $eSection is destroyed during the move.
+		$e( '#' + $eSection.context[ 0 ].model.id ).moveTo( $e(), { at: 0 } );
 
 		// Create a section and add a widget.
 		$e().create( 'section' ).create( 'column' ).create( [ 'widget', 'heading' ] );
 
 		// Separated actions.
-		let $eSection = $e().create( 'section' ),
-			$eColumn2 = $eSection.create( 'column' ),
+		let	$eColumn2 = $eSection.create( 'column' ),
 			$eHeading = $eColumn2.create( [ 'widget', 'heading' ], {
 				title: 'Hi, I\'m an Heading',
 			} );

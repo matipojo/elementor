@@ -43,10 +43,14 @@ const BackgroundVideo = elementorModules.frontend.handlers.Base.extend( {
 	},
 
 	changeVideoSize: function() {
-		var $video = this.isYTVideo ? jQuery( this.player.getIframe() ) : this.elements.$backgroundVideoHosted,
+		const $video = this.isYTVideo ? jQuery( this.player.getIframe() ) : this.elements.$backgroundVideoHosted,
 			size = this.calcVideosSize();
 
-		$video.width( size.width ).height( size.height );
+		$video.width( size.width );
+
+		if ( this.isYTVideo ) {
+			$video.height( size.height );
+		}
 	},
 
 	startVideoLoop: function() {
@@ -254,8 +258,16 @@ var Shapes = elementorModules.frontend.handlers.Base.extend( {
 		return elements;
 	},
 
+	getSvgURL( shapeType, fileName ) {
+		let svgURL = this.getSettings( 'svgURL' ) + fileName + '.svg';
+		if ( elementor.config.additional_shapes && shapeType in elementor.config.additional_shapes ) {
+			svgURL = elementor.config.additional_shapes[ shapeType ];
+		}
+		return svgURL;
+	},
+
 	buildSVG: function( side ) {
-		var self = this,
+		const self = this,
 			baseSettingKey = 'shape_divider_' + side,
 			shapeType = self.getElementSettings( baseSettingKey ),
 			$svgContainer = this.elements[ '$' + side + 'Container' ];
@@ -266,13 +278,13 @@ var Shapes = elementorModules.frontend.handlers.Base.extend( {
 			return;
 		}
 
-		var fileName = shapeType;
+		let fileName = shapeType;
 
 		if ( self.getElementSettings( baseSettingKey + '_negative' ) ) {
 			fileName += '-negative';
 		}
 
-		var svgURL = self.getSettings( 'svgURL' ) + fileName + '.svg';
+		const svgURL = self.getSvgURL( shapeType, fileName );
 
 		jQuery.get( svgURL, function( data ) {
 			$svgContainer.append( data.childNodes[ 0 ] );

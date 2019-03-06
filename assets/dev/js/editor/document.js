@@ -73,54 +73,6 @@ class Elements {
 		this.elements = data.elements;
 	}
 
-	findRecursive( elements, id ) {
-		for ( let x in elements.models ) {
-			let model = elements.models[ x ];
-
-			if ( id === model.get( 'id' ) ) {
-				return model;
-			}
-
-			if ( model.get( 'elements' ) ) {
-				model = this.findRecursive( model.get( 'elements' ), id );
-				if ( model ) {
-					return model;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	findViewRecursive( parent, id ) {
-		for ( let x in parent._views ) {
-			let view = parent._views[ x ];
-
-			if ( id === view.model.id ) {
-				return view;
-			}
-
-			if ( view.children ) {
-				view = this.findViewRecursive( view.children, id );
-				if ( view ) {
-					return view;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	getById( id ) {
-		const view = this.findViewRecursive( elementor.sections.currentView.children, id );
-
-		if ( ! view ) {
-			throw Error( 'Can\'t find view #' + id );
-		}
-
-		return view;
-	}
-
 	getSelection() {
 		return this.document.selection.get();
 	}
@@ -153,7 +105,7 @@ class Elements {
 
 		const newElements = [];
 
-		this.getSelection().forEach( ( targetElement ) => {
+		targetElements.forEach( ( targetElement ) => {
 			// Check typeof because at can be 0.
 			if ( 'number' !== typeof args.at ) {
 				args.at = targetElement.children.length + 1;
@@ -339,7 +291,7 @@ class eQuery {
 		if ( 'undefined' === typeof selector ) {
 			this.context = [ elementor.getPreviewView() ];
 		} else if ( 'string' === typeof selector && '#' === selector[ 0 ] ) {
-			this.context = elementor.getDocument().elements.getById( selector.replace( '#', '' ) );
+			this.context = this.getById( selector.replace( '#', '' ) );
 		} else {
 			if ( ! Array.isArray( context ) ) {
 				context = [ context ];
@@ -363,6 +315,83 @@ class eQuery {
 
 	createWidget( type, settings, args ) {
 		return this.create( [ 'widget', type ], settings, args );
+	}
+
+	findRecursive( elements, id ) {
+		for ( let x in elements.models ) {
+			let model = elements.models[ x ];
+
+			if ( id === model.get( 'id' ) ) {
+				return model;
+			}
+
+			if ( model.get( 'elements' ) ) {
+				model = this.findRecursive( model.get( 'elements' ), id );
+				if ( model ) {
+					return model;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	findViewRecursive( parent, key, value, multiple = true ) {
+		let found = [];
+		for ( let x in parent._views ) {
+			let view = parent._views[ x ];
+
+			if ( value === view.model.get( key ) ) {
+				found.push( view );
+				if ( ! multiple ) {
+					return found;
+				}
+			}
+
+			if ( view.children ) {
+				const views = this.findViewRecursive( view.children, key, value, multiple );
+				if ( views.length ) {
+					found = found.concat( views );
+					if ( ! multiple ) {
+						return found;
+					}
+				}
+			}
+		}
+
+		return found;
+	}
+
+	getById( id ) {
+		return this.findViewRecursive( elementor.sections.currentView.children, 'id', id, false );
+	}
+
+	find( type ) {
+		if ( ! Array.isArray( type ) ) {
+			type = [ type ];
+		}
+
+		let root, elements,
+			found = [];
+
+		this.context.forEach( ( element ) => {
+			if ( element.children ) {
+				root = element.children;
+			} else if ( element.sections ) {
+				// Page Container.
+				root = elementor.sections.currentView.children;
+			}
+
+			if ( type[ 1 ] ) {
+				elements = this.findViewRecursive( root, 'widgetType', type[ 1 ] );
+			} else {
+				elements = this.findViewRecursive( root, 'elType', type[ 0 ] );
+			}
+
+			found = found.concat( elements );
+		} );
+
+		return $e( '', found );
 	}
 }
 
@@ -432,9 +461,10 @@ class Test extends elementorModules.Module {
 		$e().paste(); // Page -> Sections -> Last
 		$e().remove(); // Page -> Sections -> All
 		$e().settings(); // Page -> Settings Model
+		$e().moveTo(); // ????
 
 		// Create a section with settings.
-		let $eSection;
+		var $eSection;
 
 		$eSection = $e().create( 'section', {
 			background_background: 'classic',
@@ -454,6 +484,7 @@ class Test extends elementorModules.Module {
 		$e().create( 'section' ).create( 'column' ).create( [ 'widget', 'heading' ] );
 
 		// Separated actions.
+		$eSection = $e().create( 'section' );
 		let	$eColumn2 = $eSection.create( 'column' ),
 			$eHeading = $eColumn2.create( [ 'widget', 'heading' ], {
 				title: 'Hi, I\'m an Heading',
@@ -486,7 +517,8 @@ class Test extends elementorModules.Module {
 		let $eColumn3 = $eSection.create( 'column' );
 
 		// Move widget.
-		$eHeading.moveTo( $eColumn3, 0 );
+		$eHeading.moveTo( $eColumn3 );
+		$eHeading.moveTo( $eColumn2, { at: 0 } );
 
 		// Drag from panel.
 		let $eVideo = $eColumn3.create( [ 'widget', 'video' ] );
@@ -500,6 +532,9 @@ class Test extends elementorModules.Module {
 		$eColumn2.paste();
 
 		// Remove.
+		$eVideo.remove();
+
+		//Remove again without errors
 		$eVideo.remove();
 
 		// Paste Style.

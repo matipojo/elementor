@@ -2,6 +2,13 @@ var BaseSettings = require( 'elementor-editor/components/settings/base/manager' 
 
 module.exports = BaseSettings.extend( {
 
+	onElementorPreviewLoaded: function() {
+		BaseSettings.prototype.onElementorPreviewLoaded.apply( this, arguments );
+
+		// Add a reference to the settings model for the $e() wrapper.
+		elementor.sections.currentView.model.set( 'settings', this.model );
+	},
+
 	save: function() {},
 
 	changeCallbacks: {

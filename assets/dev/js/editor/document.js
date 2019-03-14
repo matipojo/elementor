@@ -53,14 +53,12 @@ var History = {
 	settings( args, target ) {
 		elementor.history.history.startItem( {
 			type: 'change',
-			title: 1 === target.getSelection().length ? this.getModelLabel( args[ 0 ] ) : 'Elements',
-			elementType: args[ 0 ],
+			title: this.getTargetLabel( target ),
 		} );
 	},
 
-	moveTo( args, target ) {
+	getTargetLabel: function( target ) {
 		let title;
-
 		if ( 1 === target.getSelection().length ) {
 			const model = target.getSelection()[ 0 ].model;
 			title = this.getModelLabel( [ model.get( 'elType' ), model.get( 'widgetType' ) ] );
@@ -68,9 +66,13 @@ var History = {
 			title = 'Elements';
 		}
 
+		return title;
+	},
+
+	moveTo( args, target ) {
 		elementor.history.history.startItem( {
 			type: 'move',
-			title: title,
+			title: this.getTargetLabel( target ),
 		} );
 	},
 
@@ -586,10 +588,10 @@ class Test extends elementorModules.Module {
 
 		// Separated actions.
 		$eSection = $e().create( 'section' );
-		let	$eColumn2 = $eSection.create( 'column' ),
-			$eHeading = $eColumn2.create( [ 'widget', 'heading' ], {
-				title: 'Hi, I\'m an Heading',
-			} );
+		$eColumn2 = $eSection.create( 'column' );
+		$eHeading = $eColumn2.create( [ 'widget', 'heading' ], {
+			title: 'Hi, I\'m an Heading',
+		} );
 
 		// Add a widget at top of the column.
 		$eColumn2.create( [ 'widget', 'button' ],

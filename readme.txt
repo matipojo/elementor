@@ -4,7 +4,7 @@ Tags: page builder, editor, landing page, drag-and-drop, elementor, visual edito
 Requires at least: 4.7
 Tested up to: 5.1
 Requires PHP: 5.4
-Stable tag: 2.5.3
+Stable tag: 2.5.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -220,6 +220,31 @@ No. Elementor supports WordPress 4.7 or greater, and is compatible with PHP 5.4 
 7. **Shape Divider.** Choose from a wide array of shape dividers and separate your sections in endless ways, that until now were simply not possible.
 
 == Changelog ==
+
+= 2.5.6 - 2019-03-14 =
+* Tweak: Minor UI improvement in Slider Control
+* Tweak: Added support for range handles in Slider Control
+* Fix: Stretch Inner Section in the editor ([#7430](https://github.com/elementor/elementor/issues/7430))
+* Fix: Ensure print order of Elementor config JS variables ([#7443](https://github.com/elementor/elementor/issues/7443))
+* Fix: Inline elements not working on new pages ([#7433](https://github.com/elementor/elementor/issues/7433))
+* Fix: Removed media `id` when attachment is missing
+
+= 2.5.5 - 2019-03-11 =
+* Tweak: Support gzipped Elementor Ajax data when GZIP is enabled
+* Tweak: Added labels and scales to Slider control
+* Fix: Device mode detection in IE and Edge browser ([#7356](https://github.com/elementor/elementor/issues/7356))
+* Fix: Positioning issue while dragging inline text widgets
+* Fix: Empty widget calculation according to the new column flexbox model
+
+= 2.5.4 - 2019-03-10 =
+* Tweak: Added flexbox notice dialog
+* Fix: Backward compatibility for flexbox property ([#7366](https://github.com/elementor/elementor/issues/7366))
+* Fix: Allow `None` value for Entrance Animation control ([#7355](https://github.com/elementor/elementor/issues/7355))
+* Fix: Device mode detection in IE and Edge browser ([#7356](https://github.com/elementor/elementor/issues/7356))
+* Fix: Revert self hosted video background fix ([#7374](https://github.com/elementor/elementor/issues/7374))
+* Fix: Removed Delimiter parameter form `ucwords` for older PHP compatibility
+* Fix: Slider control returns wrong value
+* Fix: Slider control for RTL
 
 = 2.5.3 - 2019-03-06 =
 * Tweak: Reduced Editor memory usage by moving common controls injection to the frontend ([#7308](https://github.com/elementor/elementor/issues/7308))

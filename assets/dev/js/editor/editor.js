@@ -196,7 +196,7 @@ const App = Marionette.Application.extend( {
 		const elementConfig = elementorCommon.helpers.cloneObject( this.config.elements[ elType ] );
 
 		if ( 'section' === elType && model.get( 'isInner' ) ) {
-			elementConfig.title = elementor.translate( 'inner_section' );
+			elementConfig.title = this.translate( 'inner_section' );
 		}
 
 		return elementConfig;
@@ -564,8 +564,8 @@ const App = Marionette.Application.extend( {
 				at: 'center center',
 			},
 			strings: {
-				confirm: elementor.translate( 'learn_more' ),
-				cancel: elementor.translate( 'go_back' ),
+				confirm: this.translate( 'learn_more' ),
+				cancel: this.translate( 'go_back' ),
 			},
 			onConfirm: null,
 			onCancel: function() {
@@ -580,6 +580,37 @@ const App = Marionette.Application.extend( {
 		options = jQuery.extend( true, defaultOptions, options );
 
 		elementorCommon.dialogsManager.createWidget( 'confirm', options ).show();
+	},
+
+	showFlexBoxAttentionDialog: function() {
+		const introduction = new elementorModules.editor.utils.Introduction( {
+			introductionKey: 'flexbox',
+			dialogType: 'confirm',
+			dialogOptions: {
+				id: 'elementor-flexbox-attention-dialog',
+				headerMessage: this.translate( 'flexbox_attention_header' ),
+				message: this.translate( 'flexbox_attention_message' ),
+				position: {
+					my: 'center center',
+					at: 'center center',
+				},
+				strings: {
+					confirm: this.translate( 'learn_more' ),
+					cancel: this.translate( 'got_it' ),
+				},
+				hide: {
+					onButtonClick: false,
+				},
+				onCancel: () => {
+					introduction.setViewed();
+
+					introduction.getDialog().hide();
+				},
+				onConfirm: () => open( this.config.help_flexbox_bc_url, '_blank' ),
+			},
+		} );
+
+		introduction.show();
 	},
 
 	checkPageStatus: function() {
@@ -891,6 +922,12 @@ const App = Marionette.Application.extend( {
 
 		this.openLibraryOnStart();
 
+		const isOldPageVersion = this.config.document.version && this.helpers.compareVersions( this.config.document.version, '2.5.0', '<' );
+
+		if ( ! this.config.user.introduction.flexbox && isOldPageVersion ) {
+			this.showFlexBoxAttentionDialog();
+		}
+
 		this.previewLoadedOnce = true;
 	},
 
@@ -976,7 +1013,9 @@ const App = Marionette.Application.extend( {
 } );
 
 window.elementor = new App();
+
 if ( -1 === location.href.search( 'ELEMENTOR_TESTS=1' ) ) {
-	window.elementor.start();
+	elementor.start();
 }
-module.exports = window.elementor;
+
+module.exports = elementor;

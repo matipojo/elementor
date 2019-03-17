@@ -278,7 +278,14 @@ class Elements {
 	}
 
 	add( $eElement ) {
-		const elements = this.getSelection().concat( $eElement.context );
+		let elements = this.getSelection(),
+			existIds = elements.map( ( element ) => element.model.id );
+
+		$eElement.context.forEach( ( element ) => {
+			if ( -1 === existIds.indexOf( element.model.id ) ) {
+				elements = elements.concat( [ element ] );
+			}
+		} );
 
 		return $e( '', elements );
 	}

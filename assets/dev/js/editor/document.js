@@ -6,7 +6,7 @@ class Container {
 	}
 }
 
-var History = {
+const History = {
 	get( target, propKey ) {
 		if ( ! target[ propKey ] ) {
 			return;
@@ -14,13 +14,15 @@ var History = {
 
 		const origMethod = target[ propKey ];
 		return ( ...args ) => {
-			if ( this[ propKey ] ) {
+			const historyIsActive = elementor.history.history.getActive();
+
+			if ( historyIsActive && this[ propKey ] ) {
 				this[ propKey ].apply( this, [ args, target ] );
 			}
 
 			let result = origMethod.apply( target, args );
 
-			if ( this[ propKey ] ) {
+			if ( historyIsActive && this[ propKey ] ) {
 				elementor.history.history.endItem();
 			}
 
@@ -51,10 +53,46 @@ var History = {
 	},
 
 	settings( args, target ) {
-		elementor.history.history.startItem( {
+		const settings = args[ 0 ],
+			settingsKeys = Object.keys( settings );
+
+		if ( ! settingsKeys.length ) {
+			return;
+		}
+
+		target.getSelection().forEach( ( element ) => element.oldValues = element.oldValues || element.model.get( 'settings' ).toJSON() );
+
+		// Try delay save only for one control (like text or color picker) but if history item started e.g. Section preset during delete column - do not delay the execution.
+		if ( 1 === settingsKeys.length && ! elementor.history.history.isItemStarted() ) {
+			this.lazySaveChangeHistory( settings, target );
+		} else {
+			this.saveChangeHistory( settings, target );
+		}
+	},
+
+	saveChangeHistory( settings, target ) {
+		const historyItem = {
 			type: 'change',
 			title: this.getTargetLabel( target ),
+			subTitle: this.getControlLabel( settings, target ),
+			elements: {},
+		};
+
+		target.getSelection().forEach( ( element ) => {
+			const changedAttributes = {};
+
+			_.each( settings, function( value, controlName ) {
+				changedAttributes[ controlName ] = {
+					old: element.oldValues[ controlName ],
+					new: value,
+				};
+			} );
+
+			historyItem.elements[ element.model.id ] = changedAttributes;
+			delete element.oldValues;
 		} );
+
+		elementor.history.history.addItem( historyItem );
 	},
 
 	getTargetLabel: function( target ) {
@@ -69,70 +107,17 @@ var History = {
 		return title;
 	},
 
+	getControlLabel( settings, target ) {
+		const keys = Object.keys( settings );
+
+		return 1 === keys.length ? target.getSelection()[ 0 ].model.get( 'settings' ).controls[ keys[ 0 ] ].label : 'Settings';
+	},
+
 	moveTo( args, target ) {
 		elementor.history.history.startItem( {
 			type: 'move',
 			title: this.getTargetLabel( target ),
 		} );
-	},
-
-	saveHistory: function( model, options ) {
-		if ( ! elementor.history.history.getActive() ) {
-			return;
-		}
-
-		var self = this,
-			changed = Object.keys( model.changed ),
-			control = model.controls[ changed[ 0 ] ];
-
-		if ( ! control && options && options.control ) {
-			control = options.control;
-		}
-
-		if ( ! changed.length || ! control ) {
-			return;
-		}
-
-		if ( 1 === changed.length ) {
-			if ( _.isUndefined( self.oldValues[ control.name ] ) ) {
-				self.oldValues[ control.name ] = model.previous( control.name );
-			}
-
-			if ( elementor.history.history.isItemStarted() ) {
-				// Do not delay the execution
-				self.saveTextHistory( model, changed, control );
-			} else {
-				self.lazySaveTextHistory( model, changed, control );
-			}
-
-			return;
-		}
-
-		var changedAttributes = {};
-
-		_.each( changed, function( controlName ) {
-			changedAttributes[ controlName ] = {
-				old: model.previous( controlName ),
-				new: model.get( controlName ),
-			};
-		} );
-
-		var historyItem = {
-			type: 'change',
-			elementType: 'control',
-			title: elementor.history.history.getModelLabel( model ),
-			history: {
-				behavior: this,
-				changed: changedAttributes,
-				model: this.view.getEditModel().toJSON(),
-			},
-		};
-
-		if ( 1 === changed.length ) {
-			historyItem.subTitle = control.label;
-		}
-
-		elementor.history.history.addItem( historyItem );
 	},
 
 	restore: function( historyItem, isRedo ) {
@@ -169,6 +154,8 @@ var History = {
 		behavior.listenTo( settings, 'change', this.saveHistory );
 	},
 };
+
+History.lazySaveChangeHistory = _.debounce( History.saveChangeHistory.bind( History ), 800 );
 
 class Elements {
 	constructor( data ) {
@@ -625,6 +612,33 @@ class Test extends elementorModules.Module {
 
 		// Drag from panel.
 		let $eVideo = $eColumn3.create( [ 'widget', 'video' ] );
+
+		// Lazy save
+		$eHeading
+			.settings( {
+				title: 'Hi, I\'m a title #1',
+			} )
+			.settings( {
+				title: 'Hi, I\'m a title #2',
+			} )
+			.settings( {
+				title: 'Hi, I\'m a title #3',
+			} );
+
+		// Multiple elements & multiple settings.
+		$eHeading.add( $eHeading2 )
+			.settings( {
+				title: 'Hi, I\'m a red title',
+				title_color: 'red',
+			} )
+			.settings( {
+				title: 'Hi, I\'m blue title',
+				title_color: 'blue',
+			} )
+			.settings( {
+				title: 'Hi, I\'m green title',
+				title_color: 'green',
+			} );
 
 		/////////////////////////////////////////////////
 

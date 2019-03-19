@@ -234,7 +234,7 @@ var	Manager = function() {
 			panelPage = panel.getCurrentPageView(),
 			viewToScroll;
 
-		if ( elementorCommon.route.isPartOf( 'panel/editor' ) ) {
+		if ( elementorCommon.route.isPartOf( 'panel/editor' ) && panelPage.getOption( 'editedElementView' ) ) {
 			if ( panelPage.getOption( 'editedElementView' ).isDestroyed ) {
 				// If the the element isn't exist - show the history panel
 				elementorCommon.route.to( 'panel/history' );

@@ -20,7 +20,8 @@ const History = {
 				this[ propKey ].apply( this, [ args, target ] );
 			}
 
-			args.push( receiver );
+			// don't push to args, to avoid wrong args.
+			target.receiver = receiver;
 
 			let result = origMethod.apply( target, args );
 
@@ -35,6 +36,10 @@ const History = {
 	getModelLabel( type ) {
 		if ( ! Array.isArray( type ) ) {
 			type = [ type ];
+		}
+
+		if ( 'document' === type[ 0 ] ) {
+			return 'Document';
 		}
 
 		if ( type[ 1 ] ) {
@@ -137,8 +142,16 @@ const History = {
 
 	getControlLabel( settings, target ) {
 		const keys = Object.keys( settings );
+		let label;
 
-		return 1 === keys.length ? target.getSelection()[ 0 ].model.get( 'settings' ).controls[ keys[ 0 ] ].label : 'Settings';
+		if ( 1 === keys.length ) {
+			const controlConfig = target.getSelection()[ 0 ].model.get( 'settings' ).controls[ keys[ 0 ] ];
+			label = controlConfig ? controlConfig.label : keys[ 0 ];
+		} else {
+			label = 'Settings';
+		}
+
+		return label;
 	},
 
 	moveTo( args, target ) {
@@ -221,9 +234,8 @@ class Elements {
 
 		settings[ key ] = value;
 
-		// Use receiver (last argument) in order to log history.
-		const receiver = [ ...arguments ].pop();
-		return receiver.settings( settings, args );
+		// Use receiver in order to log history.
+		return this.receiver.settings( settings, args );
 	}
 
 	subSettings( settings, subSetting ) {
@@ -416,8 +428,8 @@ class eQuery {
 	constructor( selector, context ) {
 		this.selector = selector;
 
-		if ( 'undefined' === typeof selector ) {
-			this.context = [ elementor.getPreviewView() ];
+		if ( 'undefined' === typeof selector || '#document' === selector ) {
+			this.context = [ elementor.documentView ];
 		} else if ( 'string' === typeof selector && '#' === selector[ 0 ] ) {
 			this.context = this.getById( selector.replace( '#', '' ) );
 		} else {

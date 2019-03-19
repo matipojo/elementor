@@ -80,7 +80,8 @@ ControlBaseDataView = ControlBaseView.extend( {
 	},
 
 	setSettingsModel: function( value ) {
-		$e( '', this._parent ).setting( this.model.get( 'name' ), value );
+		// Use id for #document.
+		$e( '#' + this._parent.model.id ).setting( this.model.get( 'name' ), value );
 
 		this.triggerMethod( 'settings:change' );
 	},

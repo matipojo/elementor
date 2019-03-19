@@ -5,9 +5,22 @@ module.exports = BaseSettings.extend( {
 	onElementorPreviewLoaded: function() {
 		BaseSettings.prototype.onElementorPreviewLoaded.apply( this, arguments );
 
-		// Add a reference to the settings model for the $e() wrapper.
-		elementor.sections.currentView.model.set( 'settings', this.model );
-		elementor.elementsModel.set( 'settings', this.model );
+		// Add id & documentView to handle `$e() || $e( '#document' )` wrapper.
+		this.model.id = 'document';
+
+		elementor.documentView = {
+			$el: elementor.$previewElementorEl,
+			children: elementor.getPreviewView().children,
+			getEditModel: () => elementor.documentView.model,
+			addChildElement: function( element, args ) {
+				return elementor.getPreviewView().addChildElement( element, args );
+			},
+			model: new Backbone.Model( {
+				id: 'document',
+				elType: 'document',
+				settings: this.model,
+			} ),
+		};
 	},
 
 	save: function() {},

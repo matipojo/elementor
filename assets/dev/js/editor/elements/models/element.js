@@ -95,10 +95,24 @@ ElementModel = Backbone.Model.extend( {
 				settings = settings.get( key ).models[ keyParts[ 1 ] ];
 
 				key = keyParts[ 2 ];
+
+				settings.setExternalChange( key, value );
+
+				return;
 			}
 		}
 
-		settings.setExternalChange( key, value );
+		var settingsToChange;
+
+		if ( 'object' === typeof key ) {
+			settingsToChange = key;
+		} else {
+			settingsToChange = {};
+
+			settingsToChange[ key ] = value;
+		}
+
+		$e( '#' + this.id ).settings( settingsToChange, { external: true } );
 	},
 
 	getSetting: function( key ) {

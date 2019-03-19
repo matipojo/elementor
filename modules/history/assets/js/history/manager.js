@@ -21,10 +21,6 @@ var	Manager = function() {
 	};
 
 	var addBehaviors = function( behaviors ) {
-		behaviors.ElementHistory = {
-			behaviorClass: ElementHistoryBehavior,
-		};
-
 		behaviors.CollectionHistory = {
 			behaviorClass: CollectionHistoryBehavior,
 		};

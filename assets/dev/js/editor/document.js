@@ -7,7 +7,7 @@ class Container {
 }
 
 const History = {
-	get( target, propKey ) {
+	get( target, propKey, receiver ) {
 		if ( ! target[ propKey ] ) {
 			return;
 		}
@@ -19,6 +19,8 @@ const History = {
 			if ( historyIsActive && this[ propKey ] ) {
 				this[ propKey ].apply( this, [ args, target ] );
 			}
+
+			args.push( receiver );
 
 			let result = origMethod.apply( target, args );
 
@@ -70,12 +72,36 @@ const History = {
 		}
 	},
 
+	restoreChanges: function( historyItem, isRedo ) {
+		_( historyItem.get( 'elements' ) ).each( ( settings, elementID ) => {
+			const restoredValues = {};
+			_( settings ).each( ( values, key ) => {
+				if ( isRedo ) {
+					restoredValues[ key ] = values.new;
+				} else {
+					restoredValues[ key ] = values.old;
+				}
+			} );
+
+			const $eElement = $e( '#' + elementID );
+			$eElement.settings( restoredValues, { external: true } );
+			$eElement.scrollToView();
+		} );
+
+		historyItem.set( 'status', isRedo ? 'not_applied' : 'applied' );
+	},
+
 	saveChangeHistory( settings, target ) {
 		const historyItem = {
 			type: 'change',
 			title: this.getTargetLabel( target ),
 			subTitle: this.getControlLabel( settings, target ),
 			elements: {},
+			history: {
+				behavior: {
+					restore: this.restoreChanges.bind( this ),
+				},
+			},
 		};
 
 		target.getSelection().forEach( ( element ) => {
@@ -118,40 +144,6 @@ const History = {
 			type: 'move',
 			title: this.getTargetLabel( target ),
 		} );
-	},
-
-	restore: function( historyItem, isRedo ) {
-		var	history = historyItem.get( 'history' ),
-			modelID = history.model.id,
-			view = elementor.history.history.findView( modelID );
-
-		if ( ! view ) {
-			return;
-		}
-
-		var model = view.getEditModel ? view.getEditModel() : view.model,
-			settings = model.get( 'settings' ),
-			behavior = view.getBehavior( 'ElementHistory' );
-
-		// Stop listen to restore actions
-		behavior.stopListening( settings, 'change', this.saveHistory );
-
-		var restoredValues = {};
-		_.each( history.changed, function( values, key ) {
-			if ( isRedo ) {
-				restoredValues[ key ] = values.new;
-			} else {
-				restoredValues[ key ] = values.old;
-			}
-		} );
-
-		// Set at once.
-		settings.setExternalChange( restoredValues );
-
-		historyItem.set( 'status', isRedo ? 'not_applied' : 'applied' );
-
-		// Listen again
-		behavior.listenTo( settings, 'change', this.saveHistory );
 	},
 };
 
@@ -207,8 +199,44 @@ class Elements {
 		return newElements;
 	}
 
-	settings( settings ) {
-		this.getSelection().forEach( ( element ) => element.model.get( 'settings' ).set( settings ) );
+	settings( settings, args = {} ) {
+		this.getSelection().forEach( ( element ) => {
+			element.model.get( 'settings' ).set( settings );
+
+			if ( args.external ) {
+				const settingsModel = element.getEditModel().get( 'settings' );
+				jQuery.each( settings, function( key, value ) {
+					settingsModel.trigger( 'change:external:' + key, value );
+				} );
+			}
+		} );
+
+		return true;
+	}
+
+	setting( key, value, args, receiver ) {
+		const settings = {};
+
+		settings[ key ] = value;
+
+		// Use receiver in order to log history.
+		return receiver.settings( settings, args );
+	}
+
+	subSettings( settings, subSetting ) {
+		this.getSelection().forEach( ( element ) => {
+			const subSettings = element.elementSettingsModel.get( subSetting ),
+				newSettings = {},
+				clonedSettings = elementorCommon.helpers.cloneObject( subSettings );
+
+			Object.keys( settings ).forEach( ( value, key ) => {
+				clonedSettings[ key ] = value;
+			} );
+
+			newSettings[ subSetting ] = clonedSettings;
+
+			$e( '', element ).settings( newSettings );
+		} );
 
 		return true;
 	}
@@ -489,6 +517,18 @@ class eQuery {
 		} );
 
 		return $e( '', found );
+	}
+
+	scrollToView() {
+		if ( ! this.context.length ) {
+			return;
+		}
+
+		const $el = this.context[ 0 ].$el;
+
+		if ( ! elementor.helpers.isInViewport( $el[ 0 ], elementor.$previewContents.find( 'html' )[ 0 ] ) ) {
+			elementor.helpers.scrollToView( $el );
+		}
 	}
 }
 

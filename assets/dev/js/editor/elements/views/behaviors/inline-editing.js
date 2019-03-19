@@ -196,7 +196,7 @@ InlineEditingBehavior = Marionette.Behavior.extend( {
 	},
 
 	onInlineEditingUpdate: function() {
-		this.view.getEditModel().setSetting( this.getEditingSettingKey(), this.editor.getContent() );
+		$e( '', this.view ).setting( this.getEditingSettingKey(), this.editor.getContent(), { external: true } );
 	},
 } );
 

@@ -62,7 +62,9 @@ const History = {
 			return;
 		}
 
-		target.getSelection().forEach( ( element ) => element.oldValues = element.oldValues || element.model.get( 'settings' ).toJSON() );
+		target.getSelection().forEach( ( element ) => {
+			element.oldValues = element.oldValues || element.model.get( 'settings' ).toJSON();
+		} );
 
 		// Try delay save only for one control (like text or color picker) but if history item started e.g. Section preset during delete column - do not delay the execution.
 		if ( 1 === settingsKeys.length && ! elementor.history.history.isItemStarted() ) {
@@ -214,12 +216,13 @@ class Elements {
 		return true;
 	}
 
-	setting( key, value, args, receiver ) {
+	setting( key, value, args ) {
 		const settings = {};
 
 		settings[ key ] = value;
 
-		// Use receiver in order to log history.
+		// Use receiver (last argument) in order to log history.
+		const receiver = [ ...arguments ].pop();
 		return receiver.settings( settings, args );
 	}
 

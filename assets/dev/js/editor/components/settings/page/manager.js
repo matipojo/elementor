@@ -7,6 +7,7 @@ module.exports = BaseSettings.extend( {
 
 		// Add a reference to the settings model for the $e() wrapper.
 		elementor.sections.currentView.model.set( 'settings', this.model );
+		elementor.elementsModel.set( 'settings', this.model );
 	},
 
 	save: function() {},

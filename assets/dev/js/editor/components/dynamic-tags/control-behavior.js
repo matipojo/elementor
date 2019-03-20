@@ -159,14 +159,7 @@ module.exports = Marionette.Behavior.extend( {
 	},
 
 	setDynamicValue: function( value ) {
-		var settingKey = this.view.model.get( 'name' ),
-			dynamicSettings = this.view.elementSettingsModel.get( '__dynamic__' ) || {};
-
-		dynamicSettings = elementorCommon.helpers.cloneObject( dynamicSettings );
-
-		dynamicSettings[ settingKey ] = value;
-
-		this.view.elementSettingsModel.set( '__dynamic__', dynamicSettings, this.getDynamicControlSettings( settingKey ) );
+		$e( '#' + this.view.elementSettingsModel._parent.model.id ).subSetting( this.view.model.get( 'name' ), value, '__dynamic__' );
 
 		this.toggleDynamicClass();
 	},

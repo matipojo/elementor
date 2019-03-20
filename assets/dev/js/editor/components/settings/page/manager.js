@@ -21,6 +21,8 @@ module.exports = BaseSettings.extend( {
 				settings: this.model,
 			} ),
 		};
+
+		this.model._parent = elementor.documentView;
 	},
 
 	save: function() {},

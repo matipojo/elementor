@@ -61,6 +61,7 @@ const History = {
 
 	settings( args, target ) {
 		const settings = args[ 0 ],
+			settingsArgs = args[ 1 ] ? args[ 1 ] : {},
 			settingsKeys = Object.keys( settings );
 
 		if ( ! settingsKeys.length ) {
@@ -73,9 +74,9 @@ const History = {
 
 		// Try delay save only for one control (like text or color picker) but if history item started e.g. Section preset during delete column - do not delay the execution.
 		if ( 1 === settingsKeys.length && ! elementor.history.history.isItemStarted() ) {
-			this.lazySaveChangeHistory( settings, target );
+			this.lazySaveChangeHistory( settings, settingsArgs, target );
 		} else {
-			this.saveChangeHistory( settings, target );
+			this.saveChangeHistory( settings, settingsArgs, target );
 		}
 	},
 
@@ -98,11 +99,11 @@ const History = {
 		historyItem.set( 'status', isRedo ? 'not_applied' : 'applied' );
 	},
 
-	saveChangeHistory( settings, target ) {
+	saveChangeHistory( settings, settingsArgs, target ) {
 		const historyItem = {
 			type: 'change',
 			title: this.getTargetLabel( target ),
-			subTitle: this.getControlLabel( settings, target ),
+			subTitle: this.getControlLabel( settings, settingsArgs, target ),
 			elements: {},
 			history: {
 				behavior: {
@@ -140,12 +141,13 @@ const History = {
 		return title;
 	},
 
-	getControlLabel( settings, target ) {
+	getControlLabel( settings, settingsArgs, target ) {
 		const keys = Object.keys( settings );
 		let label;
 
-		if ( 1 === keys.length ) {
-			const controlConfig = target.getSelection()[ 0 ].model.get( 'settings' ).controls[ keys[ 0 ] ];
+		if ( 1 === keys.length || settingsArgs.subChange ) {
+			const controlKey = settingsArgs.subChange ? settingsArgs.subChange : keys[ 0 ],
+				controlConfig = target.getSelection()[ 0 ].model.get( 'settings' ).controls[ controlKey ];
 			label = controlConfig ? controlConfig.label : keys[ 0 ];
 		} else {
 			label = 'Settings';
@@ -229,7 +231,7 @@ class Elements {
 		return true;
 	}
 
-	setting( key, value, args ) {
+	setting( key, value, args = {} ) {
 		const settings = {};
 
 		settings[ key ] = value;
@@ -238,19 +240,31 @@ class Elements {
 		return this.receiver.settings( settings, args );
 	}
 
-	subSettings( settings, subSetting ) {
+	subSetting( key, value, subSetting, args = {} ) {
+		const settings = {};
+
+		settings[ key ] = value;
+
+		args.subChange = key;
+
+		// Use receiver in order to log history.
+		return this.receiver.subSettings( settings, subSetting, args );
+	}
+
+	subSettings( settings, subSetting, args = {} ) {
 		this.getSelection().forEach( ( element ) => {
-			const subSettings = element.elementSettingsModel.get( subSetting ),
+			const settingsModel = element.getEditModel().get( 'settings' ),
+				subSettings = settingsModel.get( subSetting ),
 				newSettings = {},
 				clonedSettings = elementorCommon.helpers.cloneObject( subSettings );
 
-			Object.keys( settings ).forEach( ( value, key ) => {
+			_( settings ).each( ( value, key ) => {
 				clonedSettings[ key ] = value;
 			} );
 
 			newSettings[ subSetting ] = clonedSettings;
 
-			$e( '', element ).settings( newSettings );
+			$e( '', element ).settings( newSettings, args );
 		} );
 
 		return true;

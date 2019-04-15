@@ -254,7 +254,7 @@ class Elements {
 	subSettings( settings, subSetting, args = {} ) {
 		this.getSelection().forEach( ( element ) => {
 			const settingsModel = element.getEditModel().get( 'settings' ),
-				subSettings = settingsModel.get( subSetting ),
+				subSettings = settingsModel.get( subSetting ) || {},
 				newSettings = {},
 				clonedSettings = elementorCommon.helpers.cloneObject( subSettings );
 

@@ -515,6 +515,11 @@ class eQuery {
 		return this.findViewRecursive( elementor.sections.currentView.children, 'id', id, false );
 	}
 
+	getIndex( index ) {
+		const element = this.context[ index ];
+		return $e( '', element );
+	}
+
 	find( type ) {
 		if ( ! Array.isArray( type ) ) {
 			type = [ type ];

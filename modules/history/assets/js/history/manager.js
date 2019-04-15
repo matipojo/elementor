@@ -80,28 +80,22 @@ var	Manager = function() {
 	};
 
 	var init = function() {
-		elementorCommon.route.register( 'panel/history', () => {
-			elementorCommon.route.to( 'panel/history/actions' );
-		} );
-
 		elementorCommon.route.register( 'panel/history/actions', () => {
 			elementor.getPanelView().setPage( 'historyPage' ).activateTab( 'actions' );
-		}, 'ctrl+shift+h' );
+		}, { keys: 'ctrl+shift+h' } );
 
 		elementorCommon.route.register( 'panel/history/revisions', () => {
 			elementor.getPanelView().setPage( 'historyPage' ).activateTab( 'revisions' );
-		}, 'ctrl+alt+r' );
-
-		const dependency = ( event ) => ! jQuery( event.target ).is( 'input, textarea, [contenteditable=true]' );
+		}, { keys: 'ctrl+alt+r' } );
 
 		elementorCommon.commands.register( 'history/undo', () => navigate(), {
 			keys: 'ctrl+z',
-			dependency: dependency,
+			exclude: [ 'input' ],
 		} );
 
 		elementorCommon.commands.register( 'history/redo', () => navigate( true ), {
 			keys: 'ctrl+shift+z, ctrl+y',
-			dependency: dependency,
+			exclude: [ 'input' ],
 		} );
 
 		elementor.hooks.addFilter( 'elements/base/behaviors', addBehaviors );
@@ -237,7 +231,7 @@ var	Manager = function() {
 		if ( elementorCommon.route.isPartOf( 'panel/editor' ) && panelPage.getOption( 'editedElementView' ) ) {
 			if ( panelPage.getOption( 'editedElementView' ).isDestroyed ) {
 				// If the the element isn't exist - show the history panel
-				elementorCommon.route.to( 'panel/history' );
+				elementorCommon.route.to( 'panel/history/actions' );
 			} else {
 				// If element exist - render again, maybe the settings has been changed
 				viewToScroll = panelPage.getOption( 'editedElementView' );

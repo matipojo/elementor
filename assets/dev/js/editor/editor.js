@@ -3,6 +3,7 @@ import Heartbeat from './utils/heartbeat';
 import Navigator from './regions/navigator/navigator';
 import HotkeysScreen from './components/hotkeys/hotkeys';
 import environment from '../../../../core/common/assets/js/utils/environment.js';
+import DateTimeControl from 'elementor-controls/date-time';
 import Document from './document';
 
 const App = Marionette.Application.extend( {
@@ -70,7 +71,7 @@ const App = Marionette.Application.extend( {
 			Choose: require( 'elementor-controls/choose' ),
 			Code: require( 'elementor-controls/code' ),
 			Color: require( 'elementor-controls/color' ),
-			Date_time: require( 'elementor-controls/date-time' ),
+			Date_time: DateTimeControl,
 			Dimensions: require( 'elementor-controls/dimensions' ),
 			Font: require( 'elementor-controls/font' ),
 			Gallery: require( 'elementor-controls/gallery' ),
@@ -391,67 +392,55 @@ const App = Marionette.Application.extend( {
 	},
 
 	registerCommands: function() {
-		elementorCommon.commands.registerDependency( 'elements', function() {
+		elementorCommon.commands.registerDependency( 'elements', () => {
 			return elementor.getCurrentElement();
 		} );
 
-		elementorCommon.commands.register( 'elements/copy', function() {
-			elementor.getCurrentElement().copy();
-		}, 'ctrl+c' );
+		elementorCommon.commands.register( 'elements/copy', () => elementor.getCurrentElement().copy(), {
+			keys: 'ctrl+c',
+			exclude: [ 'input' ],
+		} );
 
-		elementorCommon.commands.register( 'elements/duplicate', function() {
-			elementor.getCurrentElement().duplicate();
-		}, 'ctrl+d' );
+		elementorCommon.commands.register( 'elements/duplicate', () => elementor.getCurrentElement().duplicate(), {
+			keys: 'ctrl+d',
+		} );
 
-		elementorCommon.commands.register( 'elements/delete', function( event ) {
-			var $target = $( event.target );
+		elementorCommon.commands.register( 'elements/delete', () => elementor.getCurrentElement().removeElement(), {
+			keys: 'del',
+			exclude: [ 'input' ],
+		} );
 
-			if ( $target.is( ':input, .elementor-input' ) ) {
-				return;
-			}
+		elementorCommon.commands.register( 'elements/paste', () => elementor.getCurrentElement().paste(), {
+			keys: 'ctrl+v',
+			exclude: [ 'input' ],
+			dependency: () => {
+				return elementor.getCurrentElement().isPasteEnabled();
+			},
+		} );
 
-			if ( $target.closest( '[contenteditable="true"]' ).length ) {
-				return;
-			}
+		elementorCommon.commands.register( 'elements/pasteStyle', () => elementor.getCurrentElement().paste(), {
+			keys: 'ctrl+shift+v',
+			exclude: [ 'input' ],
+			dependency: () => {
+				return elementor.getCurrentElement().pasteStyle && elementorCommon.storage.get( 'transfer' );
+			},
+		} );
 
-			elementor.getCurrentElement().removeElement();
-		}, 'del' );
-
-		elementorCommon.commands.register( 'elements/paste', function() {
-			const targetElement = elementor.getCurrentElement();
-
-			if ( targetElement.isPasteEnabled() ) {
-				targetElement.paste();
-			}
-		}, 'ctrl+v' );
-
-		elementorCommon.commands.register( 'elements/pasteStyle', function() {
-			const targetElement = elementor.getCurrentElement();
-
-			if ( targetElement.pasteStyle && elementorCommon.storage.get( 'transfer' ) ) {
-				targetElement.pasteStyle();
-			}
-		}, 'ctrl+shift+v' );
-
-		elementorCommon.commands.registerDependency( 'navigator', function() {
+		elementorCommon.commands.registerDependency( 'navigator', () => {
 			return 'edit' === elementor.channels.dataEditMode.request( 'activeMode' );
 		} );
 
-		elementorCommon.commands.register( 'navigator/toggle', function() {
+		elementorCommon.commands.register( 'navigator/toggle', () => {
 			if ( elementor.navigator.storage.visible ) {
 				elementor.navigator.close();
 			} else {
 				elementor.navigator.open();
 			}
-		}, 'ctrl+i' );
+		}, { keys: 'ctrl+i' } );
 
-		elementorCommon.commands.register( 'library/show', function() {
-			elementorCommon.route.to( 'library/templates' );
-		}, 'ctrl+shift+i' );
-
-		elementorCommon.commands.register( 'preview/toggleResponsive', function() {
-			var currentDeviceMode = elementor.channels.deviceMode.request( 'currentMode' ),
-				modeIndex = this.devices.indexOf( currentDeviceMode );
+		elementorCommon.commands.register( 'preview/change-device-mode', () => {
+			const currentDeviceMode = elementor.channels.deviceMode.request( 'currentMode' );
+			let modeIndex = this.devices.indexOf( currentDeviceMode );
 
 			modeIndex++;
 
@@ -460,18 +449,18 @@ const App = Marionette.Application.extend( {
 			}
 			//
 			elementor.changeDeviceMode( this.devices[ modeIndex ] );
-		}, 'ctrl+shift+m' );
+		}, { keys: 'ctrl+shift+m' } );
 
-		elementorCommon.commands.register( 'document/save', function() {
-			elementor.saver.saveDraft();
-		}, 'ctrl+s' );
+		elementorCommon.commands.register( 'document/save', () => elementor.saver.saveDraft(), {
+			keys: 'ctrl+s',
+		} );
 
-		elementorCommon.commands.register( 'panel/exit', function() {
-			if ( ! jQuery( '.dialog-widget:visible' ).length ) {
-				return;
-			}
-			elementorCommon.route.to( 'panel/menu' );
-		}, 'esc' );
+		elementorCommon.commands.register( 'panel/exit', () => elementorCommon.route.to( 'panel/menu' ), {
+			keys: 'esc',
+			dependency: () => {
+				return ! jQuery( '.dialog-widget:visible' ).length;
+	},
+		} );
 	},
 
 	initPanel: function() {
@@ -632,7 +621,7 @@ const App = Marionette.Application.extend( {
 
 	openLibraryOnStart: function() {
 		if ( '#library' === location.hash ) {
-			elementorCommon.route.to( 'library/templates' );
+			elementorCommon.commands.run( 'library/show' );
 
 			location.hash = '';
 		}

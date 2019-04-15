@@ -21,6 +21,26 @@ export default class Shortcuts {
 		$window.on( 'keydown', ( event ) => this.handle( event ) );
 	}
 
+	printAll() {
+		const shortcuts = {};
+		jQuery.each( this.handlers, ( key, handler ) => {
+			jQuery.each( handler, ( index, config ) => {
+				shortcuts[ config.command ] = key;
+			} );
+		} );
+
+		console.log( shortcuts ); // eslint-disable-line no-console
+	}
+
+	/**
+	 * @param shortcuts
+	 * @param {Object} args
+	 * @param {callback} args.callback Required
+	 * @param {string} args.component Optional
+	 * @param {callback} args.dependency Optional
+	 * @param {array} args.exclude Optional
+	 * @param {bool} args.allowAltKey Optional
+	 */
 	register( shortcuts, args ) {
 		shortcuts.replace( ' ', '' ).split( ',' ).forEach( ( shortcut ) => {
 			if ( ! this.handlers[ shortcut ] ) {
@@ -38,8 +58,6 @@ export default class Shortcuts {
 			return;
 		}
 
-		event.preventDefault();
-
 		jQuery.each( handlers, ( key, handler ) => {
 			if ( handler.component && handler.component !== this.component ) {
 				return;
@@ -49,10 +67,20 @@ export default class Shortcuts {
 				return;
 			}
 
+			if ( handler.exclude && -1 !== handler.exclude.indexOf( 'input' ) ) {
+				const $target = jQuery( event.target );
+
+				if ( $target.is( ':input, .elementor-input' ) || $target.closest( '[contenteditable="true"]' ).length ) {
+					return;
+				}
+			}
+
 			// Fix for some keyboard sources that consider alt key as ctrl key
 			if ( ! handler.allowAltKey && event.altKey ) {
 				return;
 			}
+
+			event.preventDefault();
 
 			handler.callback( event );
 		} );

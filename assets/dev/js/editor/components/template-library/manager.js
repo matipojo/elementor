@@ -19,35 +19,36 @@ TemplateLibraryManager = function() {
 	const initLayout = function() {
 		layout = new TemplateLibraryLayoutView( { pages: screens } );
 
-		layout.getModal().on( 'hide', function() {
-			self.isOpen = false;
-			modalConfig = {};
-
-			elementorCommon.route
-				.saveState( 'library' )
-				.close( 'library' );
-		} );
+		layout.getModal().on( 'hide', () => elementorCommon.route.close( 'library' ) );
 	};
 
 	const registerRouts = function() {
-		elementorCommon.route.registerDependency( 'library', () => {
-			self.startModal();
-			return true;
-		} );
-
-		screens.forEach( ( screen ) => {
-			elementorCommon.route.register( screen.route, () => {
-				self.setScreen( screen.source, screen.type );
-			} );
-		} );
-
-		elementorCommon.route.register( 'library/templates', ( args ) => {
+		elementorCommon.commands.register( 'library/show', ( args ) => {
 			modalConfig = args;
 
 			if ( ! elementorCommon.route.restoreState( 'library' ) ) {
 				self.showDefaultScreen();
 			}
-		}, 'ctrl+shift+l' );
+		}, { keys: 'ctrl+shift+l' } );
+
+		elementorCommon.route.registerComponent( 'library', {
+			open: () => {
+				self.startModal();
+
+				return true;
+			},
+			close: () => {
+				modalConfig = {};
+			},
+		} );
+
+		screens.forEach( ( screen ) => {
+			elementorCommon.route.register( screen.route, () => {
+				self.setScreen( screen.source, screen.type );
+
+				elementorCommon.route.saveState( 'library' );
+			} );
+		} );
 
 		elementorCommon.route.register( 'library/save-template', ( args ) => {
 			self.getLayout().showSaveTemplateView( args.model );
@@ -360,12 +361,6 @@ TemplateLibraryManager = function() {
 	};
 
 	this.startModal = function() {
-		if ( self.isOpen ) {
-			return;
-		}
-
-		self.isOpen = true;
-
 		if ( ! layout ) {
 			initLayout();
 		}

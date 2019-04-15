@@ -6,8 +6,16 @@ export default class extends elementorModules.Module {
 
 		this.layout = new FinderLayout();
 
-		elementorCommon.route.register( 'finder', () => this.layout.showModal(), 'ctrl+e' );
-
 		this.layout.getModal().on( 'hide', () => elementorCommon.route.close( 'finder' ) );
+
+		elementorCommon.route.registerComponent( 'finder', {
+			open: () => {
+				this.layout.showModal();
+				return true;
+			},
+			close: () => this.layout.getModal().hide(),
+		} );
+
+		elementorCommon.route.register( 'finder', () => {}, { keys: 'ctrl+e' } );
 	}
 }

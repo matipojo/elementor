@@ -4,14 +4,60 @@ export default class extends Commands {
 	constructor( ...args ) {
 		super( ...args );
 
+		this.components = {};
 		this.savedStates = {};
+	}
+
+	registerComponent( component, args ) {
+		this.components[ component ] = args;
+
+		if ( args.open ) {
+			this.registerDependency( component, () => {
+				return this.open( component );
+			} );
+		}
+
+		return this;
+	}
+
+	open( component ) {
+		const args = this.components[ component ];
+
+		if ( ! args ) {
+			return;
+		}
+
+		if ( ! args.isOpen ) {
+			args.isOpen = args.open.apply();
+			this.components[ component ].isOpen = args.isOpen;
+		}
+
+		return args.isOpen;
+	}
+
+	close( component ) {
+		const args = this.components[ component ];
+
+		if ( ! args ) {
+			return;
+		}
+
+		if ( args.close ) {
+			args.close.apply( this );
+		}
+
+		this.components[ component ].isOpen = false;
+
+		this.clearCurrent( component );
+
+		return this;
 	}
 
 	reload( route, args ) {
 		const parts = route.split( '/' ),
 			component = parts[ 0 ];
 
-		this.close( component );
+		this.clearCurrent( component );
 
 		this.to( route, args );
 	}
@@ -20,12 +66,12 @@ export default class extends Commands {
 		const currentRoute = this.getCurrent( component ),
 			currentArgs = this.getCurrentArgs( component );
 
-		this.close( component );
+		this.clearCurrent( component );
 
 		this.to( currentRoute, currentArgs );
 	}
 
-	close( component ) {
+	clearCurrent( component ) {
 		delete this.current[ component ];
 		delete this.currentArgs[ component ];
 	}

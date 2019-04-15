@@ -151,7 +151,7 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 			return;
 		}
 			#>
-			<div class="elementor-panel-navigation-tab elementor-tab-control-{{ tabSlug }}" data-tab="{{ tabSlug }}">
+			<div class="elementor-panel-navigation-tab elementor-tab-control-{{ tabSlug }}" data-tab="{{ tabSlug }}" data-route="panel/editor/{{ tabSlug }}">
 				<a href="#">{{{ tabTitle }}}</a>
 			</div>
 		<# } ); #>
@@ -260,15 +260,4 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 			<i class="fa fa-times-circle"></i>
 		</div>
 	<# } #>
-</script>
-
-<script type="text/template" id="tmpl-elementor-panel-page-settings">
-	<div class="elementor-panel-navigation">
-		<# _.each( elementor.config.page_settings.tabs, function( tabTitle, tabSlug ) { #>
-			<div class="elementor-panel-navigation-tab elementor-tab-control-{{ tabSlug }}" data-tab="{{ tabSlug }}">
-				<a href="#">{{{ tabTitle }}}</a>
-			</div>
-			<# } ); #>
-	</div>
-	<div id="elementor-panel-page-settings-controls"></div>
 </script>

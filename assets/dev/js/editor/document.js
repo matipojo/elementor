@@ -581,37 +581,37 @@ export default class Document extends elementorModules.Module {
 
 	registerEQuery() {
 		const proxyHandler = {
-				get: ( target, propKey, receiver ) => {
-					if ( propKey in target ) {
-						return target[ propKey ];
-					}
+			get: ( target, propKey, receiver ) => {
+				if ( propKey in target ) {
+					return target[ propKey ];
+				}
 
-					if ( this.elements[ propKey ] ) {
-						return ( ...args ) => {
-							if ( target.context ) {
-								this.selection.set( target.context );
-							}
+				if ( this.elements[ propKey ] ) {
+					return ( ...args ) => {
+						if ( target.context ) {
+							this.selection.set( target.context );
+						}
 
-							const results = this.elements[ propKey ].apply( this.elements, args );
+						const results = this.elements[ propKey ].apply( this.elements, args );
 
-							// Update
-							if ( 'boolean' === typeof results ) {
-								return receiver;
-							}
+						// Update
+						if ( 'boolean' === typeof results ) {
+							return receiver;
+						}
 
-							// Move/Add keep context for current element.
-							if ( results instanceof eQuery ) {
-								target.context = results.context;
+						// Move/Add keep context for current element.
+						if ( results instanceof eQuery ) {
+							target.context = results.context;
 
-								return results;
-							}
+							return results;
+						}
 
-							// Create
-							return $e( '', results );
-						};
-					}
-				},
-			};
+						// Create
+						return $e( '', results );
+					};
+				}
+			},
+		};
 
 		window.$e = ( selector, context ) => new Proxy( new eQuery( selector, context ), proxyHandler );
 	}

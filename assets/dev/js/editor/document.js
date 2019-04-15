@@ -296,7 +296,9 @@ class Elements {
 	}
 
 	copy( storageKey = 'clipboard' ) {
-		const models = this.getSelection().map( ( element ) => element.model );
+		const models = this.getSelection().map( ( element ) => {
+			return element.model;
+		} );
 
 		elementorCommon.storage.set( storageKey, models );
 
@@ -319,12 +321,23 @@ class Elements {
 			clipboardModels.forEach( ( model ) => {
 				index++;
 				const $eTarget = element.model.id === model.id ? $e( '', element._parent ) : $e( '', element );
-
-				newElements.push( $eTarget.create( [ model.elType, model.widgetType ], model.settings, { at: index, clone: true } ) );
+				const $newElement = $eTarget.create( [ model.elType, model.widgetType ], model.settings, { at: index, clone: true } );
+				newElements.push( $newElement.context[ 0 ] );
 			} );
 		} );
 
 		return newElements;
+	}
+
+	pasteStyle( storageKey = 'clipboard' ) {
+		// TODO: Use storageKey in pasteStyle.
+		elementorCommon.storage.set( 'transfer', {
+			elements: elementorCommon.storage.get( storageKey ),
+		} );
+
+		this.getSelection().forEach( ( element ) => element.pasteStyle() );
+
+		return true;
 	}
 
 	parent() {
@@ -356,12 +369,10 @@ class Elements {
 		return true;
 	}
 
-	pasteStyle() {
-		return updatedElement;
-	}
-
 	resetStyle() {
-		return updatedElement;
+		this.getSelection().forEach( ( element ) => element.resetStyle() );
+
+		return true;
 	}
 }
 

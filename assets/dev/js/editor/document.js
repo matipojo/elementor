@@ -455,23 +455,6 @@ class eQuery {
 		}
 	}
 
-	createSection( columns = 1, settings, args ) {
-		// Temp: decrease columns because the editor adds one automatically.
-		columns--;
-
-		const $eSection = this.create( 'section', settings, args );
-
-		for ( let i = 0; i < columns; i++ ) {
-			$eSection.create( 'column' );
-		}
-
-		return $eSection;
-	}
-
-	createWidget( type, settings, args ) {
-		return this.create( [ 'widget', type ], settings, args );
-	}
-
 	findRecursive( elements, id ) {
 		for ( let x in elements.models ) {
 			let model = elements.models[ x ];

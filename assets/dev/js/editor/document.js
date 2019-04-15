@@ -282,7 +282,8 @@ class Elements {
 				element._parent.collection.remove( element.model );
 			};
 
-			newElements.push( $eElement.create( [ model.elType, model.widgetType ], model.settings, args ) );
+			const $newElement = $eElement.create( [ model.elType, model.widgetType ], model.settings, args );
+			newElements.push( $newElement.context[ 0 ] );
 		} );
 
 		return $e( '', newElements );

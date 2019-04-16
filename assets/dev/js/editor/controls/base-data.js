@@ -80,9 +80,9 @@ ControlBaseDataView = ControlBaseView.extend( {
 	},
 
 	setSettingsModel: function( value ) {
-		if ( this.elementSettingsModel._parent.getEditModel().get( 'elType' ) ) {
+		if ( this.elementSettingsModel._parent && this.elementSettingsModel._parent.getEditModel().get( 'elType' ) ) {
 			// Use id for #document.
-			$e( '#' + this._parent.model.id ).setting( this.model.get( 'name' ), value );
+			$e( '#' + this.elementSettingsModel._parent.model.id ).setting( this.model.get( 'name' ), value );
 		} else {
 			this.elementSettingsModel.set( this.model.get( 'name' ), value );
 		}

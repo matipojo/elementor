@@ -735,10 +735,7 @@ class Test extends elementorModules.Module {
 
 		$eColumn3.find( 'heading' ).pasteStyle();
 
-		// Paste Style directly.
-		$eColumn3.find( 'heading' ).pasteStyle( $eHeading );
-
-		$e.settings( {
+		$e().settings( {
 			_background_background: 'classic',
 			_background_image: {
 				url: 'http://localhost/elementor/wp-content/uploads/2019/02/library.jpg',
@@ -746,6 +743,6 @@ class Test extends elementorModules.Module {
 			},
 		} );
 
-		$e.save();
+		$e().save();
 	}
 }

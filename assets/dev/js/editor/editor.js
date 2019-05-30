@@ -926,6 +926,58 @@ window.elementor = new App();
 
 if ( -1 === location.href.search( 'ELEMENTOR_TESTS=1' ) ) {
 	elementor.start();
+} else {
+	elementor.start();
+	elementor.on( 'preview:loaded', () => {
+		_.isEqual( elementorCommon.route.current, { panel: 'panel/elements/categories' } );
+
+		var task = 0;
+		Object.keys( elementorCommon.route.commands ).forEach( ( route ) => {
+			task++;
+
+			setTimeout( () => {
+				try {
+					console.log( 'try open `' + route + '`' );
+					elementorCommon.route.to( route );
+
+					const container = route.split( '/' )[ 0 ];
+
+					setTimeout( () => {
+						console.log( 'try close `' + container + '`' );
+
+						elementorCommon.route.close( container );
+					}, 1000 );
+				} catch ( e ) {
+					console.log( e );
+				}
+			}, 1000 * task );
+		} );
+
+		task = 0;
+		Object.keys( elementorCommon.commands.commands ).forEach( ( command ) => {
+			task++;
+
+			setTimeout( () => {
+				try {
+					console.log( 'try run `' + command + '`' );
+					elementorCommon.commands.run( command );
+				} catch ( e ) {
+					console.log( e );
+				}
+			}, 2000 * task );
+		} );
+
+		setTimeout( () => {
+			try {
+				elementorCommon.commands.run( 'panel/toggle' );
+				elementorCommon.commands.run( 'navigator/toggle' );
+				elementorCommon.commands.run( 'panel/change-device-mode' ); // mobile
+				elementorCommon.commands.run( 'panel/change-device-mode' ); // desktop
+			} catch ( e ) {
+				console.log( e );
+			}
+		}, 2000 * task );
+	} );
 }
 
 module.exports = elementor;

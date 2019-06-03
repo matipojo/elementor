@@ -14,6 +14,18 @@ module.exports = elementorModules.editor.views.ControlsStack.extend( {
 	childViewOptions: function() {
 		return {
 			elementSettingsModel: this.model,
+			elementEditSettings: this.model.get( 'editSettings' ),
 		};
+	},
+
+	initialize: function() {
+		elementorModules.editor.views.ControlsStack.prototype.initialize.apply( this, arguments );
+		this.initEditSettings();
+	},
+
+	initEditSettings: function() {
+		var editSettings = new Backbone.Model( this.model.get( 'defaultEditSettings' ) );
+
+		this.model.set( 'editSettings', editSettings );
 	},
 } );

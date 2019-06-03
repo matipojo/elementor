@@ -231,6 +231,11 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 			settings = element.get( 'settings' ),
 			controlName = this.model.get( 'name' );
 
+		/* Document */
+		if ( ! settings ) {
+			return;
+		}
+
 		// Save it with old values
 		collectionCloned[ modelIndex ] = model._previousAttributes;
 

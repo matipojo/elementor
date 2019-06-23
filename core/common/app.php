@@ -88,7 +88,7 @@ class App extends BaseApp {
 	public function register_scripts() {
 		wp_register_script(
 			'elementor-common-modules',
-			ELEMENTOR_ASSETS_URL . 'js/common-modules.js',
+			$this->get_js_assets_url( 'common-modules' ),
 			[],
 			ELEMENTOR_VERSION,
 			true
@@ -155,7 +155,7 @@ class App extends BaseApp {
 			'elementor-icons',
 			$this->get_css_assets_url( 'elementor-icons', 'assets/lib/eicons/css/' ),
 			[],
-			'4.3.0'
+			'5.1.0'
 		);
 
 		wp_enqueue_style(

@@ -163,19 +163,19 @@ class Widget_Button extends Widget_Base {
 				'options' => [
 					'left'    => [
 						'title' => __( 'Left', 'elementor' ),
-						'icon' => 'fa fa-align-left',
+						'icon' => 'eicon-text-align-left',
 					],
 					'center' => [
 						'title' => __( 'Center', 'elementor' ),
-						'icon' => 'fa fa-align-center',
+						'icon' => 'eicon-text-align-center',
 					],
 					'right' => [
 						'title' => __( 'Right', 'elementor' ),
-						'icon' => 'fa fa-align-right',
+						'icon' => 'eicon-text-align-right',
 					],
 					'justify' => [
 						'title' => __( 'Justified', 'elementor' ),
-						'icon' => 'fa fa-align-justify',
+						'icon' => 'eicon-text-align-justify',
 					],
 				],
 				'prefix_class' => 'elementor%s-align-',
@@ -281,6 +281,14 @@ class Widget_Button extends Widget_Base {
 			[
 				'name' => 'typography',
 				'scheme' => Scheme_Typography::TYPOGRAPHY_4,
+				'selector' => '{{WRAPPER}} a.elementor-button, {{WRAPPER}} .elementor-button',
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Text_Shadow::get_type(),
+			[
+				'name' => 'text_shadow',
 				'selector' => '{{WRAPPER}} a.elementor-button, {{WRAPPER}} .elementor-button',
 			]
 		);

@@ -5,7 +5,10 @@ import HotkeysScreen from './components/hotkeys/hotkeys';
 import environment from '../../../../core/common/assets/js/utils/environment.js';
 import DateTimeControl from 'elementor-controls/date-time';
 import Document from './document';
+import NoticeBar from './utils/notice-bar';
 
+import IconsManager from './components/icons-manager/icons-manager';
+//_.noConflict();
 const App = Marionette.Application.extend( {
 	loaded: false,
 
@@ -73,10 +76,13 @@ const App = Marionette.Application.extend( {
 			Color: require( 'elementor-controls/color' ),
 			Date_time: DateTimeControl,
 			Dimensions: require( 'elementor-controls/dimensions' ),
+			Exit_animation: require( 'elementor-controls/select2' ),
 			Font: require( 'elementor-controls/font' ),
 			Gallery: require( 'elementor-controls/gallery' ),
+			Hidden: require( 'elementor-controls/hidden' ),
 			Hover_animation: require( 'elementor-controls/select2' ),
 			Icon: require( 'elementor-controls/icon' ),
+			Icons: require( 'elementor-controls/icons' ),
 			Image_dimensions: require( 'elementor-controls/image-dimensions' ),
 			Media: require( 'elementor-controls/media' ),
 			Number: require( 'elementor-controls/number' ),
@@ -164,7 +170,7 @@ const App = Marionette.Application.extend( {
 	_defaultDeviceMode: 'desktop',
 
 	addControlView: function( controlID, ControlView ) {
-		this.modules.controls[ elementorCommon.helpers.firstLetterUppercase( controlID ) ] = ControlView;
+		this.modules.controls[ elementorCommon.helpers.upperCaseWords( controlID ) ] = ControlView;
 	},
 
 	checkEnvCompatibility: function() {
@@ -234,7 +240,7 @@ const App = Marionette.Application.extend( {
 	},
 
 	getControlView: function( controlID ) {
-		var capitalizedControlName = elementorCommon.helpers.firstLetterUppercase( controlID ),
+		var capitalizedControlName = elementorCommon.helpers.upperCaseWords( controlID ),
 			View = this.modules.controls[ capitalizedControlName ];
 
 		if ( ! View ) {
@@ -279,6 +285,10 @@ const App = Marionette.Application.extend( {
 		this.registerCommands();
 
 		this.hotkeysScreen = new HotkeysScreen();
+
+		this.iconManager = new IconsManager();
+
+		this.noticeBar = new NoticeBar();
 	},
 
 	// TODO: BC method since 2.3.0
@@ -476,6 +486,12 @@ const App = Marionette.Application.extend( {
 				regionClass: Navigator,
 			},
 		} );
+
+		this.trigger( 'navigator:init' );
+
+		if ( this.navigator.storage.visible ) {
+			this.navigator.open();
+		}
 	},
 
 	setAjax: function() {
@@ -820,7 +836,7 @@ const App = Marionette.Application.extend( {
 
 		var previewWindow = this.$preview[ 0 ].contentWindow;
 
-		if ( ! previewWindow.elementorFrontend ) {
+		if ( ! previewWindow.elementorFrontend || elementor.config.preview.debug_data.error ) {
 			this.onPreviewLoadingError();
 
 			return;
@@ -947,12 +963,37 @@ const App = Marionette.Application.extend( {
 	},
 
 	onPreviewLoadingError: function() {
-		this.showFatalErrorDialog( {
-			headerMessage: this.translate( 'preview_not_loading_header' ),
-			message: this.translate( 'preview_not_loading_message' ) + '<br><a href="' + this.config.document.urls.preview + '" target="_blank">Preview Debug</a>',
-			onConfirm: function() {
-				open( elementor.config.help_preview_error_url, '_blank' );
-			},
+		const self = this;
+
+		const debugUrl = self.config.document.urls.preview + '&preview-debug',
+			previewDebugLinkText = self.config.i18n.preview_debug_link_text,
+			previewDebugLink = '<div id="preview-debug-link-text"><a href="' + debugUrl + '" target="_blank">' + previewDebugLinkText + '</a></div>',
+			debugData = elementor.config.preview.debug_data,
+			dialogOptions = {
+				className: 'preview-loading-error',
+				headerMessage: debugData.header,
+				message: debugData.message + previewDebugLink,
+				onConfirm: function() {
+					open( debugData.doc_url, '_blank' );
+				} };
+
+		if ( debugData.error ) {
+			self.showFatalErrorDialog( dialogOptions );
+			return;
+		}
+
+		jQuery.get( debugUrl, function() {
+			self.showFatalErrorDialog( dialogOptions );
+		} ).fail( function( response ) { //Iframe can't be loaded
+			self.showFatalErrorDialog( {
+				className: 'preview-loading-error',
+				headerMessage: debugData.header,
+				message: response.statusText + ' ' + response.status + ' ' + previewDebugLink,
+				onConfirm: function() {
+					const url = 500 <= response.status ? elementor.config.preview.help_preview_http_error_500_url : elementor.config.preview.help_preview_http_error_url;
+					open( url, '_blank' );
+				},
+			} );
 		} );
 	},
 
@@ -998,6 +1039,10 @@ const App = Marionette.Application.extend( {
 
 			$elementsToHide.hide();
 		} );
+	},
+
+	compileTemplate: function( template, data ) {
+		return Marionette.TemplateCache.prototype.compileTemplate( template )( data );
 	},
 } );
 

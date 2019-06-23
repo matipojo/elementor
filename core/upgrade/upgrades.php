@@ -40,7 +40,12 @@ class Upgrades {
 		}
 
 		foreach ( $post_ids as $post_id ) {
-			$data = Plugin::$instance->db->get_plain_editor( $post_id );
+			$document = Plugin::$instance->documents->get( $post_id );
+
+			if ( $document ) {
+				$data = $document->get_elements_data();
+			}
+
 			if ( empty( $data ) ) {
 				continue;
 			}
@@ -57,7 +62,11 @@ class Upgrades {
 				return $element;
 			} );
 
-			Plugin::$instance->db->save_editor( $post_id, $data );
+			$document = Plugin::$instance->documents->get( $post_id );
+
+			$document->save( [
+				'elements' => $data,
+			] );
 		}
 	}
 
@@ -88,7 +97,12 @@ class Upgrades {
 		}
 
 		foreach ( $post_ids as $post_id ) {
-			$data = Plugin::$instance->db->get_plain_editor( $post_id );
+			$document = Plugin::$instance->documents->get( $post_id );
+
+			if ( $document ) {
+				$data = $document->get_elements_data();
+			}
+
 			if ( empty( $data ) ) {
 				continue;
 			}
@@ -113,7 +127,11 @@ class Upgrades {
 				return $element;
 			} );
 
-			Plugin::$instance->db->save_editor( $post_id, $data );
+			$document = Plugin::$instance->documents->get( $post_id );
+
+			$document->save( [
+				'elements' => $data,
+			] );
 		}
 	}
 
@@ -141,7 +159,12 @@ class Upgrades {
 		}
 
 		foreach ( $post_ids as $post_id ) {
-			$data = Plugin::$instance->db->get_plain_editor( $post_id );
+			$document = Plugin::$instance->documents->get( $post_id );
+
+			if ( $document ) {
+				$data = $document->get_elements_data();
+			}
+
 			if ( empty( $data ) ) {
 				continue;
 			}
@@ -172,7 +195,11 @@ class Upgrades {
 				return $element;
 			} );
 
-			Plugin::$instance->db->save_editor( $post_id, $data );
+			$document = Plugin::$instance->documents->get( $post_id );
+
+			$document->save( [
+				'elements' => $data,
+			] );
 		}
 	}
 
@@ -296,7 +323,12 @@ class Upgrades {
 
 		foreach ( $post_ids as $post_id ) {
 			$do_update = false;
-			$data = Plugin::$instance->db->get_plain_editor( $post_id );
+			$document = Plugin::$instance->documents->get( $post_id );
+
+			if ( $document ) {
+				$data = $document->get_elements_data();
+			}
+
 			if ( empty( $data ) ) {
 				continue;
 			}

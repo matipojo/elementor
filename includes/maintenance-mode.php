@@ -270,11 +270,13 @@ class Maintenance_Mode {
 			'href' => Tools::get_url() . '#tab-maintenance_mode',
 		] );
 
+		$document = Plugin::$instance->documents->get( self::get( 'template_id' ) );
+
 		$wp_admin_bar->add_node( [
 			'id' => 'elementor-maintenance-edit',
 			'parent' => 'elementor-maintenance-on',
 			'title' => __( 'Edit Template', 'elementor' ),
-			'href' => Utils::get_edit_link( self::get( 'template_id' ) ),
+			'href' => $document ? $document->get_edit_url() : '',
 		] );
 	}
 
@@ -296,6 +298,12 @@ class Maintenance_Mode {
 		<?php
 	}
 
+	public function on_update_mode( $old_value, $value ) {
+		if ( $old_value !== $value ) {
+			do_action( 'elementor/maintenance_mode/mode_changed', $old_value, $value );
+		}
+	}
+
 	/**
 	 * Maintenance mode constructor.
 	 *
@@ -305,6 +313,8 @@ class Maintenance_Mode {
 	 * @access public
 	 */
 	public function __construct() {
+		add_action( 'update_option_elementor_maintenance_mode_mode', [ $this, 'on_update_mode' ], 10, 2 );
+
 		$is_enabled = (bool) self::get( 'mode' ) && (bool) self::get( 'template_id' );
 
 		if ( is_admin() ) {

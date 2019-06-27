@@ -2,7 +2,7 @@ var ElementHistoryBehavior = require( './element-behavior' ),
 	CollectionHistoryBehavior = require( './collection-behavior' );
 
 import ItemModel from './item-model';
-import PanelTab from './panel-tab';
+import Component from './component';
 
 var	Manager = function() {
 	var self = this,
@@ -44,7 +44,7 @@ var	Manager = function() {
 		return itemData.type;
 	};
 
-	var navigate = function( isRedo ) {
+	this.navigate = function( isRedo ) {
 		var currentItem = items.find( function( model ) {
 				return 'not_applied' === model.get( 'status' );
 			} ),
@@ -59,15 +59,8 @@ var	Manager = function() {
 	};
 
 	var updatePanelPageCurrentItem = function() {
-		const panel = elementor.getPanelView();
-
-		if ( 'historyPage' === panel.getCurrentPageName() ) {
-			const historyPage = panel.getCurrentPageView(),
-				currentTab = historyPage.getCurrentTab();
-
-			if ( currentTab instanceof PanelTab ) {
-				currentTab.updateCurrentItem();
-			}
+		if ( elementorCommon.route.is( 'panel/history/actions' ) ) {
+			elementorCommon.route.refreshContainer( 'panel' );
 		}
 	};
 
@@ -80,23 +73,7 @@ var	Manager = function() {
 	};
 
 	var init = function() {
-		elementorCommon.route.register( 'panel/history/actions', () => {
-			elementor.getPanelView().setPage( 'historyPage' ).activateTab( 'actions' );
-		}, { keys: 'ctrl+shift+h' } );
-
-		elementorCommon.route.register( 'panel/history/revisions', () => {
-			elementor.getPanelView().setPage( 'historyPage' ).activateTab( 'revisions' );
-		}, { keys: 'ctrl+alt+r' } );
-
-		elementorCommon.commands.register( 'history/undo', () => navigate(), {
-			keys: 'ctrl+z',
-			exclude: [ 'input' ],
-		} );
-
-		elementorCommon.commands.register( 'history/redo', () => navigate( true ), {
-			keys: 'ctrl+shift+z, ctrl+y',
-			exclude: [ 'input' ],
-		} );
+		elementorCommon.components.register( new Component( { context: self } ) );
 
 		elementor.hooks.addFilter( 'elements/base/behaviors', addBehaviors );
 		elementor.hooks.addFilter( 'elements/base-section-container/behaviors', addCollectionBehavior );
@@ -237,7 +214,7 @@ var	Manager = function() {
 				viewToScroll = panelPage.getOption( 'editedElementView' );
 			}
 		} else if ( item instanceof Backbone.Model && item.get( 'items' ).length ) {
-				var history = item.get( 'items' ).first().get( 'history' );
+			const history = item.get( 'items' ).first().get( 'history' );
 
 				if ( history && history.behavior.view && history.behavior.view.model ) {
 					viewToScroll = self.findView( history.behavior.view.model.get( 'id' ) );

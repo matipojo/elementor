@@ -38,26 +38,6 @@ module.exports = Marionette.ItemView.extend( {
 
 	initialize: function() {
 		this.listenTo( elementor.channels.deviceMode, 'change', this.onDeviceModeChange );
-
-		elementorCommon.route.register( 'panel/page/settings', () => {
-			this.openSettingsTab( 'settings' );
-		} );
-
-		elementorCommon.route.register( 'panel/page/style', () => {
-			this.openSettingsTab( 'style' );
-		} );
-
-		elementorCommon.route.register( 'panel/page/advanced', () => {
-			this.openSettingsTab( 'advanced' );
-		} );
-	},
-
-	openSettingsTab: function( tab ) {
-		if ( 'page_settings' !== elementor.getPanelView().getCurrentPageName() ) {
-			this.showSettingsPage();
-		}
-
-		elementor.getPanelView().getCurrentPageView().activateTab( tab )._renderChildren();
 	},
 
 	getDeviceModeButton: function( deviceMode ) {
@@ -107,15 +87,7 @@ module.exports = Marionette.ItemView.extend( {
 	},
 
 	showSettingsPage: function() {
-		const panel = elementor.getPanelView();
-
-		this.ui.settings.addClass( 'elementor-open' );
-
-		panel.setPage( 'page_settings' );
-
-		panel.getCurrentPageView().on( 'destroy', () => {
-			this.ui.settings.removeClass( 'elementor-open' );
-		} );
+		elementorCommon.route.to( 'panel/page-settings/settings' );
 	},
 
 	onMenuButtonsClick: function( event ) {
@@ -136,7 +108,7 @@ module.exports = Marionette.ItemView.extend( {
 	},
 
 	onSettingsClick: function() {
-		elementorCommon.route.to( 'panel/page/settings' );
+		elementorCommon.route.to( 'panel/page-settings/settings' );
 	},
 
 	onDeviceModeChange: function() {
@@ -167,10 +139,6 @@ module.exports = Marionette.ItemView.extend( {
 	},
 
 	onNavigatorClick: function() {
-		if ( elementor.navigator.isOpen() ) {
-			elementor.navigator.close();
-		} else {
-			elementor.navigator.open();
-		}
+		elementorCommon.commands.run( 'navigator/toggle' );
 	},
 } );

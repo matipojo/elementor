@@ -1,6 +1,10 @@
 var EditModeItemView = require( 'elementor-regions/panel/edit-mode' ),
 	PanelLayoutView;
 
+import PanelComponent from './component';
+import ElementsComponent from './pages/elements/component';
+import EditorComponent from './pages/editor/component';
+
 PanelLayoutView = Marionette.LayoutView.extend( {
 	template: '#tmpl-elementor-panel',
 
@@ -17,10 +21,10 @@ PanelLayoutView = Marionette.LayoutView.extend( {
 
 	childEvents: {
 		'click:add': function() {
-			elementorCommon.route.to( 'panel/elements' );
+			elementorCommon.route.to( 'panel/elements/categories' );
 		},
 		'editor:destroy': function() {
-			elementorCommon.route.to( 'panel/elements', {
+			elementorCommon.route.to( 'panel/elements/categories', {
 				autoFocusSearch: false,
 			} );
 		},
@@ -33,27 +37,11 @@ PanelLayoutView = Marionette.LayoutView.extend( {
 	perfectScrollbar: null,
 
 	initialize: function() {
-		elementorCommon.route.register( 'panel/elements', () => this.activateElementsTab() );
+		elementorCommon.components.register( new PanelComponent( { context: this } ) );
 
-		elementorCommon.route.register( 'panel/elements/categories', () => this.activateElementsTab( 'categories' ) );
+		elementorCommon.components.register( new ElementsComponent( { context: this } ) );
 
-		elementorCommon.route.register( 'panel/elements/global', () => this.activateElementsTab( 'global' ) );
-
-		elementorCommon.route.register( 'panel/editor', ( args ) => this.openEditor( args.model, args.view ) );
-
-		elementorCommon.route.register( 'panel/editor/content', () => this.activateEditorTab( 'content' ) );
-
-		elementorCommon.route.register( 'panel/editor/style', () => this.activateEditorTab( 'style' ) );
-
-		elementorCommon.route.register( 'panel/editor/advanced', () => this.activateEditorTab( 'advanced' ) );
-
-		// Section.
-		elementorCommon.route.register( 'panel/editor/layout', () => this.activateEditorTab( 'layout' ) );
-
-		// Global Settings - Lightbox.
-		elementorCommon.route.register( 'panel/general/lightbox', () => this.activateEditorTab( 'lightbox' ) );
-
-		elementorCommon.route.register( 'panel/menu', () => this.setPage( 'menu' ) );
+		elementorCommon.components.register( new EditorComponent( { context: this } ) );
 
 		this.initPages();
 	},
@@ -132,18 +120,6 @@ PanelLayoutView = Marionette.LayoutView.extend( {
 		return this.currentPageView;
 	},
 
-	activateElementsTab: function( tab ) {
-		this.setPage( 'elements' );
-
-		if ( tab ) {
-			this.currentPageView.activateTab( tab );
-		}
-	},
-
-	activateEditorTab: function( tab ) {
-		elementor.getPanelView().getCurrentPageView().activateTab( tab )._renderChildren();
-	},
-
 	setPage: function( page, title, viewOptions ) {
 		const pages = this.getPages();
 
@@ -184,22 +160,6 @@ PanelLayoutView = Marionette.LayoutView.extend( {
 		return this.currentPageView;
 	},
 
-	openEditor: function( model, view ) {
-		this.setPage( 'editor', elementor.translate( 'edit_element', [ elementor.getElementData( model ).title ] ), {
-			model: model,
-			controls: elementor.getElementControls( model ),
-			editedElementView: view,
-		} );
-
-		const action = 'panel/open_editor/' + model.get( 'elType' );
-
-		// Example: panel/open_editor/widget
-		elementor.hooks.doAction( action, this, model, view );
-
-		// Example: panel/open_editor/widget/heading
-		elementor.hooks.doAction( action + '/' + model.get( 'widgetType' ), this, model, view );
-	},
-
 	onBeforeShow: function() {
 		var PanelFooterItemView = require( 'elementor-regions/panel/footer' ),
 			PanelHeaderItemView = require( 'elementor-regions/panel/header' );
@@ -220,9 +180,6 @@ PanelLayoutView = Marionette.LayoutView.extend( {
 			.on( 'before:show', this.onEditorBeforeShow.bind( this ) )
 			.on( 'empty', this.onEditorEmpty.bind( this ) )
 			.on( 'show', this.updateScrollbar.bind( this ) );
-
-		// Set default page to elements
-		elementorCommon.route.to( 'panel/elements' );
 	},
 
 	onEditorBeforeShow: function() {

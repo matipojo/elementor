@@ -1,63 +1,19 @@
-var TemplateLibraryLayoutView = require( 'elementor-templates/views/library-layout' ),
-	TemplateLibraryCollection = require( 'elementor-templates/collections/templates' ),
+import Component from './component';
+
+	var TemplateLibraryCollection = require( 'elementor-templates/collections/templates' ),
 	TemplateLibraryManager;
 
 TemplateLibraryManager = function() {
+	this.modalConfig = {};
+
 	const self = this,
 		templateTypes = {};
 
 	let deleteDialog,
 		errorDialog,
-		layout,
 		templatesCollection,
-		defaultRoute = 'library/templates/pages',
 		config = {},
-		modalConfig = {},
-		screens = {},
 		filterTerms = {};
-
-	const initLayout = function() {
-		layout = new TemplateLibraryLayoutView( { pages: screens } );
-
-		layout.getModal().on( 'hide', () => elementorCommon.route.close( 'library' ) );
-	};
-
-	const registerRouts = function() {
-		elementorCommon.commands.register( 'library/show', ( args ) => {
-			modalConfig = args;
-
-			if ( ! elementorCommon.route.restoreState( 'library' ) ) {
-				self.showDefaultScreen();
-			}
-		}, { keys: 'ctrl+shift+l' } );
-
-		elementorCommon.route.registerComponent( 'library', {
-			open: () => {
-				self.startModal();
-
-				return true;
-			},
-			close: () => {
-				modalConfig = {};
-			},
-		} );
-
-		screens.forEach( ( screen ) => {
-			elementorCommon.route.register( screen.route, () => {
-				self.setScreen( screen.source, screen.type );
-
-				elementorCommon.route.saveState( 'library' );
-			} );
-		} );
-
-		elementorCommon.route.register( 'library/save-template', ( args ) => {
-			self.getLayout().showSaveTemplateView( args.model );
-		} );
-
-		elementorCommon.route.register( 'library/import', () => {
-			self.getLayout().showImportView();
-		} );
-	};
 
 	const registerDefaultTemplateTypes = function() {
 		var data = {
@@ -91,31 +47,6 @@ TemplateLibraryManager = function() {
 		} );
 	};
 
-	const registerDefaultScreens = function() {
-		screens = [
-			{
-				name: 'blocks',
-				source: 'remote',
-				title: elementor.translate( 'blocks' ),
-				type: 'block',
-				route: 'library/templates/blocks',
-			},
-			{
-				name: 'pages',
-				source: 'remote',
-				title: elementor.translate( 'pages' ),
-				type: 'page',
-				route: 'library/templates/pages',
-			},
-			{
-				name: 'my-templates',
-				source: 'local',
-				title: elementor.translate( 'my_templates' ),
-				route: 'library/templates/my-templates',
-			},
-		];
-	};
-
 	const registerDefaultFilterTerms = function() {
 		filterTerms = {
 			text: {
@@ -140,11 +71,9 @@ TemplateLibraryManager = function() {
 	this.init = function() {
 		registerDefaultTemplateTypes();
 
-		registerDefaultScreens();
-
 		registerDefaultFilterTerms();
 
-		registerRouts();
+		this.component = elementorCommon.components.register( new Component( { context: this } ) );
 
 		elementor.addBackgroundClickListener( 'libraryToggleMore', {
 			element: '.elementor-template-library-template-more',
@@ -157,10 +86,6 @@ TemplateLibraryManager = function() {
 		}
 
 		return templateTypes;
-	};
-
-	this.getScreens = function() {
-		return screens;
 	};
 
 	this.registerTemplateType = function( type, data ) {
@@ -196,20 +121,20 @@ TemplateLibraryManager = function() {
 	this.importTemplate = function( templateModel, options ) {
 		options = options || {};
 
-		layout.showLoadingView();
+		self.layout.showLoadingView();
 
 		self.requestTemplateContent( templateModel.get( 'source' ), templateModel.get( 'template_id' ), {
 			data: {
 				page_settings: options.withPageSettings,
 			},
 			success: function( data ) {
-				// Clone `modalConfig` because it deleted during the closing.
-				const importOptions = jQuery.extend( {}, modalConfig.importOptions );
+				// Clone `self.modalConfig` because it deleted during the closing.
+				const importOptions = jQuery.extend( {}, self.modalConfig.importOptions );
 
 				// Hide for next open.
-				layout.hideLoadingView();
+				self.layout.hideLoadingView();
 
-				self.closeModal();
+				self.layout.hideModal();
 
 				elementor.channels.data.trigger( 'template:before:insert', templateModel );
 
@@ -225,7 +150,7 @@ TemplateLibraryManager = function() {
 				self.showErrorDialog( data );
 			},
 			complete: function() {
-				layout.hideLoadingView();
+				self.layout.hideLoadingView();
 			},
 		} );
 	};
@@ -309,10 +234,6 @@ TemplateLibraryManager = function() {
 		return errorDialog;
 	};
 
-	this.getLayout = function() {
-		return layout;
-	};
-
 	this.getTemplatesCollection = function() {
 		return templatesCollection;
 	};
@@ -360,18 +281,6 @@ TemplateLibraryManager = function() {
 		elementorCommon.ajax.addRequest( 'get_library_data', ajaxOptions );
 	};
 
-	this.startModal = function() {
-		if ( ! layout ) {
-			initLayout();
-		}
-
-		layout.showModal();
-	};
-
-	this.closeModal = function() {
-		layout.hideModal();
-	};
-
 	this.getFilter = function( name ) {
 		return elementor.channels.templates.request( 'filter:' + name );
 	};
@@ -392,45 +301,21 @@ TemplateLibraryManager = function() {
 		return filterTerms;
 	};
 
-	this.setDefaultRoute = function( route ) {
-		defaultRoute = route;
-	};
-
-	this.setScreen = function( source, type, silent ) {
+	this.setScreen = function( args ) {
 		elementor.channels.templates.stopReplying();
 
-		self.setFilter( 'source', source, true );
+		self.setFilter( 'source', args.source, true );
+		self.setFilter( 'type', args.type, true );
+		self.setFilter( 'subtype', args.subtype, true );
 
-		if ( type ) {
-			self.setFilter( 'type', type, true );
-		}
-
-		if ( ! silent ) {
-			self.showTemplates();
-		}
-	};
-
-	this.showDefaultScreen = function() {
-		const remoteLibraryConfig = elementor.config.document.remoteLibrary;
-
-		if ( 'block' === remoteLibraryConfig.type ) {
-			defaultRoute = 'library/templates/blocks';
-		}
-
-		elementorCommon.route.to( defaultRoute, {
-			onAfter: () => {
-				if ( remoteLibraryConfig.category ) {
-					this.setFilter( 'subtype', remoteLibraryConfig.category );
-				}
-			},
-		} );
+		self.showTemplates();
 	};
 
 	this.loadTemplates = function( onUpdate ) {
 		self.requestLibraryData( {
-			onBeforeUpdate: layout.showLoadingView.bind( layout ),
+			onBeforeUpdate: self.layout.showLoadingView.bind( self.layout ),
 			onUpdate: function() {
-				layout.hideLoadingView();
+				self.layout.hideLoadingView();
 
 				if ( onUpdate ) {
 					onUpdate();
@@ -440,15 +325,18 @@ TemplateLibraryManager = function() {
 	};
 
 	this.showTemplates = function() {
+		// The tabs should exist in DOM on loading.
+		self.layout.setHeaderDefaultParts();
+
 		self.loadTemplates( function() {
 			var templatesToShow = self.filterTemplates();
 
-			layout.showTemplatesView( new TemplateLibraryCollection( templatesToShow ) );
+			self.layout.showTemplatesView( new TemplateLibraryCollection( templatesToShow ) );
 		} );
 	};
 
 	this.filterTemplates = function() {
-		var activeSource = self.getFilter( 'source' );
+		const activeSource = self.getFilter( 'source' );
 		return templatesCollection.filter( function( model ) {
 			if ( activeSource !== model.get( 'source' ) ) {
 				return false;

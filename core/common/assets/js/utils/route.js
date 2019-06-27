@@ -4,103 +4,72 @@ export default class extends Commands {
 	constructor( ...args ) {
 		super( ...args );
 
-		this.components = {};
 		this.savedStates = {};
 	}
 
-	registerComponent( component, args ) {
-		this.components[ component ] = args;
+	refreshContainer( container ) {
+		const currentRoute = this.getCurrent( container ),
+			currentArgs = this.getCurrentArgs( container );
 
-		if ( args.open ) {
-			this.registerDependency( component, () => {
-				return this.open( component );
-			} );
-		}
-
-		return this;
-	}
-
-	open( component ) {
-		const args = this.components[ component ];
-
-		if ( ! args ) {
-			return;
-		}
-
-		if ( ! args.isOpen ) {
-			args.isOpen = args.open.apply();
-			this.components[ component ].isOpen = args.isOpen;
-		}
-
-		return args.isOpen;
-	}
-
-	close( component ) {
-		const args = this.components[ component ];
-
-		if ( ! args ) {
-			return;
-		}
-
-		if ( args.close ) {
-			args.close.apply( this );
-		}
-
-		this.components[ component ].isOpen = false;
-
-		this.clearCurrent( component );
-
-		return this;
-	}
-
-	reload( route, args ) {
-		const parts = route.split( '/' ),
-			component = parts[ 0 ];
-
-		this.clearCurrent( component );
-
-		this.to( route, args );
-	}
-
-	refreshComponent( component ) {
-		const currentRoute = this.getCurrent( component ),
-			currentArgs = this.getCurrentArgs( component );
-
-		this.clearCurrent( component );
+		this.clearCurrent( container );
 
 		this.to( currentRoute, currentArgs );
 	}
 
-	clearCurrent( component ) {
-		delete this.current[ component ];
-		delete this.currentArgs[ component ];
+	clearCurrent( container ) {
+		const route = this.current[ container ];
+
+		if ( ! route ) {
+			return;
+		}
+
+		delete this.current[ container ];
+		delete this.currentArgs[ container ];
+		this.getComponent( route ).onCloseRoute();
 	}
 
-	saveState( component ) {
-		this.savedStates[ component ] = {
-			route: this.current[ component ],
-			args: this.currentArgs[ component ],
+	saveState( container ) {
+		this.savedStates[ container ] = {
+			route: this.current[ container ],
+			args: this.currentArgs[ container ],
 		};
 
 		return this;
 	}
 
-	restoreState( component ) {
-		if ( ! this.savedStates[ component ] ) {
+	restoreState( container ) {
+		if ( ! this.savedStates[ container ] ) {
 			return false;
 		}
 
-		this.to( this.savedStates[ component ].route, this.savedStates[ component ].args );
+		this.to( this.savedStates[ container ].route, this.savedStates[ container ].args );
 
 		return true;
 	}
 
 	beforeRun( route, args ) {
+		if ( ! super.beforeRun( route, args ) ) {
+			return false;
+		}
+
 		if ( this.is( route, args ) ) {
 			return false;
 		}
 
-		return super.beforeRun( route, args );
+		const parts = route.split( '/' ),
+			container = parts[ 0 ];
+
+		if ( this.current[ container ] ) {
+			this.getComponent( this.current[ container ] ).onCloseRoute();
+		}
+
+		const component = this.getComponent( route );
+
+		if ( ! component.isOpen ) {
+			component.isOpen = component.open();
+		}
+
+		return component.isOpen;
 	}
 
 	to( route, args ) {
@@ -113,10 +82,8 @@ export default class extends Commands {
 	}
 
 	// Don't clear current route.
-	afterRun() {}
-
-	error( message ) {
-		throw Error( 'Route: ' + message );
+	afterRun( route, args ) {
+		this.getComponent( route ).onRoute( args );
 	}
 
 	is( route, args = {} ) {
@@ -125,9 +92,9 @@ export default class extends Commands {
 		}
 
 		const parts = route.split( '/' ),
-			component = parts[ 0 ];
+			container = parts[ 0 ];
 
-		return _.isEqual( args, this.currentArgs[ component ] );
+		return _.isEqual( args, this.currentArgs[ container ] );
 	}
 
 	isPartOf( route ) {
@@ -137,9 +104,9 @@ export default class extends Commands {
 		 * `is( 'panel/editor' )` will be true for `panel/editor/style`
 		 */
 		const parts = route.split( '/' ),
-			component = parts[ 0 ],
+			container = parts[ 0 ],
 			toCheck = [],
-			currentParts = this.current[ component ].split( '/' );
+			currentParts = this.current[ container ] ? this.current[ container ].split( '/' ) : [];
 
 		let match = false;
 
@@ -151,5 +118,9 @@ export default class extends Commands {
 		} );
 
 		return match;
+	}
+
+	error( message ) {
+		throw Error( 'Route: ' + message );
 	}
 }

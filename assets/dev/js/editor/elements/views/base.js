@@ -376,6 +376,10 @@ BaseElementView = BaseContainer.extend( {
 			elType: elementView.model.get( 'elType' ),
 		};
 
+		if ( elementor.helpers.maybeDisableWidget() ) {
+			return;
+		}
+
 		if ( 'widget' === itemData.elType ) {
 			itemData.widgetType = elementView.model.get( 'widgetType' );
 		} else if ( 'section' === itemData.elType ) {
@@ -764,8 +768,7 @@ BaseElementView = BaseContainer.extend( {
 			elementor.helpers.scrollToView( this.$el, 200 );
 		}
 
-		elementorCommon.route.to( 'panel/editor', {
-			refresh: true,
+		elementorCommon.commands.run( 'panel/editor/open', {
 			model: model,
 			view: this,
 		} );

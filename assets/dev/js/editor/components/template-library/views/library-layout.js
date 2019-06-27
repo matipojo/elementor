@@ -18,7 +18,7 @@ module.exports = elementorModules.common.views.modal.Layout.extend( {
 		return {
 			title: elementor.translate( 'library' ),
 			click: function() {
-				elementor.templates.showDefaultScreen();
+				elementorCommon.commands.run( 'library/show', { toDefault: true } );
 			},
 		};
 	},
@@ -46,8 +46,6 @@ module.exports = elementorModules.common.views.modal.Layout.extend( {
 		this.modalContent.show( new TemplateLibraryCollectionView( {
 			collection: templatesCollection,
 		} ) );
-
-		this.setHeaderDefaultParts();
 	},
 
 	showImportView: function() {

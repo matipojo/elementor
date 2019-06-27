@@ -1,3 +1,5 @@
+import Component from './component';
+
 var RevisionsCollection = require( './collection' ),
 	RevisionsManager;
 
@@ -6,44 +8,24 @@ RevisionsManager = function() {
 
 	let revisions;
 
-	var onEditorSaved = function( data ) {
+	const onEditorSaved = function( data ) {
 		if ( data.latest_revisions ) {
 			self.addRevisions( data.latest_revisions );
 		}
 
 		self.requestRevisions( () => {
-		if ( data.revisions_ids ) {
-			var revisionsToKeep = revisions.filter( function( revision ) {
-				return -1 !== data.revisions_ids.indexOf( revision.get( 'id' ) );
-			} );
+			if ( data.revisions_ids ) {
+				var revisionsToKeep = revisions.filter( function( revision ) {
+					return -1 !== data.revisions_ids.indexOf( revision.get( 'id' ) );
+				} );
 
-			revisions.reset( revisionsToKeep );
-		}
+				revisions.reset( revisionsToKeep );
+			}
 		} );
 	};
 
-	var attachEvents = function() {
+	const attachEvents = function() {
 		elementor.channels.editor.on( 'saved', onEditorSaved );
-	};
-
-	const navigate = ( up ) => {
-		elementor.getPanelView().getCurrentPageView().getCurrentTab().navigate( up );
-	};
-
-	const isRevision = () => {
-		return elementorCommon.route.is( 'panel/history/revisions' );
-	};
-
-	const addCommands = function() {
-		elementorCommon.commands.register( 'panel/revisions/navigate/down', () => navigate(), {
-			keys: 'down',
-			dependency: isRevision,
-		} );
-
-		elementorCommon.commands.register( 'panel/revisions/navigate/up', () => navigate( true ), {
-			keys: 'up',
-			dependency: isRevision,
-		} );
 	};
 
 	this.getItems = function() {
@@ -129,12 +111,12 @@ RevisionsManager = function() {
 	this.init = function() {
 		attachEvents();
 
-		addCommands();
+		elementorCommon.components.register( new Component( { context: self } ) );
 	};
 
 	this.onRevisionsUpdate = function() {
 		if ( elementorCommon.route.is( 'panel/history/revisions' ) ) {
-			elementorCommon.route.reload( 'panel/history/revisions' );
+			elementorCommon.route.refreshContainer( 'panel' );
 		}
 	};
 };

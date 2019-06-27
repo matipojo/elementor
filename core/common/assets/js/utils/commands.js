@@ -5,29 +5,41 @@ export default class extends elementorModules.Module {
 		this.current = {};
 		this.currentArgs = {};
 		this.commands = {};
-		this.dependencies = {};
+		this.components = {};
 	}
 
-	printAll() {
-		console.log( Object.keys( this.commands ).sort() ); // eslint-disable-line no-console
+	getAll() {
+		return Object.keys( this.commands ).sort();
 	}
 
-	registerDependency( component, callback ) {
-		this.dependencies[ component ] = callback;
+	register( component, command, callback ) {
+		let namespace;
+		if ( 'string' === typeof component ) {
+			namespace = component;
+			component = elementorCommon.components.get( namespace );
 
-		return this;
-	}
-
-	register( command, callback, shortcut ) {
-		if ( this.commands[ command ] ) {
-			this.error( `\`${ command }\` is already registered.` );
+			if ( ! component ) {
+				this.error( `'${ namespace }' component is not exist.` );
+			}
+		} else {
+			namespace = component.getNamespace();
 		}
 
-		this.commands[ command ] = callback;
+		const fullCommand = namespace + ( command ? '/' + command : '' );
+
+		if ( this.commands[ fullCommand ] ) {
+			this.error( `\`${ fullCommand }\` is already registered.` );
+		}
+
+		this.commands[ fullCommand ] = callback;
+		this.components[ fullCommand ] = namespace;
+
+		const shortcuts = component.getShortcuts(),
+			shortcut = shortcuts[ command ];
 
 		if ( shortcut ) {
-			shortcut.command = command;
-			shortcut.callback = ( event ) => this.runShortcut( command, event );
+			shortcut.command = fullCommand;
+			shortcut.callback = ( event ) => this.runShortcut( fullCommand, event );
 			elementorCommon.shortcuts.register( shortcut.keys, shortcut );
 		}
 
@@ -40,27 +52,33 @@ export default class extends elementorModules.Module {
 		return this;
 	}
 
+	getComponent( command ) {
+		const componentName = this.components[ command ];
+
+		return elementorCommon.components.get( componentName );
+	}
+
 	is( command ) {
 		const parts = command.split( '/' ),
-			component = parts[ 0 ];
+			container = parts[ 0 ];
 
-		return command === this.current[ component ];
+		return command === this.current[ container ];
 	}
 
-	getCurrent( component ) {
-		if ( ! this.current[ component ] ) {
+	getCurrent( container ) {
+		if ( ! this.current[ container ] ) {
 			return false;
 		}
 
-		return this.current[ component ];
+		return this.current[ container ];
 	}
 
-	getCurrentArgs( component ) {
-		if ( ! this.currentArgs[ component ] ) {
+	getCurrentArgs( container ) {
+		if ( ! this.currentArgs[ container ] ) {
 			return false;
 		}
 
-		return this.currentArgs[ component ];
+		return this.currentArgs[ container ];
 	}
 
 	beforeRun( command, args = {} ) {
@@ -68,15 +86,9 @@ export default class extends elementorModules.Module {
 			this.error( `\`${ command }\` not found.` );
 		}
 
-		const parts = command.split( '/' ),
-			component = parts[ 0 ];
-
-		if ( this.dependencies[ component ] && ! this.dependencies[ component ].apply( null, [ args ] ) ) {
+		if ( ! this.getComponent( command ).dependency( args ) ) {
 			return false;
 		}
-
-		this.current[ component ] = command;
-		this.currentArgs[ component ] = args;
 
 		return true;
 	}
@@ -86,14 +98,24 @@ export default class extends elementorModules.Module {
 			return;
 		}
 
+		const parts = command.split( '/' ),
+			container = parts[ 0 ];
+
+		this.current[ container ] = command;
+		this.currentArgs[ container ] = args;
+
+		const component = this.getComponent( command );
+
 		if ( args.onBefore ) {
-			args.onBefore.apply( this, [ args ] );
+			args.onBefore.apply( component, [ args ] );
 		}
 
-		this.commands[ command ].apply( this, [ args ] );
+		this.commands[ command ].apply( component, [ args ] );
+
+		component.activate();
 
 		if ( args.onAfter ) {
-			args.onAfter.apply( this, [ args ] );
+			args.onAfter.apply( component, [ args ] );
 		}
 
 		this.afterRun( command, args );
@@ -105,10 +127,10 @@ export default class extends elementorModules.Module {
 
 	afterRun( command ) {
 		const parts = command.split( '/' ),
-			component = parts[ 0 ];
+			container = parts[ 0 ];
 
-		delete this.current[ component ];
-		delete this.currentArgs[ component ];
+		delete this.current[ container ];
+		delete this.currentArgs[ container ];
 	}
 
 	error( message ) {

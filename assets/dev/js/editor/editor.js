@@ -6,6 +6,7 @@ import environment from '../../../../core/common/assets/js/utils/environment.js'
 import DateTimeControl from 'elementor-controls/date-time';
 import Document from './document';
 import NoticeBar from './utils/notice-bar';
+import Component from './elements/component';
 
 import IconsManager from './components/icons-manager/icons-manager';
 //_.noConflict();
@@ -151,7 +152,7 @@ const App = Marionette.Application.extend( {
 			ignore: '.elementor-control-dynamic-switcher',
 		},
 		panelFooterSubMenus: {
-			element: '.elementor-panel-footer-tool',
+			element: '.elementor-panel-footer-tool.elementor-toggle-state',
 			ignore: '.elementor-panel-footer-tool.elementor-toggle-state, #elementor-panel-saver-button-publish-label',
 			callback: ( $elementsToHide ) => {
 				$elementsToHide.removeClass( 'elementor-open' );
@@ -282,7 +283,7 @@ const App = Marionette.Application.extend( {
 
 		this.notifications = new Notifications();
 
-		this.registerCommands();
+		elementorCommon.components.register( new Component( { context: this } ) );
 
 		this.hotkeysScreen = new HotkeysScreen();
 
@@ -401,80 +402,11 @@ const App = Marionette.Application.extend( {
 		return targetElement;
 	},
 
-	registerCommands: function() {
-		elementorCommon.commands.registerDependency( 'elements', () => {
-			return elementor.getCurrentElement();
-		} );
-
-		elementorCommon.commands.register( 'elements/copy', () => elementor.getCurrentElement().copy(), {
-			keys: 'ctrl+c',
-			exclude: [ 'input' ],
-		} );
-
-		elementorCommon.commands.register( 'elements/duplicate', () => elementor.getCurrentElement().duplicate(), {
-			keys: 'ctrl+d',
-		} );
-
-		elementorCommon.commands.register( 'elements/delete', () => elementor.getCurrentElement().removeElement(), {
-			keys: 'del',
-			exclude: [ 'input' ],
-		} );
-
-		elementorCommon.commands.register( 'elements/paste', () => elementor.getCurrentElement().paste(), {
-			keys: 'ctrl+v',
-			exclude: [ 'input' ],
-			dependency: () => {
-				return elementor.getCurrentElement().isPasteEnabled();
-			},
-		} );
-
-		elementorCommon.commands.register( 'elements/pasteStyle', () => elementor.getCurrentElement().paste(), {
-			keys: 'ctrl+shift+v',
-			exclude: [ 'input' ],
-			dependency: () => {
-				return elementor.getCurrentElement().pasteStyle && elementorCommon.storage.get( 'transfer' );
-			},
-		} );
-
-		elementorCommon.commands.registerDependency( 'navigator', () => {
-			return 'edit' === elementor.channels.dataEditMode.request( 'activeMode' );
-		} );
-
-		elementorCommon.commands.register( 'navigator/toggle', () => {
-			if ( elementor.navigator.storage.visible ) {
-				elementor.navigator.close();
-			} else {
-				elementor.navigator.open();
-			}
-		}, { keys: 'ctrl+i' } );
-
-		elementorCommon.commands.register( 'preview/change-device-mode', () => {
-			const currentDeviceMode = elementor.channels.deviceMode.request( 'currentMode' );
-			let modeIndex = this.devices.indexOf( currentDeviceMode );
-
-			modeIndex++;
-
-			if ( modeIndex >= this.devices.length ) {
-				modeIndex = 0;
-			}
-			//
-			elementor.changeDeviceMode( this.devices[ modeIndex ] );
-		}, { keys: 'ctrl+shift+m' } );
-
-		elementorCommon.commands.register( 'document/save', () => elementor.saver.saveDraft(), {
-			keys: 'ctrl+s',
-		} );
-
-		elementorCommon.commands.register( 'panel/exit', () => elementorCommon.route.to( 'panel/menu' ), {
-			keys: 'esc',
-			dependency: () => {
-				return ! jQuery( '.dialog-widget:visible' ).length;
-	},
-		} );
-	},
-
 	initPanel: function() {
 		this.addRegions( { panel: require( 'elementor-regions/panel/panel' ) } );
+
+		// Set default page to elements.
+		elementorCommon.route.to( 'panel/elements/categories' );
 
 		this.trigger( 'panel:init' );
 	},
@@ -488,10 +420,6 @@ const App = Marionette.Application.extend( {
 		} );
 
 		this.trigger( 'navigator:init' );
-
-		if ( this.navigator.storage.visible ) {
-			this.navigator.open();
-		}
 	},
 
 	setAjax: function() {
@@ -542,7 +470,7 @@ const App = Marionette.Application.extend( {
 			}
 
 			if ( ! isClickInsideElementor ) {
-				elementorCommon.route.to( 'panel/elements' );
+				elementorCommon.route.to( 'panel/elements/categories' );
 			}
 		} );
 	},
@@ -868,7 +796,7 @@ const App = Marionette.Application.extend( {
 		this.addBackgroundClickArea( elementorFrontend.elements.window.document );
 
 		if ( this.previewLoadedOnce ) {
-			elementorCommon.route.to( 'panel/elements' );
+			elementorCommon.route.to( 'panel/elements/categories' );
 		} else {
 			this.onFirstPreviewLoaded();
 		}
@@ -913,7 +841,7 @@ const App = Marionette.Application.extend( {
 
 		elementorCommon.shortcuts.bindListener( elementorFrontend.elements.$window );
 
-		this.trigger( 'preview:loaded' );
+		this.trigger( 'preview:loaded', ! this.loaded /* isFirst */ );
 
 		this.loaded = true;
 	},
@@ -967,13 +895,13 @@ const App = Marionette.Application.extend( {
 
 		const debugUrl = self.config.document.urls.preview + '&preview-debug',
 			previewDebugLinkText = self.config.i18n.preview_debug_link_text,
-			previewDebugLink = '<div id="preview-debug-link-text"><a href="' + debugUrl + '" target="_blank">' + previewDebugLinkText + '</a></div>',
+			previewDebugLink = '<div id="elementor-preview-debug-link-text"><a href="' + debugUrl + '" target="_blank">' + previewDebugLinkText + '</a></div>',
 			debugData = elementor.config.preview.debug_data,
 			dialogOptions = {
-				className: 'preview-loading-error',
+				className: 'elementor-preview-loading-error',
 				headerMessage: debugData.header,
 				message: debugData.message + previewDebugLink,
-				onConfirm: function() {
+			onConfirm: function() {
 					open( debugData.doc_url, '_blank' );
 				} };
 
@@ -986,14 +914,14 @@ const App = Marionette.Application.extend( {
 			self.showFatalErrorDialog( dialogOptions );
 		} ).fail( function( response ) { //Iframe can't be loaded
 			self.showFatalErrorDialog( {
-				className: 'preview-loading-error',
+				className: 'elementor-preview-loading-error',
 				headerMessage: debugData.header,
 				message: response.statusText + ' ' + response.status + ' ' + previewDebugLink,
 				onConfirm: function() {
 					const url = 500 <= response.status ? elementor.config.preview.help_preview_http_error_500_url : elementor.config.preview.help_preview_http_error_url;
 					open( url, '_blank' );
-				},
-			} );
+			},
+		} );
 		} );
 	},
 

@@ -1,7 +1,6 @@
 /* global ElementorConfig */
-
 import editorBase from './editor-base';
-//_.noConflict();
+
 const App = editorBase.extend( {
 	onStart: function() {
 		NProgress.start();

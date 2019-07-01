@@ -563,7 +563,7 @@ class eQuery {
 
 export default class Document extends elementorModules.Module {
 	constructor( args ) {
-		super( ...args );
+		super( args );
 
 		args.document = this;
 

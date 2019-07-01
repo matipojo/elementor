@@ -94,6 +94,8 @@ export default class extends elementorModules.Component {
 			this.context.layout = new TemplateLibraryLayoutView();
 
 			this.context.layout.getModal().on( 'hide', () => this.close() );
+
+			this.context.onFirstOpen();
 		}
 
 		this.context.layout.showModal();

@@ -69,15 +69,17 @@ TemplateLibraryManager = function() {
 	};
 
 	this.init = function() {
-		registerDefaultTemplateTypes();
-
-		registerDefaultFilterTerms();
-
 		this.component = elementorCommon.components.register( new Component( { context: this } ) );
 
 		elementor.addBackgroundClickListener( 'libraryToggleMore', {
 			element: '.elementor-template-library-template-more',
 		} );
+	};
+
+	this.onFirstOpen = function() {
+		registerDefaultTemplateTypes();
+
+		registerDefaultFilterTerms();
 	};
 
 	this.getTemplateTypes = function( type ) {

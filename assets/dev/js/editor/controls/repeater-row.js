@@ -2,7 +2,15 @@ var ControlBaseDataView = require( 'elementor-controls/base-data' ),
 	RepeaterRowView;
 
 RepeaterRowView = Marionette.CompositeView.extend( {
-	template: Marionette.TemplateCache.get( '#tmpl-elementor-repeater-row' ),
+	getTemplate: () => {
+		let template;
+		try {
+			template = Marionette.TemplateCache.get( '#tmpl-elementor-repeater-row' );
+		} catch ( e ) {
+			// Do nothing.
+		}
+		return template;
+	},
 
 	className: 'elementor-repeater-fields',
 

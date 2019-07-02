@@ -127,6 +127,10 @@ var	Manager = function() {
 		return null !== currentItemID;
 	};
 
+	this.getCurrentID = function() {
+		return currentItemID;
+	};
+
 	this.addItem = function( itemData ) {
 		if ( ! this.getActive() ) {
 			return;

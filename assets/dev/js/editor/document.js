@@ -7,6 +7,8 @@ class Container {
 }
 
 const History = {
+	subItems: {},
+
 	get( target, propKey, receiver ) {
 		if ( ! target[ propKey ] ) {
 			return;
@@ -18,6 +20,16 @@ const History = {
 
 			if ( historyIsActive && this[ propKey ] ) {
 				this[ propKey ].apply( this, [ args, target ] );
+
+				// Keep sub items count in order to close the history item
+				// only after all recursive items are finished.
+				var currentID = elementor.history.history.getCurrentID();
+
+				if ( ! this.subItems[ currentID ] ) {
+					this.subItems[ currentID ] = 0;
+				}
+
+				this.subItems[ currentID ]++;
 			}
 
 			// don't push to args, to avoid wrong args.
@@ -26,7 +38,13 @@ const History = {
 			let result = origMethod.apply( target, args );
 
 			if ( historyIsActive && this[ propKey ] ) {
-				elementor.history.history.endItem();
+				this.subItems[ currentID ]--;
+
+				// All recursive items are finished.
+				if ( ! this.subItems[ currentID ] ) {
+					elementor.history.history.endItem();
+					delete this.subItems[ currentID ];
+				}
 			}
 
 			return result;
@@ -55,6 +73,24 @@ const History = {
 		elementor.history.history.startItem( {
 			type: 'add',
 			title: 1 === target.getSelection().length ? this.getModelLabel( args[ 0 ] ) : 'Elements',
+			elementType: args[ 0 ],
+		} );
+	},
+
+	remove( args, target ) {
+		let title;
+		if ( 1 === target.getSelection().length ) {
+			const element = target.getSelection()[ 0 ],
+				model = [ element.model.get( 'elType' ), element.model.get( 'widgetType' ) ];
+
+			title = this.getModelLabel( model );
+		} else {
+			title = 'Elements';
+		}
+
+		elementor.history.history.startItem( {
+			type: 'remove',
+			title: title,
 			elementType: args[ 0 ],
 		} );
 	},

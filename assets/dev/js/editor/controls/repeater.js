@@ -242,6 +242,8 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 
 		settings.trigger( 'change', settings );
 
+		$e( '#' + element.id ).setting( controlName, model.collection );
+
 		delete settings.changed;
 		delete settings._previousAttributes;
 	},

@@ -118,16 +118,18 @@ const History = {
 
 	restoreChanges: function( historyItem, isRedo ) {
 		_( historyItem.get( 'elements' ) ).each( ( settings, elementID ) => {
-			const restoredValues = {};
+			const $eElement = $e( '#' + elementID ),
+				restoredValues = {};
 			_( settings ).each( ( values, key ) => {
+				const control =	$eElement.getSettings().getControl( key );
+
 				if ( isRedo ) {
-					restoredValues[ key ] = values.new;
+					restoredValues[ key ] = control.is_repeater ? _( values.new ) : values.new;
 				} else {
-					restoredValues[ key ] = values.old;
+					restoredValues[ key ] = control.is_repeater ? _( values.old ) : values.old;
 				}
 			} );
 
-			const $eElement = $e( '#' + elementID );
 			$eElement.settings( restoredValues, { external: true } );
 			$eElement.scrollToView();
 		} );
@@ -151,10 +153,18 @@ const History = {
 		target.getSelection().forEach( ( element ) => {
 			const changedAttributes = {};
 
-			_.each( settings, function( value, controlName ) {
+			_.each( settings, ( value, controlName ) => {
+				const control =	element.model.get( 'settings' ).getControl( key );
+
+				if ( control.is_repeater ) {
+
+				}
+
+
 				changedAttributes[ controlName ] = {
 					old: element.oldValues[ controlName ],
-					new: value,
+					// Clone. don't save by reference.
+					new: elementorCommon.helpers.cloneObject( value ),
 				};
 			} );
 
@@ -254,13 +264,12 @@ class Elements {
 
 	settings( settings, args = {} ) {
 		this.getSelection().forEach( ( element ) => {
-			element.model.get( 'settings' ).set( settings );
+			const settingsModel = element.getEditModel().get( 'settings' );
 
 			if ( args.external ) {
-				const settingsModel = element.getEditModel().get( 'settings' );
-				jQuery.each( settings, function( key, value ) {
-					settingsModel.trigger( 'change:external:' + key, value );
-				} );
+				settingsModel.setExternalChange( settings );
+			} else {
+				settingsModel.set( settings );
 			}
 		} );
 
@@ -409,6 +418,10 @@ class Elements {
 		this.getSelection().forEach( ( element ) => element.resetStyle() );
 
 		return true;
+	}
+
+	getSettings() {
+		return this.getSelection()[ 0 ].model.get( 'settings' );
 	}
 }
 
@@ -634,6 +647,11 @@ export default class Document extends elementorModules.Module {
 							return receiver;
 						}
 
+						// Get settings and etc.
+						if ( 'object' === typeof results ) {
+							return results;
+						}
+
 						// Move/Add keep context for current element.
 						if ( results instanceof eQuery ) {
 							target.context = results.context;
@@ -658,12 +676,38 @@ class Test extends elementorModules.Module {
 
 		// Create a section at end of document.
 		$e().create( 'section' ); // Page -> Sections -> Last
+		$e().remove(); // Page -> Sections -> All
+
+		$e().moveTo(); // ????
+
 		$e().copy(); // Page -> Sections -> All
 		$e().duplicate(); // Page -> Sections -> All
 		$e().paste(); // Page -> Sections -> Last
-		$e().remove(); // Page -> Sections -> All
-		$e().settings(); // Page -> Settings Model
-		$e().moveTo(); // ????
+
+		$e().pasteStyle(); // Page -> Settings
+		$e().resetStyle(); // Page -> Settings
+
+		$e().settings(); // Page -> Settings
+
+		$e().save(); // Draft
+
+		/////////////////////////////
+
+		$eSection.create( 'column' ); // Section -> Last
+		$eSection.remove();
+
+		$eSection.moveTo( 2 );
+
+		$eSection.copy();
+		$eSection.duplicate();
+		$eSection.paste();
+
+		$eSection.pasteStyle();
+		$eSection.resetStyle();
+
+		$eSection.settings();
+
+		$eSection.save(); // Library
 
 		// Create a section with settings.
 		var $eSection;
@@ -751,6 +795,21 @@ class Test extends elementorModules.Module {
 				title: 'Hi, I\'m green title',
 				title_color: 'green',
 			} );
+
+		let $eTabs = $eColumn3.create( [ 'widget', 'tabs' ] );
+
+		let $tab = $eTabs.get( 'tabs' ).add( {
+			title: 'Tab #4',
+			content: '<p>Tab #4 content</p>',
+		}, 4 );
+
+		$tab.settings( {
+			content: '<p>Tab #4 after edit</p>',
+		} );
+
+		$eTabs.get( 'tabs' ).find( $tab );
+
+		$eTabs.get( 'tabs' ).remove( $tab );
 
 		/////////////////////////////////////////////////
 

@@ -122,6 +122,7 @@ BaseSettingsModel = Backbone.Model.extend( {
 
 			control = jQuery.extend( {}, controlDefaultSettings, control );
 
+			// Repeater.
 			if ( control.fields ) {
 				var styleFields = [];
 

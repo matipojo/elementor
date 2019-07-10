@@ -65,6 +65,10 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 			this.listenTo( this.collection, 'change', this.onRowControlChange );
 			this.listenTo( this.collection, 'update', this.onRowUpdate, this );
 		}
+
+		this.collection.each( ( model ) => {
+			model.control = this;
+		} );
 	},
 
 	initialize: function() {
@@ -76,7 +80,7 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 		this.listenTo( this.collection, 'update', this.onRowUpdate, this );
 	},
 
-	addRow: function( data, options ) {
+	addRow: function( data, options = {} ) {
 		var id = elementor.helpers.getUniqueID();
 
 		if ( data instanceof Backbone.Model ) {
@@ -84,6 +88,12 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 		} else {
 			data._id = id;
 		}
+
+		const elementId = this.elementSettingsModel._parent.model.id;
+
+		$e( '#' + elementId ).repeaterRowAdd( this.model.get( 'name' ), data, {
+			options: options,
+		} );
 
 		return this.collection.add( data, options );
 	},
@@ -182,6 +192,7 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 			newIndex = ui.item.index();
 
 		this.collection.remove( model );
+		$e( '#' + this.elementSettingsModel._parent.model.id ).repeaterRowRemove( this.model.get( 'name' ), oldIndex );
 
 		this.addRow( model, { at: newIndex } );
 	},
@@ -249,7 +260,7 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 	},
 
 	onButtonAddRowClick: function() {
-		var defaults = {};
+		const defaults = {};
 		_.each( this.model.get( 'fields' ), function( field ) {
 			defaults[ field.name ] = field.default;
 		} );
@@ -262,6 +273,7 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 
 	onChildviewClickRemove: function( childView ) {
 		childView.model.destroy();
+		$e( '#' + this.elementSettingsModel._parent.model.id ).repeaterRowRemove( this.model.get( 'name' ), childView.itemIndex - 1 );
 
 		if ( childView === this.currentEditableChild ) {
 			delete this.currentEditableChild;

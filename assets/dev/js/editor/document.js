@@ -6,211 +6,40 @@ class Container {
 	}
 }
 
-const History = {
-	subItems: {},
+class Setting {
+	constructor( data ) {
+		this.element = data.element;
+		this.key = data.key;
+		this.value = data.value;
+	}
+}
 
-	get( target, propKey, receiver ) {
-		if ( ! target[ propKey ] ) {
-			return;
-		}
+class SubElement extends Setting {
+	add( subElement, at ) {
+		this.value.add( subElement, at );
+	}
 
-		const origMethod = target[ propKey ];
-		return ( ...args ) => {
-			const historyIsActive = elementor.history.history.getActive();
+	move( from, to ) {
+		const subFrom = this.value.get( from );
+		this.remove( from );
+		this.add( subFrom, to );
+	}
 
-			if ( historyIsActive && this[ propKey ] ) {
-				this[ propKey ].apply( this, [ args, target ] );
+	remove( at ) {
+		this.value.remove( at );
+	}
 
-				// Keep sub items count in order to close the history item
-				// only after all recursive items are finished.
-				var currentID = elementor.history.history.getCurrentID();
+	duplicate( at ) {
+		const subElement = this.value.get( at );
+		this.add( subElement, at + 1 );
+	}
 
-				if ( ! this.subItems[ currentID ] ) {
-					this.subItems[ currentID ] = 0;
-				}
+	update( at, settings ) {
+		this.value.get( at ).set( settings );
+	}
+}
 
-				this.subItems[ currentID ]++;
-			}
-
-			// don't push to args, to avoid wrong args.
-			target.receiver = receiver;
-
-			let result = origMethod.apply( target, args );
-
-			if ( historyIsActive && this[ propKey ] ) {
-				this.subItems[ currentID ]--;
-
-				// All recursive items are finished.
-				if ( ! this.subItems[ currentID ] ) {
-					elementor.history.history.endItem();
-					delete this.subItems[ currentID ];
-				}
-			}
-
-			return result;
-		};
-	},
-
-	getModelLabel( type ) {
-		if ( ! Array.isArray( type ) ) {
-			type = [ type ];
-		}
-
-		if ( 'document' === type[ 0 ] ) {
-			return 'Document';
-		}
-
-		if ( type[ 1 ] ) {
-			const config = elementor.config.widgets[ type[ 1 ] ];
-			return config ? config.title : type[ 1 ];
-		}
-
-		const config = elementor.config.elements[ type[ 0 ] ];
-		return config ? config.title : type[ 0 ];
-	},
-
-	create( args, target ) {
-		elementor.history.history.startItem( {
-			type: 'add',
-			title: 1 === target.getSelection().length ? this.getModelLabel( args[ 0 ] ) : 'Elements',
-			elementType: args[ 0 ],
-		} );
-	},
-
-	remove( args, target ) {
-		let title;
-		if ( 1 === target.getSelection().length ) {
-			const element = target.getSelection()[ 0 ],
-				model = [ element.model.get( 'elType' ), element.model.get( 'widgetType' ) ];
-
-			title = this.getModelLabel( model );
-		} else {
-			title = 'Elements';
-		}
-
-		elementor.history.history.startItem( {
-			type: 'remove',
-			title: title,
-			elementType: args[ 0 ],
-		} );
-	},
-
-	settings( args, target ) {
-		const settings = args[ 0 ],
-			settingsArgs = args[ 1 ] ? args[ 1 ] : {},
-			settingsKeys = Object.keys( settings );
-
-		if ( ! settingsKeys.length ) {
-			return;
-		}
-
-		target.getSelection().forEach( ( element ) => {
-			element.oldValues = element.oldValues || element.model.get( 'settings' ).toJSON();
-		} );
-
-		// Try delay save only for one control (like text or color picker) but if history item started e.g. Section preset during delete column - do not delay the execution.
-		if ( 1 === settingsKeys.length && ! elementor.history.history.isItemStarted() ) {
-			this.lazySaveChangeHistory( settings, settingsArgs, target );
-		} else {
-			this.saveChangeHistory( settings, settingsArgs, target );
-		}
-	},
-
-	restoreChanges: function( historyItem, isRedo ) {
-		_( historyItem.get( 'elements' ) ).each( ( settings, elementID ) => {
-			const $eElement = $e( '#' + elementID ),
-				restoredValues = {};
-			_( settings ).each( ( values, key ) => {
-				const control =	$eElement.getSettings().getControl( key );
-
-				if ( isRedo ) {
-					restoredValues[ key ] = control.is_repeater ? _( values.new ) : values.new;
-				} else {
-					restoredValues[ key ] = control.is_repeater ? _( values.old ) : values.old;
-				}
-			} );
-
-			$eElement.settings( restoredValues, { external: true } );
-			$eElement.scrollToView();
-		} );
-
-		historyItem.set( 'status', isRedo ? 'not_applied' : 'applied' );
-	},
-
-	saveChangeHistory( settings, settingsArgs, target ) {
-		const historyItem = {
-			type: 'change',
-			title: this.getTargetLabel( target ),
-			subTitle: this.getControlLabel( settings, settingsArgs, target ),
-			elements: {},
-			history: {
-				behavior: {
-					restore: this.restoreChanges.bind( this ),
-				},
-			},
-		};
-
-		target.getSelection().forEach( ( element ) => {
-			const changedAttributes = {};
-
-			_.each( settings, ( value, controlName ) => {
-				const control =	element.model.get( 'settings' ).getControl( key );
-
-				if ( control.is_repeater ) {
-
-				}
-
-
-				changedAttributes[ controlName ] = {
-					old: element.oldValues[ controlName ],
-					// Clone. don't save by reference.
-					new: elementorCommon.helpers.cloneObject( value ),
-				};
-			} );
-
-			historyItem.elements[ element.model.id ] = changedAttributes;
-			delete element.oldValues;
-		} );
-
-		elementor.history.history.addItem( historyItem );
-	},
-
-	getTargetLabel: function( target ) {
-		let title;
-		if ( 1 === target.getSelection().length ) {
-			const model = target.getSelection()[ 0 ].model;
-			title = this.getModelLabel( [ model.get( 'elType' ), model.get( 'widgetType' ) ] );
-		} else {
-			title = 'Elements';
-		}
-
-		return title;
-	},
-
-	getControlLabel( settings, settingsArgs, target ) {
-		const keys = Object.keys( settings );
-		let label;
-
-		if ( 1 === keys.length || settingsArgs.subChange ) {
-			const controlKey = settingsArgs.subChange ? settingsArgs.subChange : keys[ 0 ],
-				controlConfig = target.getSelection()[ 0 ].model.get( 'settings' ).controls[ controlKey ];
-			label = controlConfig ? controlConfig.label : keys[ 0 ];
-		} else {
-			label = 'Settings';
-		}
-
-		return label;
-	},
-
-	moveTo( args, target ) {
-		elementor.history.history.startItem( {
-			type: 'move',
-			title: this.getTargetLabel( target ),
-		} );
-	},
-};
-
-History.lazySaveChangeHistory = _.debounce( History.saveChangeHistory.bind( History ), 800 );
+import History from './history';
 
 class Elements {
 	constructor( data ) {
@@ -260,6 +89,61 @@ class Elements {
 		} );
 
 		return newElements;
+	}
+
+	cloneCollection( collection ) {
+		const newCollection = new Backbone.Collection();
+
+		collection.forEach( ( model ) => {
+			newCollection.add( model.clone(), null, true );
+		} );
+
+		return newCollection;
+	}
+
+	repeaterRowAdd( repeaterId, newRow, args = {} ) {
+		const newRows = {};
+
+		this.getSelection().forEach( ( element ) => {
+			const settingsModel = element.getEditModel().get( 'settings' ),
+				collection = settingsModel.get( repeaterId );
+
+			newRows[ element.getEditModel().id ] = collection.add( newRow, args.options );
+
+			settingsModel.trigger( 'change:external:' + repeaterId );
+		} );
+
+		return newRows;
+	}
+
+	repeaterRowRemove( repeaterId, rowIndex, args = {} ) {
+		this.getSelection().forEach( ( element ) => {
+			const settingsModel = element.getEditModel().get( 'settings' ),
+				collection = settingsModel.get( repeaterId ),
+				at = _.isNumber( rowIndex ) ? rowIndex : collection.length - 1,
+				model = collection.at( at );
+
+			collection.remove( model, args );
+
+			settingsModel.trigger( 'change:external:' + repeaterId );
+		} );
+
+		return true;
+	}
+
+	repeaterRowSettings( settings, repeater, rowIndex, args = {} ) {
+		this.getSelection().forEach( ( element ) => {
+			const settingsModel = element.getEditModel().get( 'settings' ),
+				subSettings = settingsModel.get( repeater ),
+				newSubSettings = this.cloneCollection( subSettings ),
+				row = newSubSettings.at( rowIndex );
+
+			row.set( settings );
+
+			$e( '', element ).setting( repeater, newSubSettings, args );
+		} );
+
+		return true;
 	}
 
 	settings( settings, args = {} ) {

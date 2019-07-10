@@ -80,7 +80,15 @@ ControlBaseDataView = ControlBaseView.extend( {
 	},
 
 	setSettingsModel: function( value ) {
-		if ( this.elementSettingsModel._parent && this.elementSettingsModel._parent.getEditModel().get( 'elType' ) ) {
+		if ( this.elementSettingsModel._parent && this.elementSettingsModel._parent.model.attributes.is_repeater ) {
+			const controlName = this.elementSettingsModel._parent.model.get( 'name' ),
+				rowIndex = this._parent.itemIndex - 1,
+				newSettings = {};
+			newSettings[ this.model.get( 'name' ) ] = value;
+
+			$e( '#' + this.elementSettingsModel._parent._parent.model.id ).repeaterRowSettings( newSettings, controlName, rowIndex );
+			// $e( '#' + this.elementSettingsModel._parent._parent.model.id ).getSetting( controlName ).get( this.elementSettingsModel.collection.findIndex() ).setting( this.model.get( 'name' ), value );
+		} else if ( this.elementSettingsModel._parent && this.elementSettingsModel._parent.getEditModel().get( 'elType' ) ) {
 			// Use id for #document.
 			$e( '#' + this.elementSettingsModel._parent.model.id ).setting( this.model.get( 'name' ), value );
 		} else {

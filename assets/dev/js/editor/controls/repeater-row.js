@@ -96,6 +96,10 @@ RepeaterRowView = Marionette.CompositeView.extend( {
 
 	onRender: function() {
 		this.setTitle();
+
+		this.children.each( ( view ) => {
+			view.setSettingsModel = this.setSettingsModel;
+		} );
 	},
 
 	onModelChange: function() {
@@ -108,6 +112,18 @@ RepeaterRowView = Marionette.CompositeView.extend( {
 		if ( 'desktop' === device ) {
 			elementor.getPanelView().getCurrentPageView().$el.toggleClass( 'elementor-responsive-switchers-open' );
 		}
+	},
+
+	setSettingsModel: function( value ) {
+		const controlName = this.elementSettingsModel.control.model.get( 'name' ),
+			rowIndex = this._parent.itemIndex - 1,
+			newSettings = {};
+		newSettings[ this.model.get( 'name' ) ] = value;
+
+		$e( '#' + this.elementSettingsModel.control._parent.model.id ).repeaterRowSettings( newSettings, controlName, rowIndex );
+
+		this.triggerMethod( 'settings:change' );
+		this.trigger( 'change' );
 	},
 } );
 

@@ -4,7 +4,7 @@ import Navigator from './regions/navigator/navigator';
 import HotkeysScreen from './components/hotkeys/hotkeys';
 import environment from '../../../../core/common/assets/js/utils/environment.js';
 import DateTimeControl from 'elementor-controls/date-time';
-import Document from './document';
+import Document from './e-query/document';
 import NoticeBar from './utils/notice-bar';
 import Component from './elements/component';
 

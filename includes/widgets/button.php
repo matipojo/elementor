@@ -230,9 +230,6 @@ class Widget_Button extends Widget_Base {
 						'max' => 50,
 					],
 				],
-				'condition' => [
-					'selected_icon[value]!' => '',
-				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-button .elementor-align-icon-right' => 'margin-left: {{SIZE}}{{UNIT}};',
 					'{{WRAPPER}} .elementor-button .elementor-align-icon-left' => 'margin-right: {{SIZE}}{{UNIT}};',
@@ -345,6 +342,7 @@ class Widget_Button extends Widget_Base {
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} a.elementor-button:hover, {{WRAPPER}} .elementor-button:hover, {{WRAPPER}} a.elementor-button:focus, {{WRAPPER}} .elementor-button:focus' => 'color: {{VALUE}};',
+					'{{WRAPPER}} a.elementor-button:hover svg, {{WRAPPER}} .elementor-button:hover svg, {{WRAPPER}} a.elementor-button:focus svg, {{WRAPPER}} .elementor-button:focus svg' => 'fill: {{VALUE}};',
 				],
 			]
 		);
@@ -527,6 +525,16 @@ class Widget_Button extends Widget_Base {
 	protected function render_text() {
 		$settings = $this->get_settings_for_display();
 
+		$migrated = isset( $settings['__fa4_migrated']['selected_icon'] );
+		$is_new = empty( $settings['icon'] ) && Icons_Manager::is_migration_allowed();
+
+		if ( ! $is_new && empty( $settings['icon_align'] ) ) {
+			// @todo: remove when deprecated
+			// added as bc in 2.6
+			//old default
+			$settings['icon_align'] = $this->get_settings( 'icon_align' );
+		}
+
 		$this->add_render_attribute( [
 			'content-wrapper' => [
 				'class' => 'elementor-button-content-wrapper',
@@ -541,9 +549,6 @@ class Widget_Button extends Widget_Base {
 				'class' => 'elementor-button-text',
 			],
 		] );
-
-		$migrated = isset( $settings['__fa4_migrated']['selected_icon'] );
-		$is_new = empty( $settings['icon'] ) && Icons_Manager::is_migration_allowed();
 
 		$this->add_inline_editing_attributes( 'text', 'none' );
 		?>
@@ -560,5 +565,9 @@ class Widget_Button extends Widget_Base {
 			<span <?php echo $this->get_render_attribute_string( 'text' ); ?>><?php echo $settings['text']; ?></span>
 		</span>
 		<?php
+	}
+
+	public function on_import( $element ) {
+		return Icons_Manager::on_import_migration( $element, 'icon', 'selected_icon' );
 	}
 }

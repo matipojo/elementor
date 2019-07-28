@@ -2,14 +2,12 @@ import Module from './module';
 
 export default class extends Module {
 	__construct( args ) {
-		if ( ! args || ! args.context ) {
-			throw Error( 'context is required' );
+		if ( ! args || ! args.manager ) {
+			throw Error( 'manager is required' );
 		}
 
-		this.context = args.context;
-		this.tabs = {};
-		this.isActive = {};
-		this.isModal = false;
+		this.manager = args.manager;
+		this.tabs = this.getInitialTabs();
 		this.defaultRoute = '';
 		this.currentTab = '';
 	}
@@ -20,17 +18,15 @@ export default class extends Module {
 		jQuery.each( this.getRoutes(), ( route, callback ) => this.registerRoute( route, callback ) );
 
 		jQuery.each( this.getCommands(), ( command, callback ) => this.registerCommand( command, callback ) );
-
-		if ( this.isModal ) {
-			elementorCommon.shortcuts.register( 'esc', {
-				scopes: [ this.getNamespace() ],
-				callback: () => this.close(),
-			} );
-		}
 	}
 
 	getNamespace() {
 		throw Error( 'getNamespace must be override.' );
+	}
+
+	getRootContainer() {
+		const parts = this.getNamespace().split( '/' );
+		return parts[ 0 ];
 	}
 
 	getCommands() {
@@ -42,6 +38,10 @@ export default class extends Module {
 	}
 
 	getRoutes() {
+		return {};
+	}
+
+	getInitialTabs() {
 		return {};
 	}
 
@@ -91,27 +91,23 @@ export default class extends Module {
 		elementorCommon.components.inactivate( this.getNamespace() );
 	}
 
+	isActive() {
+		return elementorCommon.components.isActive( this.getNamespace() );
+	}
+
 	onRoute() {
-		this.isActive = true;
-		this.toggleUIIndicator( true );
+		this.activate();
 	}
 
 	onCloseRoute() {
-		this.isActive = false;
-		this.toggleUIIndicator( false );
+		this.inactivate();
 	}
 
-	toggleUIIndicator( value ) {
-		if ( this.getUIIndicator ) {
-			jQuery( this.getUIIndicator() ).toggleClass( 'elementor-open', value );
-		}
-	}
-
-	setDefault( route ) {
+	setDefaultRoute( route ) {
 		this.defaultRoute = this.getNamespace() + '/' + route;
 	}
 
-	getDefault() {
+	getDefaultRoute() {
 		return this.defaultRoute;
 	}
 
@@ -122,7 +118,7 @@ export default class extends Module {
 	addTab( tab, args, position ) {
 		this.tabs[ tab ] = args;
 		// It can be 0.
-		if ( undefined !== typeof position ) {
+		if ( 'undefined' !== typeof position ) {
 			const newTabs = {};
 			const ids = Object.keys( this.tabs );
 			// Remove new tab

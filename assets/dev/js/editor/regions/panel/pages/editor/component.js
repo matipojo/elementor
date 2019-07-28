@@ -10,7 +10,7 @@ export default class extends elementorModules.Component {
 		return 'panel/editor';
 	}
 
-	getTabs() {
+	getInitialTabs() {
 		return {
 			content: { title: elementor.translate( 'content' ) },
 			style: { title: elementor.translate( 'style' ) },
@@ -26,7 +26,7 @@ export default class extends elementorModules.Component {
 
 				this.setDefaultTab( args );
 
-				elementorCommon.route.to( this.getDefault(), args );
+				elementorCommon.route.to( this.getDefaultRoute(), args );
 			},
 		};
 	}
@@ -36,11 +36,11 @@ export default class extends elementorModules.Component {
 	}
 
 	renderTab( tab ) {
-		this.context.getCurrentPageView().activateTab( tab );
+		this.manager.getCurrentPageView().activateTab( tab );
 	}
 
 	activateTab( tab ) {
-		this.activeTabs[ this.context.getCurrentPageView().model.id ] = tab;
+		this.activeTabs[ this.manager.getCurrentPageView().model.id ] = tab;
 
 		super.activateTab( tab );
 	}
@@ -49,13 +49,11 @@ export default class extends elementorModules.Component {
 		let defaultTab;
 		if ( this.activeTabs[ args.model.id ] ) {
 			defaultTab = this.activeTabs[ args.model.id ];
-		} else if ( args.model.get( 'elType' ).match( /section|column/ ) ) {
-			defaultTab = 'layout';
 		} else {
-			defaultTab = 'content';
+			defaultTab = jQuery( this.getTabsWrapperSelector() ).find( '.elementor-component-tab' ).eq( 0 ).data( 'tab' );
 		}
 
-		this.setDefault( defaultTab );
+		this.setDefaultRoute( defaultTab );
 	}
 
 	openEditor( model, view ) {
@@ -69,10 +67,10 @@ export default class extends elementorModules.Component {
 		const action = 'panel/open_editor/' + model.get( 'elType' );
 
 		// Example: panel/open_editor/widget
-		elementor.hooks.doAction( action, this.context, model, view );
+		elementor.hooks.doAction( action, this.manager, model, view );
 
 		// Example: panel/open_editor/widget/heading
-		elementor.hooks.doAction( action + '/' + model.get( 'widgetType' ), this.context, model, view );
+		elementor.hooks.doAction( action + '/' + model.get( 'widgetType' ), this.manager, model, view );
 
 		return editor;
 	}

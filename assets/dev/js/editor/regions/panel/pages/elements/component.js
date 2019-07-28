@@ -3,7 +3,7 @@ export default class extends elementorModules.Component {
 		return 'panel/elements';
 	}
 
-	getTabs() {
+	getInitialTabs() {
 		return {
 			categories: { title: elementor.translate( 'elements' ) },
 			global: { title: elementor.translate( 'global' ) },
@@ -15,6 +15,6 @@ export default class extends elementorModules.Component {
 	}
 
 	renderTab( tab ) {
-		this.context.setPage( 'elements' ).showView( tab );
+		this.manager.setPage( 'elements' ).showView( tab );
 	}
 }

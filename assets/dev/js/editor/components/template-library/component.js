@@ -1,16 +1,16 @@
 const TemplateLibraryLayoutView = require( 'elementor-templates/views/library-layout' );
 
-export default class extends elementorModules.Component {
+export default class extends elementorModules.ComponentModal {
 	__construct( args ) {
-		super.__construct( args );
-
-		this.isModal = true;
+		// Before contruct because it's used in getInitialTabs().
 		this.docLibraryConfig = elementor.config.document.remoteLibrary;
 
+		super.__construct( args );
+
 		if ( 'block' === this.docLibraryConfig.type ) {
-			this.setDefault( 'templates/blocks' );
+			this.setDefaultRoute( 'templates/blocks' );
 		} else {
-			this.setDefault( 'templates/pages' );
+			this.setDefaultRoute( 'templates/pages' );
 		}
 	}
 
@@ -18,45 +18,44 @@ export default class extends elementorModules.Component {
 		return 'library';
 	}
 
-	getTabs() {
-		// Allow add tabs via `addTab`.
-		if ( _.isEmpty( this.tabs ) ) {
-			this.tabs = {
-				'templates/blocks': {
-					title: elementor.translate( 'blocks' ),
-					filter: {
-						source: 'remote',
-						type: 'block',
-						subtype: this.docLibraryConfig.category,
-					},
-				},
-				'templates/pages': {
-					title: elementor.translate( 'pages' ),
-					filter: {
-						source: 'remote',
-						type: 'page',
-					},
-				},
-				'templates/my-templates': {
-					title: elementor.translate( 'my_templates' ),
-					filter: {
-						source: 'local',
-					},
-				},
-			};
-		}
+	getModalLayout() {
+		return TemplateLibraryLayoutView;
+	}
 
-		return this.tabs;
+	getInitialTabs() {
+		return {
+			'templates/blocks': {
+				title: elementor.translate( 'blocks' ),
+				filter: {
+					source: 'remote',
+					type: 'block',
+					subtype: this.docLibraryConfig.category,
+				},
+			},
+			'templates/pages': {
+				title: elementor.translate( 'pages' ),
+				filter: {
+					source: 'remote',
+					type: 'page',
+				},
+			},
+			'templates/my-templates': {
+				title: elementor.translate( 'my_templates' ),
+				filter: {
+					source: 'local',
+				},
+			},
+		};
 	}
 
 	getRoutes() {
 		return {
 			import: () => {
-				this.context.layout.showImportView();
+				this.manager.layout.showImportView();
 			},
 
 			'save-template': ( args ) => {
-				this.context.layout.showSaveTemplateView( args.model );
+				this.manager.layout.showSaveTemplateView( args.model );
 			},
 		};
 	}
@@ -80,7 +79,7 @@ export default class extends elementorModules.Component {
 	}
 
 	renderTab( tab ) {
-		this.context.setScreen( this.tabs[ tab ].filter );
+		this.manager.setScreen( this.tabs[ tab ].filter );
 	}
 
 	activateTab( tab ) {
@@ -90,15 +89,13 @@ export default class extends elementorModules.Component {
 	}
 
 	open() {
-		if ( ! this.context.layout ) {
-			this.context.layout = new TemplateLibraryLayoutView();
+		super.open();
 
-			this.context.layout.getModal().on( 'hide', () => this.close() );
+		if ( ! this.manager.layout ) {
+			this.manager.layout = this.layout;
 
-			this.context.onFirstOpen();
+			this.manager.onFirstOpen();
 		}
-
-		this.context.layout.showModal();
 
 		return true;
 	}
@@ -108,17 +105,16 @@ export default class extends elementorModules.Component {
 			return false;
 		}
 
-		this.context.modalConfig = {};
-		this.context.layout.getModal().hide();
+		this.manager.modalConfig = {};
 
 		return true;
 	}
 
 	show( args ) {
-		this.context.modalConfig = args;
+		this.manager.modalConfig = args;
 
 		if ( args.toDefault || ! elementorCommon.route.restoreState( 'library' ) ) {
-			elementorCommon.route.to( this.getDefault() );
+			elementorCommon.route.to( this.getDefaultRoute() );
 		}
 	}
 }

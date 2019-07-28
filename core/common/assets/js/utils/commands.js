@@ -46,16 +46,10 @@ export default class extends elementorModules.Module {
 		return this;
 	}
 
-	unregister( command ) {
-		delete this.commands[ command ];
-
-		return this;
-	}
-
 	getComponent( command ) {
-		const componentName = this.components[ command ];
+		const namespace = this.components[ command ];
 
-		return elementorCommon.components.get( componentName );
+		return elementorCommon.components.get( namespace );
 	}
 
 	is( command ) {
@@ -95,7 +89,7 @@ export default class extends elementorModules.Module {
 
 	run( command, args = {} ) {
 		if ( ! this.beforeRun( command, args ) ) {
-			return;
+			return false;
 		}
 
 		const parts = command.split( '/' ),
@@ -112,13 +106,13 @@ export default class extends elementorModules.Module {
 
 		this.commands[ command ].apply( component, [ args ] );
 
-		component.activate();
-
 		if ( args.onAfter ) {
 			args.onAfter.apply( component, [ args ] );
 		}
 
 		this.afterRun( command, args );
+
+		return true;
 	}
 
 	runShortcut( command, event ) {

@@ -532,7 +532,7 @@ export default class Document extends elementorModules.Module {
 						}
 
 						// Get settings and etc.
-						if ( 'object' === typeof results ) {
+						if ( 'object' === typeof results && ! _.isArray(results)) {
 							return results;
 						}
 

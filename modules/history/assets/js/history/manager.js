@@ -1,6 +1,3 @@
-var ElementHistoryBehavior = require( './element-behavior' ),
-	CollectionHistoryBehavior = require( './collection-behavior' );
-
 import ItemModel from './item-model';
 import Component from './component';
 
@@ -18,22 +15,6 @@ var	Manager = function() {
 		move: elementor.translate( 'moved' ),
 		paste_style: elementor.translate( 'style_pasted' ),
 		reset_style: elementor.translate( 'style_reset' ),
-	};
-
-	var addBehaviors = function( behaviors ) {
-		behaviors.CollectionHistory = {
-			behaviorClass: CollectionHistoryBehavior,
-		};
-
-		return behaviors;
-	};
-
-	var addCollectionBehavior = function( behaviors ) {
-		behaviors.CollectionHistory = {
-			behaviorClass: CollectionHistoryBehavior,
-		};
-
-		return behaviors;
 	};
 
 	var getActionLabel = function( itemData ) {
@@ -74,31 +55,6 @@ var	Manager = function() {
 
 	var init = function() {
 		elementorCommon.components.register( new Component( { manager: self } ) );
-
-		elementor.hooks.addFilter( 'elements/base/behaviors', addBehaviors );
-		elementor.hooks.addFilter( 'elements/base-section-container/behaviors', addCollectionBehavior );
-
-		elementor.channels.data
-			.on( 'drag:before:update', self.startMovingItem )
-			.on( 'drag:after:update', self.endItem )
-
-			.on( 'element:before:add', self.startAddElement )
-			.on( 'element:after:add', self.endItem )
-
-			.on( 'element:before:remove', self.startRemoveElement )
-			.on( 'element:after:remove', self.endItem )
-
-			.on( 'element:before:paste:style', self.startPasteStyle )
-			.on( 'element:after:paste:style', self.endItem )
-
-			.on( 'element:before:reset:style', self.startResetStyle )
-			.on( 'element:after:reset:style', self.endItem )
-
-			.on( 'section:before:drop', self.startDropElement )
-			.on( 'section:after:drop', self.endItem )
-
-			.on( 'template:before:insert', self.startInsertTemplate )
-			.on( 'template:after:insert', self.endItem );
 
 		elementor.channels.editor.on( 'saved', onPanelSave );
 	};

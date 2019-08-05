@@ -62,8 +62,6 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 
 			// Set the value silent
 			this.elementSettingsModel.set( controlName, this.collection, { silent: true } );
-			this.listenTo( this.collection, 'change', this.onRowControlChange );
-			this.listenTo( this.collection, 'update', this.onRowUpdate, this );
 		}
 
 		this.collection.each( ( model ) => {
@@ -75,9 +73,6 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 		ControlBaseDataView.prototype.initialize.apply( this, arguments );
 
 		this.fillCollection();
-
-		this.listenTo( this.collection, 'change', this.onRowControlChange );
-		this.listenTo( this.collection, 'update', this.onRowUpdate, this );
 	},
 
 	addRow: function( data, options = {} ) {
@@ -91,9 +86,7 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 
 		const elementId = this.elementSettingsModel._parent.model.id;
 
-		$e( '#' + elementId ).repeaterRowAdd( this.model.get( 'name' ), data, {
-			options: options,
-		} );
+		$e( '#' + elementId ).get( this.model.get( 'name' ) ).insert( data, options );
 
 		return this.collection.add( data, options );
 	},
@@ -192,7 +185,8 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 			newIndex = ui.item.index();
 
 		this.collection.remove( model );
-		$e( '#' + this.elementSettingsModel._parent.model.id ).repeaterRowRemove( this.model.get( 'name' ), oldIndex );
+
+		$e( '#' + this.elementSettingsModel._parent.model.id ).get( this.model.get( 'name' ) ).getItem( oldIndex ).remove();
 
 		this.addRow( model, { at: newIndex } );
 	},
@@ -219,8 +213,6 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 
 		settings._previousAttributes = {};
 		settings._previousAttributes[ controlName ] = collectionCloned.toJSON();
-
-		settings.trigger( 'change', settings, settings._pending );
 
 		delete settings.changed;
 		delete settings._previousAttributes;
@@ -251,10 +243,6 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 		settings._previousAttributes = {};
 		settings._previousAttributes[ controlName ] = collectionCloned;
 
-		settings.trigger( 'change', settings );
-
-		$e( '#' + element.id ).setting( controlName, model.collection );
-
 		delete settings.changed;
 		delete settings._previousAttributes;
 	},
@@ -265,15 +253,20 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 			defaults[ field.name ] = field.default;
 		} );
 
-		var newModel = this.addRow( defaults ),
-			newChildView = this.children.findByModel( newModel );
+		const elementId = this.elementSettingsModel._parent.model.id;
 
-		this.editRow( newChildView );
+		$e( '#' + elementId ).get( this.model.get( 'name' ) ).insert( defaults );
+
+		this.updateChildIndexes();
+
+		this.updateActiveRow();
 	},
 
 	onChildviewClickRemove: function( childView ) {
-		childView.model.destroy();
-		$e( '#' + this.elementSettingsModel._parent.model.id ).repeaterRowRemove( this.model.get( 'name' ), childView.itemIndex - 1 );
+		const $eElement = $e( '#' + this.elementSettingsModel._parent.model.id ),
+			controlName = this.model.get( 'name' );
+
+		$eElement.get( controlName ).getItem( childView._index ).remove();
 
 		if ( childView === this.currentEditableChild ) {
 			delete this.currentEditableChild;
@@ -285,9 +278,10 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 	},
 
 	onChildviewClickDuplicate: function( childView ) {
-		var newModel = this.createItemModel( childView.model.toJSON(), {}, this );
+		const $eElement = $e( '#' + this.elementSettingsModel._parent.model.id ),
+			controlName = this.model.get( 'name' );
 
-		this.addRow( newModel, { at: childView.itemIndex } );
+		$eElement.get( controlName ).getItem( childView._index ).duplicate();
 	},
 
 	onChildviewClickEdit: function( childView ) {
@@ -296,6 +290,9 @@ ControlRepeaterItemView = ControlBaseDataView.extend( {
 
 	onAfterExternalChange: function() {
 		// Update the collection with current value
+		const controlName = this.model.get( 'name' );
+		this.collection = this.elementSettingsModel.set( controlName, this.collection.toJSON() );
+
 		this.fillCollection();
 
 		ControlBaseDataView.prototype.onAfterExternalChange.apply( this, arguments );

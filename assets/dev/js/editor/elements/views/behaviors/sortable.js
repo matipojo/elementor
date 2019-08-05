@@ -101,24 +101,9 @@ SortableBehavior = Marionette.Behavior.extend( {
 	},
 
 	updateSort: function( ui ) {
-		var model = elementor.channels.data.request( 'dragging:model' ),
-			$childElement = ui.item,
-			collection = this.view.collection,
-			newIndex = $childElement.parent().children().index( $childElement ),
-			child = this.view.children.findByModelCid( model.cid );
+		var model = elementor.channels.data.request( 'dragging:model' );
 
-		this.view.addChildElement( model.clone(), {
-			at: newIndex,
-			trigger: {
-				beforeAdd: 'drag:before:update',
-				afterAdd: 'drag:after:update',
-			},
-			onBeforeAdd: function() {
-				child._isRendering = true;
-
-				collection.remove( model );
-			},
-		} );
+		$e( '#' + model.attributes.id ).moveTo( $e( '#' + this.view.getID() ) );
 
 		elementor.saver.setFlagEditorChange( true );
 	},
@@ -139,29 +124,7 @@ SortableBehavior = Marionette.Behavior.extend( {
 
 		if ( draggedIsInnerSection && targetIsInnerColumn ) {
 			jQuery( ui.sender ).sortable( 'cancel' );
-
-			return;
 		}
-
-		var newIndex = ui.item.index(),
-			modelData = model.toJSON( { copyHtmlCache: true } );
-
-		this.view.addChildElement( modelData, {
-			at: newIndex,
-			trigger: {
-				beforeAdd: 'drag:before:update',
-				afterAdd: 'drag:after:update',
-			},
-			onAfterAdd: function() {
-				var senderSection = elementor.channels.data.request( 'dragging:parent:view' );
-
-				senderSection.isManualRemoving = true;
-
-				model.destroy();
-
-				senderSection.isManualRemoving = false;
-			},
-		} );
 	},
 
 	onSortStart: function( event, ui ) {

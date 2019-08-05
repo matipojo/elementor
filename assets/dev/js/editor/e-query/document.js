@@ -1,8 +1,7 @@
-import History from './history';
-import Elements from './elements';
-import Settings from './settings';
 import eQuery from './e-query';
+import Settings from './settings';
 import Selection from './selection';
+import Elements from './elements/elements';
 
 export default class Document extends elementorModules.Module {
 	constructor( args ) {
@@ -12,8 +11,10 @@ export default class Document extends elementorModules.Module {
 
 		this.type = args.type;
 
-		this.elements = new Proxy( new Elements( args ), History );
+		this.elements = new Elements( args );
+
 		this.settings = new Settings( args );
+
 		this.selection = new Selection( args );
 
 		this.status = 'saved';

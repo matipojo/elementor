@@ -116,14 +116,12 @@ RepeaterRowView = Marionette.CompositeView.extend( {
 
 	setSettingsModel: function( value ) {
 		const controlName = this.elementSettingsModel.control.model.get( 'name' ),
-			rowIndex = this._parent.itemIndex - 1,
 			newSettings = {};
 		newSettings[ this.model.get( 'name' ) ] = value;
 
-		$e( '#' + this.elementSettingsModel.control._parent.model.id ).repeaterRowSettings( newSettings, controlName, rowIndex );
+		const $eElement = $e( '#' + this.elementSettingsModel.control._parent.model.id );
 
-		this.triggerMethod( 'settings:change' );
-		this.trigger( 'change' );
+		$eElement.get( controlName ).getItem( this._parent._index ).settings( newSettings );
 	},
 } );
 

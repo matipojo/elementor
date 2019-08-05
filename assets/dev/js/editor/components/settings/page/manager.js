@@ -22,6 +22,9 @@ module.exports = BaseSettings.extend( {
 			addChildElement: function( element, args ) {
 				return elementor.getPreviewView().addChildElement( element, args );
 			},
+			getID() {
+				return elementor.documentView.model.id;
+			},
 			model: new Backbone.Model( {
 				id: 'document',
 				elType: 'document',
@@ -30,6 +33,7 @@ module.exports = BaseSettings.extend( {
 		};
 
 		this.model._parent = elementor.documentView;
+		elementor.documentView._parent = elementor.documentView;
 	},
 
 	save: function() {},

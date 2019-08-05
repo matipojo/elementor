@@ -1,6 +1,146 @@
 jQuery( () => {
 	QUnit.module( 'eQuery' );
 
+	/** -------------------------------------------
+	 * @description Test repeater commands.
+	 * @todo change `Tabs:` to `Repeater:`
+	 * -------------------------------------------- */
+
+	QUnit.test( 'Create Tabs', ( assert ) => {
+		$eSection = $e().create( 'section' );
+		$eColumn = $eSection.find( 'column' );
+		$eTabs1 = $eColumn.create( [ 'widget', 'tabs' ] );
+
+		// Check type of new widget.
+		assert.equal( $eTabs1.context[ 0 ].model.get( 'widgetType' ), 'tabs' );
+	} );
+
+	QUnit.test( 'Tabs: Duplicate Row', ( assert ) => {
+		$eSection = $e().create( 'section' );
+		$eColumn = $eSection.find( 'column' );
+		$eTabs1 = $eColumn.create( [ 'widget', 'tabs' ] );
+		$eRepeater = $eTabs1.get( 'tabs' );
+
+		$eRepeater.getItem( 1 ).duplicate();
+
+		// Check setting name.
+		assert.equal( $eRepeater.getItem( 2 ).getSetting( 'tab_title' ), 'Tab #2' );
+	} );
+
+	QUnit.test( 'Tabs: Insert Row', ( assert ) => {
+		$eSection = $e().create( 'section' );
+		$eColumn = $eSection.find( 'column' );
+		$eTabs1 = $eColumn.create( [ 'widget', 'tabs' ] );
+		$eRepeater = $eTabs1.get( 'tabs' );
+
+		$eRepeater.insert( {
+			tab_title: 'New tab',
+			tab_content: 'Some content of new tab',
+		} );
+
+		// Check tabs count.
+		assert.equal( $eRepeater.elements[ 0 ].getEditModel().get( 'settings' ).get( 'tabs' ).length, 3 );
+	} );
+
+	QUnit.test( 'Tabs: Move Row', ( assert ) => {
+		$eSection = $e().create( 'section' );
+		$eColumn = $eSection.find( 'column' );
+		$eTabs1 = $eColumn.create( [ 'widget', 'tabs' ] );
+
+		$eRepeater = $eTabs1.get( 'tabs' );
+
+		$eRepeater.insert( {
+			tab_title: 'New tab',
+			tab_content: 'Some content of new tab',
+		} );
+
+		$eRepeater.getItem( 2 ).move( 0 );
+
+		// Check if new tab at 0.
+		assert.equal( $eRepeater.getItem( 0 ).getSetting( 'tab_title' ), 'New tab' );
+	} );
+
+	QUnit.test( 'Tabs: Remove Row', ( assert ) => {
+		$eSection = $e().create( 'section' );
+		$eColumn = $eSection.find( 'column' );
+		$eTabs1 = $eColumn.create( [ 'widget', 'tabs' ] );
+		$eRepeater = $eTabs1.get( 'tabs' );
+
+		$eRepeater.getItem( 1 ).remove();
+
+		// Check tabs count.
+		assert.equal( $eRepeater.elements[ 0 ].getEditModel().get( 'settings' ).get( 'tabs' ).length, 1 );
+	} );
+
+	QUnit.test( 'Tabs: Change Settings', ( assert ) => {
+		$eSection = $e().create( 'section' );
+		$eColumn = $eSection.find( 'column' );
+		$eTabs1 = $eColumn.create( [ 'widget', 'tabs' ] );
+		$eRepeater = $eTabs1.get( 'tabs' );
+
+		$eRepeater.getItem( 1 ).settings( { tab_title: 'Test settings' } );
+
+		// Check tabs count.
+		assert.equal( $eRepeater.getItem( 1 ).getSetting( 'tab_title' ), 'Test settings' );
+	} );
+
+	// TODO: add lazyLogSettingsHistory test
+
+	QUnit.test( 'Tabs: Change Settings Lazy Log History', ( assert ) => {
+		$eSection = $e().create( 'section' );
+		$eColumn = $eSection.find( 'column' );
+		$eTabs1 = $eColumn.create( [ 'widget', 'tabs' ] );
+		$eTabs2 = $eColumn.create( [ 'widget', 'tabs' ] );
+
+		$eMultipleTabs = $eTabs1.add( $eTabs2 ).get( 'tabs' );
+		$eMultipleTabs.getItem( 0 ).duplicate();
+
+		$eTabs1.get( 'tabs' ).getItem( 2 ).settings( { tab_title: 'Tab #3 Duplicated from #2' } );
+
+		$eTabs1.get( 'tabs' ).getItem( 1 ).settings( { tab_title: 'Tab #2 Before Remove' } ).remove(); // will crash.
+		$eTabs1.get( 'tabs' ).getItem( 0 ).settings( { tab_title: 'Tab #1 Before Remove' } ).remove();
+
+
+	} );
+
+	return;
+
+	$eSection = $e().create( 'section' );
+	$eColumn = $eSection.find( 'column' );
+	$eTabs1 = $eColumn.create( [ 'widget', 'tabs' ] );
+	$eTabs2 = $eColumn.create( [ 'widget', 'tabs' ] );
+
+	$eMultipleTabs = $eTabs1.add( $eTabs2 ).get( 'tabs' );
+	$eMultipleTabs.insert( { tab_title: 'lol' } );
+
+
+	$eMultipleTabs.getItem( 0 ).duplicate();
+	$eMultipleTabs.getItem( 1 ).move( 3 );
+	$eMultipleTabs.getItem( 1 ).move( 2 );
+
+	$eMultipleTabs.getItem( 0 ).remove();
+	$eMultipleTabs.getItem( 0 ).duplicate();
+	$eMultipleTabs.getItem( 0 ).insert( { tab_title: 'lol' } );
+	$eMultipleTabs.getItem( 0 ).settings( { tab_title: 'Im here' } );
+
+	// Not exits.
+	$eMultipleTabs.getItem( 5 ).remove();
+
+	// without get item.
+	$eMultipleTabs.duplicate(); // will not work.
+	$eMultipleTabs.move( 2 ); // will not work.
+	$eMultipleTabs.remove( 2 ); // will not work.
+	$eMultipleTabs.settings( { tab_title: 'Im here' } ); // will not work.
+
+	$eMultipleTabs.insert( { tab_title: 'lol' } ); // will work !
+
+	// Some tests.
+
+	$eTabs1.get( 'tabs' ).getItem( 2 ).settings( { tab_title: 'Tab #3 Duplicated from #2' } );
+
+	$eTabs1.get( 'tabs' ).getItem( 1 ).settings( { tab_title: 'Tab #2 Before Remove' } ).remove();
+	$eTabs1.get( 'tabs' ).getItem( 0 ).settings( { tab_title: 'Tab #1 Before Remove' } ).remove();
+
 	// Create a section at end of document.
 	$e().create( 'section' ); // Page -> Sections -> Last
 	$e().remove(); // Page -> Sections -> All

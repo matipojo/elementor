@@ -42,12 +42,33 @@ export default class Shortcuts {
 	 * @param {bool} args.allowAltKey Optional
 	 */
 	register( shortcuts, args ) {
+		const registered = [];
 		shortcuts.replace( ' ', '' ).split( ',' ).forEach( ( shortcut ) => {
 			if ( ! this.handlers[ shortcut ] ) {
-				this.handlers[ shortcut ] = [];
+				this.handlers[ shortcut ] = {};
 			}
 
-			this.handlers[ shortcut ].push( args );
+			const uniqueId = Math.random().toString( 16 ).substr( 2, 7 );
+
+			this.handlers[ shortcut ][ uniqueId ] = args;
+
+			registered.push( uniqueId );
+		} );
+
+		return registered;
+	}
+
+	unregister( shortcuts, uniqueId = '' ) {
+		shortcuts.replace( ' ', '' ).split( ',' ).forEach( ( shortcut ) => {
+			if ( ! this.handlers[ shortcut ] ) {
+				return;
+			}
+
+			if ( uniqueId ) {
+				delete this.handlers[ shortcut ][ uniqueId ];
+			} else {
+				delete this.handlers[ shortcut ];
+			}
 		} );
 	}
 

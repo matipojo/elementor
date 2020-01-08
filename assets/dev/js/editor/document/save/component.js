@@ -117,7 +117,7 @@ export default class Component extends BackwardsCompatibility {
 			jQuery.extend( true, elementor.config, data.config );
 		}
 
-		elementor.config.data = elements;
+		// elementor.config.data = elements;
 
 		elementor.channels.editor.trigger( 'saved', data );
 

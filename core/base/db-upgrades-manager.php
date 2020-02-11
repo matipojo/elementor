@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class DB_Upgrades_Manager extends Background_Task_Manager {
 	protected $current_version = null;
+	protected $query_limit = 100;
 
 	abstract public function get_new_version();
 	abstract public function get_version_option_name();
@@ -21,7 +22,11 @@ abstract class DB_Upgrades_Manager extends Background_Task_Manager {
 	}
 
 	public function get_query_limit() {
-		return 100;
+		return $this->query_limit;
+	}
+
+	public function set_query_limit( $limit ) {
+		$this->query_limit = $limit;
 	}
 
 	public function get_current_version() {
@@ -42,6 +47,12 @@ abstract class DB_Upgrades_Manager extends Background_Task_Manager {
 		}
 
 		return version_compare( $this->get_new_version(), $current_version, '>' );
+	}
+
+	public function on_runner_start() {
+		parent::on_runner_start();
+
+		define( 'IS_ELEMENTOR_UPGRADE', true );
 	}
 
 	public function on_runner_complete( $did_tasks = false ) {
@@ -156,11 +167,9 @@ abstract class DB_Upgrades_Manager extends Background_Task_Manager {
 	}
 
 	public function __construct() {
-		if ( ! is_admin() || ! current_user_can( 'update_plugins' ) ) {
-			return;
-		}
-
-		if ( $this->get_flag( 'completed' ) ) {
+		// If upgrade is completed - show the notice only for admins.
+		// Note: in this case `should_upgrade` returns false, because it's already upgraded.
+		if ( is_admin() && current_user_can( 'manage_options' ) && $this->get_flag( 'completed' ) ) {
 			add_action( 'admin_notices', [ $this, 'admin_notice_upgrade_is_completed' ] );
 		}
 

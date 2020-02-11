@@ -1,3 +1,6 @@
+import WidgetDraggable from './behaviors/widget-draggable';
+import WidgetResizable from './behaviors/widget-resizeable';
+
 var BaseElementView = require( 'elementor-elements/views/base' ),
 	WidgetView;
 
@@ -37,9 +40,39 @@ WidgetView = BaseElementView.extend( {
 				behaviorClass: require( 'elementor-behaviors/inline-editing' ),
 				inlineEditingClass: 'elementor-inline-editing',
 			},
+			Draggable: {
+				behaviorClass: WidgetDraggable,
+			},
+			Resizable: {
+				behaviorClass: WidgetResizable,
+			},
 		} );
 
 		return elementor.hooks.applyFilters( 'elements/widget/behaviors', behaviors, this );
+	},
+
+	getEditButtons: function() {
+		const elementData = elementor.getElementData( this.model ),
+			editTools = {};
+
+		editTools.edit = {
+			title: elementor.translate( 'edit_element', [ elementData.title ] ),
+			icon: 'edit',
+		};
+
+		if ( elementor.getPreferences( 'edit_buttons' ) ) {
+			editTools.duplicate = {
+				title: elementor.translate( 'duplicate_element', [ elementData.title ] ),
+				icon: 'clone',
+			};
+
+			editTools.remove = {
+				title: elementor.translate( 'delete_element', [ elementData.title ] ),
+				icon: 'close',
+			};
+		}
+
+		return editTools;
 	},
 
 	initialize: function() {
@@ -50,6 +83,7 @@ WidgetView = BaseElementView.extend( {
 		editModel.on( {
 			'before:remote:render': this.onModelBeforeRemoteRender.bind( this ),
 			'remote:render': this.onModelRemoteRender.bind( this ),
+			'settings:loaded': () => setTimeout( this.render.bind( this ) ),
 		} );
 
 		if ( 'remote' === this.getTemplateType() && ! this.getEditModel().getHtmlCache() ) {
@@ -67,7 +101,7 @@ WidgetView = BaseElementView.extend( {
 
 	getContextMenuGroups: function() {
 		var groups = BaseElementView.prototype.getContextMenuGroups.apply( this, arguments ),
-			transferGroupIndex = groups.indexOf( _.findWhere( groups, { name: 'transfer' } ) );
+			transferGroupIndex = groups.indexOf( _.findWhere( groups, { name: 'clipboard' } ) );
 
 		groups.splice( transferGroupIndex + 1, 0, {
 			name: 'save',
@@ -89,6 +123,10 @@ WidgetView = BaseElementView.extend( {
 
 			this.$el.addClass( 'elementor-element' );
 
+			return;
+		}
+
+		if ( elementorCommonConfig.isTesting && this.isDestroyed ) {
 			return;
 		}
 
@@ -121,13 +159,10 @@ WidgetView = BaseElementView.extend( {
 	},
 
 	attachElContent: function( html ) {
-		var self = this,
-			htmlContent = self.getHTMLContent( html );
+		_.defer( () => {
+			elementorFrontend.elements.window.jQuery( this.el ).empty().append( this.getHandlesOverlay(), this.getHTMLContent( html ) );
 
-		_.defer( function() {
-			elementorFrontend.elements.window.jQuery( self.el ).html( htmlContent );
-
-			self.bindUIElements(); // Build again the UI elements since the content attached just now
+			this.bindUIElements(); // Build again the UI elements since the content attached just now
 
 			self.trigger( 'after:attachElContent', this );
 		} );
@@ -179,15 +214,15 @@ WidgetView = BaseElementView.extend( {
 			skinType = editModel.getSetting( '_skin' ) || 'default';
 
 		self.$el
-			.attr( 'data-element_type', editModel.get( 'widgetType' ) + '.' + skinType )
+			.attr( 'data-widget_type', editModel.get( 'widgetType' ) + '.' + skinType )
 			.removeClass( 'elementor-widget-empty' )
 			.children( '.elementor-widget-empty-icon' )
 			.remove();
 
-		// TODO: Find better way to detect if all images are loaded
+		// TODO: Find a better way to detect if all the images have been loaded
 		self.$el.imagesLoaded().always( function() {
 			setTimeout( function() {
-				if ( 1 > self.$el.height() ) {
+				if ( 1 > self.$el.children( '.elementor-widget-container' ).outerHeight() ) {
 					self.handleEmptyWidget();
 				}
 			}, 200 );

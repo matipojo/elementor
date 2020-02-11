@@ -1,4 +1,4 @@
-head {
+#elementor-device-mode {
 
 	&:after {
 
@@ -13,6 +13,5 @@ head {
 		@media (max-width: $screen-sm-max) {
 			content: 'mobile';
 		}
-
 	}
 }

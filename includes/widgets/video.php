@@ -219,7 +219,6 @@ class Widget_Video extends Widget_Base {
 				'type' => Controls_Manager::URL,
 				'autocomplete' => false,
 				'show_external' => false,
-				'label_block' => true,
 				'show_label' => false,
 				'dynamic' => [
 					'active' => true,
@@ -276,6 +275,17 @@ class Widget_Video extends Widget_Base {
 			[
 				'label' => __( 'Autoplay', 'elementor' ),
 				'type' => Controls_Manager::SWITCHER,
+			]
+		);
+
+		$this->add_control(
+			'play_on_mobile',
+			[
+				'label' => __( 'Play on Mobile', 'elementor' ),
+				'type' => Controls_Manager::SWITCHER,
+				'condition' => [
+					'autoplay' => 'yes',
+				],
 			]
 		);
 
@@ -578,6 +588,7 @@ class Widget_Video extends Widget_Base {
 					'43' => '4:3',
 					'32' => '3:2',
 					'11' => '1:1',
+					'916' => '9:16',
 				],
 				'default' => '169',
 				'prefix_class' => 'elementor-aspect-ratio-',
@@ -718,7 +729,7 @@ class Widget_Video extends Widget_Base {
 				],
 				'range' => [
 					'%' => [
-						'min' => 50,
+						'min' => 30,
 					],
 				],
 				'selectors' => [
@@ -746,13 +757,12 @@ class Widget_Video extends Widget_Base {
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'lightbox_content_animation',
 			[
 				'label' => __( 'Entrance Animation', 'elementor' ),
 				'type' => Controls_Manager::ANIMATION,
 				'frontend_available' => true,
-				'label_block' => true,
 			]
 		);
 
@@ -831,6 +841,8 @@ class Widget_Video extends Widget_Base {
 						'modalOptions' => [
 							'id' => 'elementor-lightbox-' . $this->get_id(),
 							'entranceAnimation' => $settings['lightbox_content_animation'],
+							'entranceAnimation_tablet' => $settings['lightbox_content_animation_tablet'],
+							'entranceAnimation_mobile' => $settings['lightbox_content_animation_mobile'],
 							'videoAspectRatio' => $settings['aspect_ratio'],
 						],
 					];
@@ -906,6 +918,10 @@ class Widget_Video extends Widget_Base {
 
 		if ( $settings['autoplay'] && ! $this->has_image_overlay() ) {
 			$params['autoplay'] = '1';
+
+			if ( $settings['play_on_mobile'] ) {
+				$params['playsinline'] = '1';
+			}
 		}
 
 		$params_dictionary = [];

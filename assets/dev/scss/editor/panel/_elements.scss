@@ -1,6 +1,14 @@
 //
 // Panel Elements
 //
+#elementor-panel-page-elements {
+
+	body:not(.elementor-controls-ready) & {
+		height: 100%;
+		overflow: hidden;
+	}
+}
+
 #elementor-panel-elements-navigation {
 
 	.elementor-panel-navigation-tab {
@@ -15,7 +23,28 @@
 #elementor-panel-elements {
 	overflow: hidden;
 	padding: 0 5px;
+}
 
+#elementor-panel-elements-loading {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(255, 255, 255, 0.5);
+	z-index: 1;
+
+	body.elementor-controls-ready & {
+		display: none;
+	}
+
+	.eicon-loading {
+		font-size: 25px;
+		color: $editor-info;
+	}
 }
 
 .elementor-element-wrapper {
@@ -30,6 +59,12 @@
 	border-radius: 3px;
 	background-color: #fff;
 	cursor: move;
+	
+	.icon,
+	.title {
+		color: $editor-darker;
+		transition: $transition-hover;
+	}
 
 	&:hover {
 		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -42,7 +77,6 @@
 	.icon {
 		font-size: 28px;
 		padding-top: 15px;
-		color: $editor-darker;
 	}
 
 	.elementor-element-title-wrapper {
@@ -52,7 +86,6 @@
 
 	.title {
 		font-size: 11px;
-		color: $editor-darker;
 		display: table-cell;
 		vertical-align: middle;
 		height: 40px;
@@ -62,21 +95,12 @@
 #elementor-panel-elements-search-wrapper {
 	position: relative;
 	margin: 10px 10px 5px;
-
-	i {
-		position: absolute;
-		@include end(0);
-		top: 50%;
-		color: $editor-light;
-		transform: translateY(-50%);
-		transition: $end 1s;
-	}
 }
 
 #elementor-panel-elements-search-input {
 	background-color: rgba(255,255,255,.7);
 	font-size: 11px;
-	@include padding(10px, 27px, 10px, 10px);
+	@include padding(10px, 10px, 10px, 29px);
 	font-style: italic;
 	color: $editor-light;
 	border: none;
@@ -87,15 +111,15 @@
 	-moz-appearance: none;
 
 	+ i {
-		@include end(10px);
+		position: absolute;
+		@include start(10px);
+		top: 50%;
+		color: $editor-light;
+		transform: translateY(-50%);
 	}
 
 	&:focus {
 		background-color: rgba(255,255,255,1);
-		@include padding-start(15px);
-
-		+ i {
-			@include end(15px);
-		}
+		@include padding-end(15px);
 	}
 }

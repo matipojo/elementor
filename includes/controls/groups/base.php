@@ -315,26 +315,13 @@ abstract class Group_Control_Base implements Group_Control_Interface {
 	 * @return array Processed fields.
 	 */
 	protected function prepare_fields( $fields ) {
+		$popover_options = $this->get_options( 'popover' );
+
+		$popover_name = ! $popover_options ? null : $popover_options['starter_name'];
+
 		foreach ( $fields as $field_key => &$field ) {
-			if ( ! empty( $field['condition'] ) ) {
-				$field = $this->add_conditions_prefix( $field );
-			}
-
-			if ( ! empty( $field['selectors'] ) ) {
-				$field['selectors'] = $this->handle_selectors( $field['selectors'] );
-			}
-
-			if ( ! empty( $field['device_args'] ) ) {
-				foreach ( $field['device_args'] as $device => $device_arg ) {
-
-					if ( ! empty( $field['device_args'][ $device ]['condition'] ) ) {
-						$field['device_args'][ $device ] = $this->add_conditions_prefix( $field['device_args'][ $device ] );
-					}
-
-					if ( ! empty( $device_arg['selectors'] ) ) {
-						$field['device_args'][ $device ]['selectors'] = $this->handle_selectors( $device_arg['selectors'] );
-					}
-				}
+			if ( $popover_name ) {
+				$field['condition'][ $popover_name . '!' ] = '';
 			}
 
 			if ( isset( $this->args['fields_options']['__all'] ) ) {
@@ -343,6 +330,34 @@ abstract class Group_Control_Base implements Group_Control_Interface {
 
 			if ( isset( $this->args['fields_options'][ $field_key ] ) ) {
 				$field = array_merge( $field, $this->args['fields_options'][ $field_key ] );
+			}
+
+			if ( ! empty( $field['condition'] ) ) {
+				$field = $this->add_condition_prefix( $field );
+			}
+
+			if ( ! empty( $field['conditions'] ) ) {
+				$field['conditions'] = $this->add_conditions_prefix( $field['conditions'] );
+			}
+
+			if ( ! empty( $field['selectors'] ) ) {
+				$field['selectors'] = $this->handle_selectors( $field['selectors'] );
+			}
+
+			if ( ! empty( $field['device_args'] ) ) {
+				foreach ( $field['device_args'] as $device => $device_arg ) {
+					if ( ! empty( $field['device_args'][ $device ]['condition'] ) ) {
+						$field['device_args'][ $device ] = $this->add_condition_prefix( $field['device_args'][ $device ] );
+					}
+
+					if ( ! empty( $field['device_args'][ $device ]['conditions'] ) ) {
+						$field['device_args'][ $device ]['conditions'] = $this->add_conditions_prefix( $field['device_args'][ $device ]['conditions'] );
+					}
+
+					if ( ! empty( $device_arg['selectors'] ) ) {
+						$field['device_args'][ $device ]['selectors'] = $this->handle_selectors( $device_arg['selectors'] );
+					}
+				}
 			}
 		}
 
@@ -418,7 +433,7 @@ abstract class Group_Control_Base implements Group_Control_Interface {
 	 *
 	 * @return array Group control field.
 	 */
-	private function add_conditions_prefix( $field ) {
+	private function add_condition_prefix( $field ) {
 		$controls_prefix = $this->get_controls_prefix();
 
 		$prefixed_condition_keys = array_map(
@@ -434,6 +449,22 @@ abstract class Group_Control_Base implements Group_Control_Interface {
 		);
 
 		return $field;
+	}
+
+	private function add_conditions_prefix( $conditions ) {
+		$controls_prefix = $this->get_controls_prefix();
+
+		foreach ( $conditions['terms'] as & $condition ) {
+			if ( isset( $condition['terms'] ) ) {
+				$condition = $this->add_conditions_prefix( $condition );
+
+				continue;
+			}
+
+			$condition['name'] = $controls_prefix . $condition['name'];
+		}
+
+		return $conditions;
 	}
 
 	/**

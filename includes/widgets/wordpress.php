@@ -124,6 +124,10 @@ class Widget_WordPress extends Widget_Base {
 		return [ 'wordpress', 'widget' ];
 	}
 
+	public function get_help_url() {
+		return '';
+	}
+
 	/**
 	 * Whether the reload preview is required or not.
 	 *
@@ -267,7 +271,7 @@ class Widget_WordPress extends Widget_Base {
 	 *
 	 * Written as a Backbone JavaScript template and used to generate the live preview.
 	 *
-	 * @since 1.0.0
+	 * @since 2.9.0
 	 * @access protected
 	 */
 	protected function content_template() {}

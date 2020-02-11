@@ -31,6 +31,7 @@ abstract class Document extends Controls_Stack {
 	 * Document type meta key.
 	 */
 	const TYPE_META_KEY = '_elementor_template_type';
+	const PAGE_META_KEY = '_elementor_page_settings';
 
 	private $main_id;
 
@@ -81,11 +82,12 @@ abstract class Document extends Controls_Stack {
 	 */
 	public static function get_editor_panel_config() {
 		return [
+			'title' => static::get_title(), // JS Container title.
 			'widgets_settings' => [],
 			'elements_categories' => static::get_editor_panel_categories(),
 			'messages' => [
 				/* translators: %s: the document title. */
-				'publish_notification' => sprintf( __( 'Hurray! Your %s is live.', 'elementor' ), self::get_title() ),
+				'publish_notification' => sprintf( __( 'Hurray! Your %s is live.', 'elementor' ), static::get_title() ),
 			],
 		];
 	}
@@ -157,10 +159,12 @@ abstract class Document extends Controls_Stack {
 
 	/**
 	 * @since 2.0.12
-	 * @deprecated 2.4.0
+	 * @deprecated 2.4.0 Use `Document::get_remote_library_config()` instead
 	 * @access public
 	 */
-	public function get_remote_library_type() {}
+	public function get_remote_library_type() {
+		_deprecated_function( __METHOD__, '2.4.0', __CLASS__ . '::get_remote_library_config()' );
+	}
 
 	/**
 	 * @since 2.0.0
@@ -220,10 +224,12 @@ abstract class Document extends Controls_Stack {
 
 	/**
 	 * @since 2.0.6
-	 * @deprecated 2.4.0 Use `Document::get_container_attributes` instead
+	 * @deprecated 2.4.0 Use `Document::get_container_attributes()` instead
 	 * @access public
 	 */
 	public function get_container_classes() {
+		_deprecated_function( __METHOD__, '2.4.0', __CLASS__ . '::get_container_attributes()' );
+
 		return '';
 	}
 
@@ -236,15 +242,14 @@ abstract class Document extends Controls_Stack {
 			'class' => 'elementor elementor-' . $id,
 		];
 
-		if ( ! Plugin::$instance->preview->is_preview_mode( $id ) ) {
-			$attributes['data-elementor-settings'] = wp_json_encode( $this->get_frontend_settings() );
+		$version_meta = $this->get_main_meta( '_elementor_version' );
+
+		if ( version_compare( $version_meta, '2.5.0', '<' ) ) {
+			$attributes['class'] .= ' elementor-bc-flex-widget';
 		}
 
-		// TODO: BC since 2.4.0
-		$classes = $this->get_container_classes();
-
-		if ( $classes ) {
-			$attributes['class'] .= ' ' . $classes;
+		if ( ! Plugin::$instance->preview->is_preview_mode( $id ) ) {
+			$attributes['data-elementor-settings'] = wp_json_encode( $this->get_frontend_settings() );
 		}
 
 		return $attributes;
@@ -260,6 +265,7 @@ abstract class Document extends Controls_Stack {
 		$url = get_preview_post_link(
 			$main_post_id,
 			[
+				'preview_id' => $main_post_id,
 				'preview_nonce' => wp_create_nonce( 'post_preview_' . $main_post_id ),
 			]
 		);
@@ -406,13 +412,14 @@ abstract class Document extends Controls_Stack {
 	}
 
 	/**
-	 * @since 2.0.0
+	 * @since 2.9.0
 	 * @access protected
 	 */
-	protected function _get_initial_config() {
+	protected function get_initial_config() {
 		return [
 			'id' => $this->get_main_id(),
 			'type' => $this->get_name(),
+			'version' => $this->get_main_meta( '_elementor_version' ),
 			'remoteLibrary' => $this->get_remote_library_config(),
 			'last_edited' => $this->get_last_edited(),
 			'panel' => static::get_editor_panel_config(),
@@ -522,26 +529,60 @@ abstract class Document extends Controls_Stack {
 			return false;
 		}
 
-		if ( DB::STATUS_AUTOSAVE === $data['settings']['post_status'] ) {
-			if ( ! defined( 'DOING_AUTOSAVE' ) ) {
-				define( 'DOING_AUTOSAVE', true );
-			}
+		/**
+		 * Before document save.
+		 *
+		 * Fires when document save starts on Elementor.
+		 *
+		 * @since 2.5.12
+		 *
+		 * @param \Elementor\Core\Base\Document $this The current document.
+		 * @param $data.
+		 */
+		do_action( 'elementor/document/before_save', $this, $data );
+
+		if ( ! current_user_can( 'unfiltered_html' ) ) {
+			$data = wp_kses_post_deep( $data );
 		}
 
 		if ( ! empty( $data['settings'] ) ) {
+			if ( isset( $data['settings']['post_status'] ) && DB::STATUS_AUTOSAVE === $data['settings']['post_status'] ) {
+				if ( ! defined( 'DOING_AUTOSAVE' ) ) {
+					define( 'DOING_AUTOSAVE', true );
+				}
+			}
+
 			$this->save_settings( $data['settings'] );
+
+			// Refresh post after save settings.
+			$this->post = get_post( $this->post->ID );
 		}
 
-		// Refresh post after save settings.
-		$this->post = get_post( $this->post->ID );
+		// Don't check is_empty, because an empty array should be saved.
+		if ( isset( $data['elements'] ) && is_array( $data['elements'] ) ) {
+			$this->save_elements( $data['elements'] );
+		}
 
-		// TODO: refresh settings.
-		$this->save_elements( $data['elements'] );
+		$this->save_template_type();
+
+		$this->save_version();
 
 		// Remove Post CSS
-		$post_css = new Post_CSS( $this->post->ID );
+		$post_css = Post_CSS::create( $this->post->ID );
 
 		$post_css->delete();
+
+		/**
+		 * After document save.
+		 *
+		 * Fires when document save is complete.
+		 *
+		 * @since 2.5.12
+		 *
+		 * @param \Elementor\Core\Base\Document $this The current document.
+		 * @param $data.
+		 */
+		do_action( 'elementor/document/after_save', $this, $data );
 
 		return true;
 	}
@@ -727,7 +768,7 @@ abstract class Document extends Controls_Stack {
 	 * @access public
 	 */
 	public function convert_to_elementor() {
-		$this->save_template_type();
+		$this->save( [] );
 
 		if ( empty( $this->post->post_content ) ) {
 			return [];
@@ -811,7 +852,7 @@ abstract class Document extends Controls_Stack {
 	public function get_panel_page_settings() {
 		return [
 			/* translators: %s: Document title */
-			'title' => sprintf( __( '%s Settings', 'elementor' ), self::get_title() ),
+			'title' => sprintf( __( '%s Settings', 'elementor' ), static::get_title() ),
 		];
 	}
 
@@ -886,8 +927,6 @@ abstract class Document extends Controls_Stack {
 
 		Plugin::$instance->db->save_plain_text( $this->post->ID );
 
-		update_metadata( 'post', $this->post->ID, '_elementor_version', DB::DB_VERSION );
-
 		/**
 		 * After saving data.
 		 *
@@ -922,13 +961,33 @@ abstract class Document extends Controls_Stack {
 		return false;
 	}
 
+	public function save_version() {
+		if ( ! defined( 'IS_ELEMENTOR_UPGRADE' ) ) {
+			// Save per revision.
+			$this->update_meta( '_elementor_version', ELEMENTOR_VERSION );
+
+			/**
+			 * Document version save.
+			 *
+			 * Fires when document version is saved on Elementor.
+			 * Will not fire during Elementor Upgrade.
+			 *
+			 * @since 2.5.12
+			 *
+			 * @param \Elementor\Core\Base\Document $this The current document.
+			 *
+			 */
+			do_action( 'elementor/document/save_version', $this );
+		}
+	}
+
 	/**
 	 * @since 2.0.0
 	 * @access public
-	 * @deprecated Use `save_template_type`.
+	 * @deprecated 2.2.0 Use `Document::save_template_type()`.
 	 */
 	public function save_type() {
-		// TODO: _deprecated_function( __METHOD__, '2.2.0', 'save_template_type' );
+		_deprecated_function( __METHOD__, '2.2.0', __CLASS__ . '::save_template_type()' );
 
 		$this->save_template_type();
 	}
@@ -1095,14 +1154,6 @@ abstract class Document extends Controls_Stack {
 			'category' => $this->get_name(),
 			'autoImportSettings' => false,
 		];
-
-		// TODO: BC since 2.4.0
-		$bc_type = $this->get_remote_library_type();
-
-		if ( $bc_type ) {
-			$config['category'] = $bc_type;
-		}
-		// END BC
 
 		return $config;
 	}

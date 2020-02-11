@@ -21,14 +21,19 @@ BaseSettingsModel = Backbone.Model.extend( {
 			defaults = {};
 
 		_.each( self.controls, function( control ) {
-			var isUIControl = -1 !== control.features.indexOf( 'ui' );
+			// Check features since they does not exist in tests.
+			var isUIControl = control.features && -1 !== control.features.indexOf( 'ui' );
 
 			if ( isUIControl ) {
 				return;
 			}
 			var controlName = control.name;
 
-			defaults[ controlName ] = control.default;
+			if ( 'object' === typeof control.default ) {
+				defaults[ controlName ] = elementorCommon.helpers.cloneObject( control.default );
+			} else {
+				defaults[ controlName ] = control.default;
+			}
 
 			var isDynamicControl = control.dynamic && control.dynamic.active,
 				hasDynamicSettings = isDynamicControl && attrs.__dynamic__ && attrs.__dynamic__[ controlName ];
@@ -70,15 +75,20 @@ BaseSettingsModel = Backbone.Model.extend( {
 
 	handleRepeaterData: function( attrs ) {
 		_.each( this.controls, function( field ) {
-			if ( field.is_repeater ) {
+			if ( 'repeater' === field.type ) {
 				// TODO: Apply defaults on each field in repeater fields
 				if ( ! ( attrs[ field.name ] instanceof Backbone.Collection ) ) {
 					attrs[ field.name ] = new Backbone.Collection( attrs[ field.name ], {
 						model: function( attributes, options ) {
 							options = options || {};
 
-							options.controls = field.fields;
+							options.controls = {};
 
+							Object.entries( field.fields ).map( ( [ key, item ] ) => {
+								options.controls[ item.name ] = item;
+							} );
+
+							// TODO: Cannot be deleted, since it handle repeater items after repeater widget creation.
 							if ( ! attributes._id ) {
 								attributes._id = elementor.helpers.getUniqueID();
 							}
@@ -91,9 +101,17 @@ BaseSettingsModel = Backbone.Model.extend( {
 		} );
 	},
 
-	getFontControls: function() {
-		return _.filter( this.getActiveControls(), function( control ) {
-			return 'font' === control.type;
+	getFontControls() {
+		return this.getControlsByType( 'font' );
+	},
+
+	getIconsControls() {
+		return this.getControlsByType( 'icons' );
+	},
+
+	getControlsByType( type ) {
+		return _.filter( this.getActiveControls(), ( control ) => {
+			return type === control.type;
 		} );
 	},
 
@@ -161,7 +179,7 @@ BaseSettingsModel = Backbone.Model.extend( {
 	},
 
 	getActiveControls: function( controls, attributes ) {
-		var activeControls = {};
+		const activeControls = {};
 
 		if ( ! controls ) {
 			controls = this.controls;
@@ -171,7 +189,7 @@ BaseSettingsModel = Backbone.Model.extend( {
 			attributes = this.attributes;
 		}
 
-		_.each( controls, function( control, controlKey ) {
+		jQuery.each( controls, ( controlKey, control ) => {
 			if ( elementor.helpers.isActiveControl( control, attributes ) ) {
 				activeControls[ controlKey ] = control;
 			}
@@ -288,40 +306,24 @@ BaseSettingsModel = Backbone.Model.extend( {
 			}
 		} );
 
-		if ( options.removeDefault ) {
+		// TODO: `options.removeDefault` is a bc since 2.5.14
+		if ( ( options.remove && -1 !== options.remove.indexOf( 'default' ) ) || options.removeDefault ) {
 			var controls = this.controls;
 
 			_.each( data, function( value, key ) {
-				var control = controls[ key ];
+				const control = controls[ key ];
 
-				if ( control ) {
-					// TODO: use `save_default` in text|textarea controls.
-					if ( control.save_default || ( ( 'text' === control.type || 'textarea' === control.type ) && data[ key ] ) ) {
-						return;
-					}
+				if ( ! control ) {
+					return;
+				}
 
-					if ( data[ key ] && 'object' === typeof data[ key ] ) {
-						// First check length difference
-						if ( Object.keys( data[ key ] ).length !== Object.keys( control.default ).length ) {
-							return;
-						}
+				// TODO: use `save_default` in text|textarea controls.
+				if ( control.save_default || ( ( 'text' === control.type || 'textarea' === control.type ) && data[ key ] ) ) {
+					return;
+				}
 
-						// If it's equal length, loop over value
-						var isEqual = true;
-
-						_.each( data[ key ], function( propertyValue, propertyKey ) {
-							if ( data[ key ][ propertyKey ] !== control.default[ propertyKey ] ) {
-								return isEqual = false;
-							}
-						} );
-
-						if ( isEqual ) {
-							delete data[ key ];
-						}
-					}
-					if ( data[ key ] === control.default ) {
-							delete data[ key ];
-					}
+				if ( _.isEqual( data[ key ], control.default ) ) {
+					delete data[ key ];
 				}
 			} );
 		}

@@ -21,6 +21,7 @@ ControlsStack = Marionette.CompositeView.extend( {
 
 	childViewOptions: function() {
 		return {
+			// TODO: elementSettingsModel is deprecated since 2.8.0.
 			elementSettingsModel: this.model,
 		};
 	},
@@ -34,7 +35,6 @@ ControlsStack = Marionette.CompositeView.extend( {
 
 	events: function() {
 		return {
-			'click @ui.tabs': 'onClickTabControl',
 			'click @ui.reloadButton': 'onReloadButtonClick',
 		};
 	},
@@ -89,21 +89,21 @@ ControlsStack = Marionette.CompositeView.extend( {
 		return this.activeTab === sectionControlModel.get( 'tab' );
 	},
 
-	activateTab: function( tabName ) {
-		this.activeTab = tabName;
-
-		this.ui.tabs
-			.removeClass( 'elementor-active' )
-			.filter( '[data-tab="' + tabName + '"]' )
-			.addClass( 'elementor-active' );
+	activateTab: function( tab ) {
+		this.activeTab = tab;
 
 		this.activateFirstSection();
+
+		this._renderChildren();
+
+		return this;
 	},
 
 	activateSection: function( sectionName ) {
 		this.activeSection = sectionName;
-	},
 
+		return this;
+	},
 	activateFirstSection: function() {
 		var self = this;
 
@@ -124,6 +124,8 @@ ControlsStack = Marionette.CompositeView.extend( {
 		}
 
 		self.activateSection( sectionControls[ 0 ].get( 'name' ) );
+
+		return this;
 	},
 
 	getChildView: function( item ) {
@@ -171,11 +173,7 @@ ControlsStack = Marionette.CompositeView.extend( {
 	},
 
 	getNamespaceArray: function() {
-		var eventNamespace = [];
-
-		eventNamespace.push( elementor.getPanelView().getCurrentPageName() );
-
-		return eventNamespace;
+		return [ elementor.getPanelView().getCurrentPageName() ];
 	},
 
 	openActiveSection: function() {
@@ -187,10 +185,9 @@ ControlsStack = Marionette.CompositeView.extend( {
 		if ( activeSectionView[ 0 ] ) {
 			activeSectionView[ 0 ].$el.addClass( 'elementor-open' );
 
-			var eventNamespace = this.getNamespaceArray();
+			const eventNamespace = this.getNamespaceArray();
 
-			eventNamespace.push( activeSection );
-			eventNamespace.push( 'activated' );
+			eventNamespace.push( activeSection, 'activated' );
 
 			elementor.channels.editor.trigger( eventNamespace.join( ':' ), this );
 		}
@@ -202,27 +199,8 @@ ControlsStack = Marionette.CompositeView.extend( {
 		this.handlePopovers();
 	},
 
-	onRenderTemplate: function() {
-		this.activateTab( this.activeTab || this.ui.tabs.eq( 0 ).data( 'tab' ) );
-	},
-
 	onModelDestroy: function() {
 		this.destroy();
-	},
-
-	onClickTabControl: function( event ) {
-		event.preventDefault();
-
-		var $tab = this.$( event.currentTarget ),
-			tabName = $tab.data( 'tab' );
-
-		if ( this.activeTab === tabName ) {
-			return;
-		}
-
-		this.activateTab( tabName );
-
-		this._renderChildren();
 	},
 
 	onReloadButtonClick: function() {

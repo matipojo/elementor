@@ -5,6 +5,8 @@ module.exports = elementorModules.ViewModule.extend( {
 
 	swiper: null,
 
+	player: null,
+
 	getDefaultSettings: function() {
 		return {
 			classes: {
@@ -87,9 +89,7 @@ module.exports = elementorModules.ViewModule.extend( {
 		modal.onShow = function() {
 			DialogsManager.getWidgetType( 'lightbox' ).prototype.onShow.apply( modal, arguments );
 
-			setTimeout( function() {
-				self.setEntranceAnimation();
-			}, 10 );
+			self.setEntranceAnimation();
 		};
 
 		modal.onHide = function() {
@@ -126,7 +126,7 @@ module.exports = elementorModules.ViewModule.extend( {
 		var self = this,
 			classes = self.getSettings( 'classes' ),
 			$item = jQuery( '<div>', { class: classes.item } ),
-			$image = jQuery( '<img>', { src: imageURL, class: classes.image + ' ' + classes.preventClose } );
+			$image = jQuery( '<img>', { src: imageURL, class: classes.image } );
 
 		$item.append( $image );
 
@@ -135,7 +135,7 @@ module.exports = elementorModules.ViewModule.extend( {
 
 	setVideoContent: function( options ) {
 		var classes = this.getSettings( 'classes' ),
-			$videoContainer = jQuery( '<div>', { class: classes.videoContainer } ),
+			$videoContainer = jQuery( '<div>', { class: `${ classes.videoContainer } ${ classes.preventClose }` } ),
 			$videoWrapper = jQuery( '<div>', { class: classes.videoWrapper } ),
 			$videoElement,
 			modal = this.getModal();
@@ -271,28 +271,94 @@ module.exports = elementorModules.ViewModule.extend( {
 	},
 
 	playSlideVideo: function() {
-		var $activeSlide = this.getSlide( 'active' ),
+		const $activeSlide = this.getSlide( 'active' ),
 			videoURL = $activeSlide.data( 'elementor-slideshow-video' );
 
 		if ( ! videoURL ) {
 			return;
 		}
 
-		var classes = this.getSettings( 'classes' ),
+		const classes = this.getSettings( 'classes' ),
 			$videoContainer = jQuery( '<div>', { class: classes.videoContainer + ' ' + classes.invisible } ),
 			$videoWrapper = jQuery( '<div>', { class: classes.videoWrapper } ),
-			$videoFrame = jQuery( '<iframe>', { src: videoURL } ),
 			$playIcon = $activeSlide.children( '.' + classes.playButton );
+
+		let videoType, apiProvider;
 
 		$videoContainer.append( $videoWrapper );
 
-		$videoWrapper.append( $videoFrame );
-
 		$activeSlide.append( $videoContainer );
 
-		$playIcon.addClass( classes.playing ).removeClass( classes.hidden );
+		if ( -1 !== videoURL.indexOf( 'vimeo.com' ) ) {
+			videoType = 'vimeo';
+			apiProvider = elementorFrontend.utils.vimeo;
+		} else if ( videoURL.match( /^(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com)/ ) ) {
+			videoType = 'youtube';
+			apiProvider = elementorFrontend.utils.youtube;
+		}
 
-		$videoFrame.on( 'load', function() {
+		const videoID = apiProvider.getVideoIDFromURL( videoURL );
+
+		apiProvider.onApiReady( ( apiObject ) => {
+			if ( 'youtube' === videoType ) {
+				this.prepareYTVideo( apiObject, videoID, $videoContainer, $videoWrapper, $playIcon );
+			} else if ( 'vimeo' === videoType ) {
+				this.prepareVimeoVideo( apiObject, videoID, $videoContainer, $videoWrapper, $playIcon );
+			}
+		} );
+
+		$playIcon.addClass( classes.playing ).removeClass( classes.hidden );
+	},
+
+	prepareYTVideo: function( YT, videoID, $videoContainer, $videoWrapper, $playIcon ) {
+		const classes = this.getSettings( 'classes' ),
+			$videoPlaceholderElement = jQuery( '<div>' );
+		let startStateCode = YT.PlayerState.PLAYING;
+
+		$videoWrapper.append( $videoPlaceholderElement );
+
+		// Since version 67, Chrome doesn't fire the `PLAYING` state at start time
+		if ( window.chrome ) {
+			startStateCode = YT.PlayerState.UNSTARTED;
+		}
+
+		$videoContainer.addClass( 'elementor-loading' + ' ' + classes.invisible );
+
+		this.player = new YT.Player( $videoPlaceholderElement[ 0 ], {
+			videoId: videoID,
+			events: {
+				onReady: () => {
+					$playIcon.addClass( classes.hidden );
+
+					$videoContainer.removeClass( classes.invisible );
+
+					this.player.playVideo();
+				},
+				onStateChange: ( event ) => {
+					if ( event.data === startStateCode ) {
+						$videoContainer.removeClass( 'elementor-loading' + ' ' + classes.invisible );
+					}
+				},
+			},
+			playerVars: {
+				controls: 0,
+				rel: 0,
+			},
+		} );
+	},
+
+	prepareVimeoVideo: function( Vimeo, videoId, $videoContainer, $videoWrapper, $playIcon ) {
+		const classes = this.getSettings( 'classes' ),
+			vimeoOptions = {
+				id: videoId,
+				autoplay: true,
+				transparent: false,
+				playsinline: false,
+			};
+
+		this.player = new Vimeo.Player( $videoWrapper, vimeoOptions );
+
+		this.player.ready().then( () => {
 			$playIcon.addClass( classes.hidden );
 
 			$videoContainer.removeClass( classes.invisible );
@@ -300,7 +366,7 @@ module.exports = elementorModules.ViewModule.extend( {
 	},
 
 	setEntranceAnimation: function( animation ) {
-		animation = animation || this.getSettings( 'modalOptions.entranceAnimation' );
+		animation = animation || elementorFrontend.getCurrentDeviceSetting( this.getSettings( 'modalOptions' ), 'entranceAnimation' );
 
 		var $widgetMessage = this.getModal().getElements( 'message' );
 
@@ -326,6 +392,58 @@ module.exports = elementorModules.ViewModule.extend( {
 		return 'yes' === currentLinkOpenInLightbox || ( generalOpenInLightbox && 'no' !== currentLinkOpenInLightbox );
 	},
 
+	openSlideshow: function( slideshowID, initialSlideURL ) {
+		const $allSlideshowLinks = jQuery( this.getSettings( 'selectors.links' ) ).filter( ( index, element ) => {
+			const $element = jQuery( element );
+
+			return slideshowID === element.dataset.elementorLightboxSlideshow && ! $element.parent( '.swiper-slide-duplicate' ).length && ! $element.parents( '.slick-cloned' ).length;
+		} );
+
+		const slides = [];
+
+		let initialSlideIndex = 0;
+
+		$allSlideshowLinks.each( function() {
+			const slideVideo = this.dataset.elementorLightboxVideo;
+
+			let slideIndex = this.dataset.elementorLightboxIndex;
+
+			if ( undefined === slideIndex ) {
+				slideIndex = $allSlideshowLinks.index( this );
+			}
+
+			if ( initialSlideURL === this.href ) {
+				initialSlideIndex = slideIndex;
+			}
+
+			const slideData = {
+				image: this.href,
+				index: slideIndex,
+			};
+
+			if ( slideVideo ) {
+				slideData.video = slideVideo;
+			}
+
+			slides.push( slideData );
+		} );
+
+		slides.sort( ( a, b ) => a.index - b.index );
+
+		this.showModal( {
+			type: 'slideshow',
+			modalOptions: {
+				id: 'elementor-lightbox-slideshow-' + slideshowID,
+			},
+			slideshow: {
+				slides: slides,
+				swiper: {
+					initialSlide: +initialSlideIndex,
+				},
+			},
+		} );
+	},
+
 	openLink: function( event ) {
 		var element = event.currentTarget,
 			$target = jQuery( event.target ),
@@ -342,7 +460,7 @@ module.exports = elementorModules.ViewModule.extend( {
 
 		event.preventDefault();
 
-		if ( editMode && ! elementorFrontend.getGeneralSettings( 'elementor_enable_lightbox_in_editor' ) ) {
+		if ( editMode && ! elementor.getPreferences( 'lightbox_in_editor' ) ) {
 			return;
 		}
 
@@ -367,85 +485,11 @@ module.exports = elementorModules.ViewModule.extend( {
 			return;
 		}
 
-		var slideshowID = element.dataset.elementorLightboxSlideshow;
-
-		var $allSlideshowLinks = jQuery( this.getSettings( 'selectors.links' ) ).filter( function() {
-			return slideshowID === this.dataset.elementorLightboxSlideshow;
-		} );
-
-		var slides = [],
-			uniqueLinks = {};
-
-		$allSlideshowLinks.each( function() {
-			var slideVideo = this.dataset.elementorLightboxVideo,
-				uniqueID = slideVideo || this.href;
-
-			if ( uniqueLinks[ uniqueID ] ) {
-				return;
-			}
-
-			uniqueLinks[ uniqueID ] = true;
-
-			var slideIndex = this.dataset.elementorLightboxIndex;
-
-			if ( undefined === slideIndex ) {
-				slideIndex = $allSlideshowLinks.index( this );
-			}
-
-			var slideData = {
-				image: this.href,
-				index: slideIndex,
-			};
-
-			if ( slideVideo ) {
-				slideData.video = slideVideo;
-			}
-
-			slides.push( slideData );
-		} );
-
-		slides.sort( function( a, b ) {
-			return a.index - b.index;
-		} );
-
-		var initialSlide = element.dataset.elementorLightboxIndex;
-
-		if ( undefined === initialSlide ) {
-			initialSlide = $allSlideshowLinks.index( element );
-		}
-
-		this.showModal( {
-			type: 'slideshow',
-			modalOptions: {
-				id: 'elementor-lightbox-slideshow-' + slideshowID,
-			},
-			slideshow: {
-				slides: slides,
-				swiper: {
-					initialSlide: +initialSlide,
-				},
-			},
-		} );
+		this.openSlideshow( element.dataset.elementorLightboxSlideshow, element.href );
 	},
 
 	bindEvents: function() {
 		elementorFrontend.elements.$document.on( 'click', this.getSettings( 'selectors.links' ), this.openLink );
-	},
-
-	onInit: function() {
-		elementorModules.ViewModule.prototype.onInit.apply( this, arguments );
-
-		if ( elementorFrontend.isEditMode() ) {
-			elementor.settings.general.model.on( 'change', this.onGeneralSettingsChange );
-		}
-	},
-
-	onGeneralSettingsChange: function( model ) {
-		if ( 'elementor_lightbox_content_animation' in model.changed ) {
-			this.setSettings( 'modalOptions.entranceAnimation', model.changed.elementor_lightbox_content_animation );
-
-			this.setEntranceAnimation();
-		}
 	},
 
 	onSlideChange: function() {

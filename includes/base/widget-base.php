@@ -33,18 +33,6 @@ abstract class Widget_Base extends Element_Base {
 	protected $_has_template_content = true;
 
 	/**
-	 * Element edit tools.
-	 *
-	 * Holds all the edit tools of the element. For example: delete, duplicate etc.
-	 *
-	 * @access protected
-	 * @static
-	 *
-	 * @var array
-	 */
-	protected static $_edit_tools;
-
-	/**
 	 * Get element type.
 	 *
 	 * Retrieve the element type, in this case `widget`.
@@ -285,46 +273,6 @@ abstract class Widget_Base extends Element_Base {
 	}
 
 	/**
-	 * Get default edit tools.
-	 *
-	 * Retrieve the element default edit tools. Used to set initial tools.
-	 * By default the element has no edit tools.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @static
-	 *
-	 * @return array Default edit tools.
-	 */
-	protected static function get_default_edit_tools() {
-		$widget_label = __( 'Widget', 'elementor' );
-
-		$edit_tools = [
-			'edit' => [
-				'title' => __( 'Edit', 'elementor' ),
-				'icon' => 'edit',
-			],
-		];
-
-		if ( self::is_edit_buttons_enabled() ) {
-			$edit_tools += [
-				'duplicate' => [
-					/* translators: %s: Widget label */
-					'title' => sprintf( __( 'Duplicate %s', 'elementor' ), $widget_label ),
-					'icon' => 'clone',
-				],
-				'remove' => [
-					/* translators: %s: Widget label */
-					'title' => sprintf( __( 'Remove %s', 'elementor' ), $widget_label ),
-					'icon' => 'close',
-				],
-			];
-		}
-
-		return $edit_tools;
-	}
-
-	/**
 	 * Register widget skins.
 	 *
 	 * This method is activated while initializing the widget base class. It is
@@ -350,12 +298,12 @@ abstract class Widget_Base extends Element_Base {
 	 * the control, element name, type, icon and more. This method also adds
 	 * widget type, keywords and categories.
 	 *
-	 * @since 1.0.10
+	 * @since 2.9.0
 	 * @access protected
 	 *
 	 * @return array The initial widget config.
 	 */
-	protected function _get_initial_config() {
+	protected function get_initial_config() {
 		$config = [
 			'widget_type' => $this->get_name(),
 			'keywords' => $this->get_keywords(),
@@ -364,7 +312,14 @@ abstract class Widget_Base extends Element_Base {
 			'show_in_panel' => $this->show_in_panel(),
 		];
 
-		return array_merge( parent::_get_initial_config(), $config );
+		$stack = Plugin::$instance->controls_manager->get_element_stack( $this );
+
+		if ( $stack ) {
+			$config['controls'] = $this->get_stack( false )['controls'];
+			$config['tabs_controls'] = $this->get_tabs_controls();
+		}
+
+		return array_merge( parent::get_initial_config(), $config );
 	}
 
 	/**
@@ -387,7 +342,6 @@ abstract class Widget_Base extends Element_Base {
 	 * @param string $template_content Template content.
 	 */
 	protected function print_template_content( $template_content ) {
-		$this->render_edit_tools();
 		?>
 		<div class="elementor-widget-container">
 			<?php
@@ -458,7 +412,7 @@ abstract class Widget_Base extends Element_Base {
 
 		$settings = $this->get_settings();
 
-		$this->add_render_attribute( '_wrapper', 'data-element_type', $this->get_name() . '.' . ( ! empty( $settings['_skin'] ) ? $settings['_skin'] : 'default' ) );
+		$this->add_render_attribute( '_wrapper', 'data-widget_type', $this->get_name() . '.' . ( ! empty( $settings['_skin'] ) ? $settings['_skin'] : 'default' ) );
 	}
 
 	/**
@@ -499,11 +453,6 @@ abstract class Widget_Base extends Element_Base {
 		if ( empty( $widget_content ) ) {
 			return;
 		}
-
-		if ( Plugin::$instance->editor->is_edit_mode() ) {
-			$this->render_edit_tools();
-		}
-
 		?>
 		<div class="elementor-widget-container">
 			<?php
@@ -824,5 +773,34 @@ abstract class Widget_Base extends Element_Base {
 	 */
 	public function get_skins() {
 		return Plugin::$instance->skins_manager->get_skins( $this );
+	}
+
+	/**
+	 * @param string $plugin_title  Plugin's title
+	 * @param string $since         Plugin version widget was deprecated
+	 * @param string $last          Plugin version in which the widget will be removed
+	 * @param string $replacement   Widget replacement
+	 */
+	protected function deprecated_notice( $plugin_title, $since, $last = '', $replacement = '' ) {
+		$this->start_controls_section( 'Deprecated',
+			[
+				'label' => __( 'Deprecated', 'elementor' ),
+			]
+		);
+
+		$this->add_control(
+			'deprecated_notice',
+			[
+				'type' => Controls_Manager::DEPRECATED_NOTICE,
+				'widget' => $this->get_title(),
+				'since' => $since,
+				'last' => $last,
+				'plugin' => $plugin_title,
+				'replacement' => $replacement,
+			]
+		);
+
+		$this->end_controls_section();
+
 	}
 }

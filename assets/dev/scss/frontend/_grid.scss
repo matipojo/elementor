@@ -65,27 +65,52 @@
 	}
 }
 
+// TODO: BC since 2.7.0
+.elementor-bc-flex-widget {
 
-// In columns stretch mode
+	.elementor-section-content-top {
 
-.elementor-container {
+		> .elementor-container {
 
-	> .elementor-row {
+			> .elementor-row {
 
-		> .elementor-column {
+				> .elementor-column {
 
-			> .elementor-column-wrap {
-
-				.elementor-section-content-top > & {
-					align-items: flex-start;
+					> .elementor-column-wrap {
+						align-items: flex-start;
+					}
 				}
+			}
+		}
+	}
 
-				.elementor-section-content-middle > & {
-					align-items: center;
+	.elementor-section-content-middle {
+
+		> .elementor-container {
+
+			> .elementor-row {
+
+				> .elementor-column {
+
+					> .elementor-column-wrap {
+						align-items: center;
+					}
 				}
+			}
+		}
+	}
 
-				.elementor-section-content-bottom > & {
-					align-items: flex-end;
+	.elementor-section-content-bottom {
+
+		> .elementor-container {
+
+			> .elementor-row {
+
+				> .elementor-column {
+
+					> .elementor-column-wrap {
+						align-items: flex-end;
+					}
 				}
 			}
 		}
@@ -112,6 +137,16 @@
 .elementor-widget-wrap {
 	position: relative;
 	width: 100%;
+	flex-wrap: wrap;
+	align-content: flex-start;
+
+	.elementor:not(.elementor-bc-flex-widget) & {
+		display: flex;
+	}
+
+	> .elementor-element {
+		width: 100%;
+	}
 }
 
 .elementor-widget {
@@ -119,6 +154,12 @@
 
 	&:not(:last-child) {
 		margin-bottom: 20px;
+
+		&.elementor-widget__width-auto,
+		&.elementor-widget__width-initial,
+		&.elementor-absolute {
+			margin-bottom: 0;
+		}
 	}
 }
 
@@ -255,15 +296,16 @@ ul.elementor-icon-list-items.elementor-inline-items {
 	}
 
 	@mixin grid_loop($device) {
-		@for $i from 1 through 12 {
 
-			&#{$device}-0 {
-				.elementor-grid {
-					display: flex;
-					overflow: hidden;
-					flex-wrap: wrap;
-				}
+		&#{$device}-0 {
+			.elementor-grid {
+				display: flex;
+				overflow: hidden;
+				flex-wrap: wrap;
 			}
+		}
+
+		@for $i from 1 through 12 {
 
 			&#{$device}-#{$i} {
 				.elementor-grid {

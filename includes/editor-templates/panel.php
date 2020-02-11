@@ -32,7 +32,13 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 	<div class="elementor-panel-menu-item-icon">
 		<i class="{{ icon }}"></i>
 	</div>
-	<div class="elementor-panel-menu-item-title">{{{ title }}}</div>
+	<# if ( 'undefined' === typeof type || 'link' !== type ) { #>
+		<div class="elementor-panel-menu-item-title">{{{ title }}}</div>
+	<# } else {
+		let target = ( 'undefined' !== typeof newTab && newTab ) ? '_blank' : '_self';
+	#>
+		<a href="{{ link }}" target="{{ target }}"><div class="elementor-panel-menu-item-title">{{{ title }}}</div></a>
+	<# } #>
 </script>
 
 <script type="text/template" id="tmpl-elementor-panel-header">
@@ -49,15 +55,15 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 
 <script type="text/template" id="tmpl-elementor-panel-footer-content">
 	<div id="elementor-panel-footer-settings" class="elementor-panel-footer-tool elementor-leave-open tooltip-target" data-tooltip="<?php esc_attr_e( 'Settings', 'elementor' ); ?>">
-		<i class="fa fa-cog" aria-hidden="true"></i>
+		<i class="eicon-cog" aria-hidden="true"></i>
 		<span class="elementor-screen-only"><?php printf( __( '%s Settings', 'elementor' ), $document::get_title() ); ?></span>
 	</div>
 	<div id="elementor-panel-footer-navigator" class="elementor-panel-footer-tool tooltip-target" data-tooltip="<?php esc_attr_e( 'Navigator', 'elementor' ); ?>">
 		<i class="eicon-navigator" aria-hidden="true"></i>
 		<span class="elementor-screen-only"><?php echo __( 'Navigator', 'elementor' ); ?></span>
 	</div>
-	<div id="elementor-panel-footer-history" class="elementor-panel-footer-tool elementor-leave-open tooltip-target elementor-toggle-state" data-tooltip="<?php esc_attr_e( 'History', 'elementor' ); ?>">
-		<i class="fa fa-history" aria-hidden="true"></i>
+	<div id="elementor-panel-footer-history" class="elementor-panel-footer-tool elementor-leave-open tooltip-target" data-tooltip="<?php esc_attr_e( 'History', 'elementor' ); ?>">
+		<i class="eicon-history" aria-hidden="true"></i>
 		<span class="elementor-screen-only"><?php echo __( 'History', 'elementor' ); ?></span>
 	</div>
 	<div id="elementor-panel-footer-responsive" class="elementor-panel-footer-tool elementor-toggle-state">
@@ -88,14 +94,14 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 	</div>
 	<div id="elementor-panel-footer-saver-preview" class="elementor-panel-footer-tool tooltip-target" data-tooltip="<?php esc_attr_e( 'Preview Changes', 'elementor' ); ?>">
 		<span id="elementor-panel-footer-saver-preview-label">
-			<i class="fa fa-eye" aria-hidden="true"></i>
+			<i class="eicon-eye" aria-hidden="true"></i>
 			<span class="elementor-screen-only"><?php echo __( 'Preview Changes', 'elementor' ); ?></span>
 		</span>
 	</div>
 	<div id="elementor-panel-footer-saver-publish" class="elementor-panel-footer-tool">
 		<button id="elementor-panel-saver-button-publish" class="elementor-button elementor-button-success elementor-disabled">
 			<span class="elementor-state-icon">
-				<i class="fa fa-spin fa-circle-o-notch" aria-hidden="true"></i>
+				<i class="eicon-loading eicon-animation-spin" aria-hidden="true"></i>
 			</span>
 			<span id="elementor-panel-saver-button-publish-label">
 				<?php echo __( 'Publish', 'elementor' ); ?>
@@ -104,13 +110,13 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 	</div>
 	<div id="elementor-panel-footer-saver-options" class="elementor-panel-footer-tool elementor-toggle-state">
 		<button id="elementor-panel-saver-button-save-options" class="elementor-button elementor-button-success tooltip-target elementor-disabled" data-tooltip="<?php esc_attr_e( 'Save Options', 'elementor' ); ?>">
-			<i class="fa fa-caret-up" aria-hidden="true"></i>
+			<i class="eicon-caret-up" aria-hidden="true"></i>
 			<span class="elementor-screen-only"><?php echo __( 'Save Options', 'elementor' ); ?></span>
 		</button>
 		<div class="elementor-panel-footer-sub-menu-wrapper">
 			<p class="elementor-last-edited-wrapper">
 				<span class="elementor-state-icon">
-					<i class="fa fa-spin fa-circle-o-notch" aria-hidden="true"></i>
+					<i class="eicon-loading eicon-animation-spin" aria-hidden="true"></i>
 				</span>
 				<span class="elementor-last-edited">
 					{{{ elementor.config.document.last_edited }}}
@@ -122,7 +128,7 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 					<span class="elementor-title"><?php echo __( 'Save Draft', 'elementor' ); ?></span>
 				</div>
 				<div id="elementor-panel-footer-sub-menu-item-save-template" class="elementor-panel-footer-sub-menu-item">
-					<i class="elementor-icon fa fa-folder" aria-hidden="true"></i>
+					<i class="elementor-icon eicon-folder" aria-hidden="true"></i>
 					<span class="elementor-title"><?php echo __( 'Save as Template', 'elementor' ); ?></span>
 				</div>
 			</div>
@@ -133,7 +139,7 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 <script type="text/template" id="tmpl-elementor-mode-switcher-content">
 	<input id="elementor-mode-switcher-preview-input" type="checkbox">
 	<label for="elementor-mode-switcher-preview-input" id="elementor-mode-switcher-preview">
-		<i class="fa" aria-hidden="true" title="<?php esc_attr_e( 'Hide Panel', 'elementor' ); ?>"></i>
+		<i class="eicon" aria-hidden="true" title="<?php esc_attr_e( 'Hide Panel', 'elementor' ); ?>"></i>
 		<span class="elementor-screen-only"><?php echo __( 'Hide Panel', 'elementor' ); ?></span>
 	</label>
 </script>
@@ -142,10 +148,11 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 	<div class="elementor-panel-navigation">
 		<# _.each( elementData.tabs_controls, function( tabTitle, tabSlug ) {
 			if ( 'content' !== tabSlug && ! elementor.userCan( 'design' ) ) {
-			return;
-		}
+				return;
+			}
+			$e.bc.ensureTab( 'panel/editor', tabSlug );
 			#>
-			<div class="elementor-panel-navigation-tab elementor-tab-control-{{ tabSlug }}" data-tab="{{ tabSlug }}">
+			<div class="elementor-component-tab elementor-panel-navigation-tab elementor-tab-control-{{ tabSlug }}" data-tab="{{ tabSlug }}">
 				<a href="#">{{{ tabTitle }}}</a>
 			</div>
 		<# } ); #>
@@ -159,6 +166,14 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 		</div>
 	<# } #>
 	<div id="elementor-controls"></div>
+	<# if ( elementData.help_url ) { #>
+		<div id="elementor-panel__editor__help">
+			<a id="elementor-panel__editor__help__link" href="{{ elementData.help_url }}" target="_blank">
+				<?php echo __( 'Need Help', 'elementor' ); ?>
+				<i class="eicon-help-o"></i>
+			</a>
+		</div>
+	<# } #>
 </script>
 
 <script type="text/template" id="tmpl-elementor-panel-schemes-disabled">
@@ -168,16 +183,14 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 </script>
 
 <script type="text/template" id="tmpl-elementor-panel-scheme-color-item">
-	<div class="elementor-panel-scheme-color-input-wrapper">
-		<input type="text" class="elementor-panel-scheme-color-value" value="{{ value }}" data-alpha="true" />
-	</div>
+	<div class="elementor-panel-scheme-color-picker-placeholder"></div>
 	<div class="elementor-panel-scheme-color-title">{{{ title }}}</div>
 </script>
 
 <script type="text/template" id="tmpl-elementor-panel-scheme-typography-item">
 	<div class="elementor-panel-heading">
 		<div class="elementor-panel-heading-toggle">
-			<i class="fa" aria-hidden="true"></i>
+			<i class="eicon" aria-hidden="true"></i>
 		</div>
 		<div class="elementor-panel-heading-title">{{{ title }}}</div>
 	</div>
@@ -192,9 +205,9 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 
 		foreach ( $scheme_fields as $option_name => $option ) :
 			?>
-			<div class="elementor-panel-scheme-typography-item">
+			<div class="elementor-panel-scheme-typography-item elementor-control elementor-control-type-select">
 				<div class="elementor-panel-scheme-item-title elementor-control-title"><?php echo $option['label']; ?></div>
-				<div class="elementor-panel-scheme-typography-item-value">
+				<div class="elementor-panel-scheme-typography-item-value elementor-control-input-wrapper">
 					<?php if ( 'select' === $option['type'] ) : ?>
 						<select name="<?php echo esc_attr( $option_name ); ?>" class="elementor-panel-scheme-typography-item-field">
 							<?php foreach ( $option['options'] as $field_key => $field_value ) : ?>
@@ -223,15 +236,20 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 
 <script type="text/template" id="tmpl-elementor-control-responsive-switchers">
 	<div class="elementor-control-responsive-switchers">
+		<div class="elementor-control-responsive-switchers__holder">
 		<#
 			var devices = responsive.devices || [ 'desktop', 'tablet', 'mobile' ];
 
-			_.each( devices, function( device ) { #>
-				<a class="elementor-responsive-switcher elementor-responsive-switcher-{{ device }}" data-device="{{ device }}">
+			_.each( devices, function( device ) {
+				var deviceLabel = device.charAt(0).toUpperCase() + device.slice(1),
+					tooltipDir = "<?php echo is_rtl() ? 'e' : 'w'; ?>";
+			#>
+				<a class="elementor-responsive-switcher tooltip-target elementor-responsive-switcher-{{ device }}" data-device="{{ device }}" data-tooltip="{{ deviceLabel }}" data-tooltip-pos="{{ tooltipDir }}">
 					<i class="eicon-device-{{ device }}"></i>
 				</a>
 			<# } );
 		#>
+		</div>
 	</div>
 </script>
 
@@ -239,30 +257,19 @@ $document = Plugin::$instance->documents->get( Plugin::$instance->editor->get_po
 	<div class="elementor-control-dynamic-switcher-wrapper">
 		<div class="elementor-control-dynamic-switcher">
 			<?php echo __( 'Dynamic', 'elementor' ); ?>
-			<i class="fa fa-database"></i>
+			<i class="eicon-database"></i>
 		</div>
 	</div>
 </script>
 
 <script type="text/template" id="tmpl-elementor-control-dynamic-cover">
 	<div class="elementor-dynamic-cover__settings">
-		<i class="fa fa-{{ hasSettings ? 'wrench' : 'database' }}"></i>
+		<i class="eicon-{{ hasSettings ? 'wrench' : 'database' }}"></i>
 	</div>
 	<div class="elementor-dynamic-cover__title" title="{{{ title + ' ' + content }}}">{{{ title + ' ' + content }}}</div>
 	<# if ( isRemovable ) { #>
 		<div class="elementor-dynamic-cover__remove">
-			<i class="fa fa-times-circle"></i>
+			<i class="eicon-close-circle"></i>
 		</div>
 	<# } #>
-</script>
-
-<script type="text/template" id="tmpl-elementor-panel-page-settings">
-	<div class="elementor-panel-navigation">
-		<# _.each( elementor.config.page_settings.tabs, function( tabTitle, tabSlug ) { #>
-			<div class="elementor-panel-navigation-tab elementor-tab-control-{{ tabSlug }}" data-tab="{{ tabSlug }}">
-				<a href="#">{{{ tabTitle }}}</a>
-			</div>
-			<# } ); #>
-	</div>
-	<div id="elementor-panel-page-settings-controls"></div>
 </script>

@@ -42,6 +42,17 @@ class Preview {
 			return;
 		}
 
+		if ( isset( $_GET['preview-debug'] ) ) {
+			register_shutdown_function( function () {
+				$e = error_get_last();
+				if ( $e ) {
+					echo '<div id="elementor-preview-debug-error"><pre>';
+					echo $e['message'];
+					echo '</pre></div>';
+				}
+			} );
+		}
+
 		$this->post_id = get_the_ID();
 
 		// Don't redirect to permalink.
@@ -64,6 +75,9 @@ class Preview {
 		add_filter( 'the_content', [ $this, 'builder_wrapper' ], 999999 );
 
 		add_action( 'wp_footer', [ $this, 'wp_footer' ] );
+
+		// Avoid Cloudflare's Rocket Loader lazy load the editor iframe
+		add_filter( 'script_loader_tag', [ $this, 'rocket_loader_filter' ], 10, 3 );
 
 		// Tell to WP Cache plugins do not cache this request.
 		Utils::do_not_cache();
@@ -168,6 +182,8 @@ class Preview {
 
 		Plugin::$instance->frontend->enqueue_styles();
 
+		Plugin::$instance->widgets_manager->enqueue_widgets_styles();
+
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		$direction_suffix = is_rtl() ? '-rtl' : '';
@@ -233,6 +249,10 @@ class Preview {
 		 * @since 1.5.4
 		 */
 		do_action( 'elementor/preview/enqueue_scripts' );
+	}
+
+	public function rocket_loader_filter( $tag, $handle, $src ) {
+		return str_replace( '<script', '<script data-cfasync="false"', $tag );
 	}
 
 	/**

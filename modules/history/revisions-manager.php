@@ -4,7 +4,6 @@ namespace Elementor\Modules\History;
 use Elementor\Core\Base\Document;
 use Elementor\Core\Common\Modules\Ajax\Module as Ajax;
 use Elementor\Core\Files\CSS\Post as Post_CSS;
-use Elementor\Core\Settings\Manager;
 use Elementor\Plugin;
 use Elementor\Utils;
 
@@ -218,7 +217,7 @@ class Revisions_Manager {
 
 		Plugin::$instance->db->copy_elementor_meta( $revision_id, $parent_id );
 
-		$post_css = new Post_CSS( $parent_id );
+		$post_css = Post_CSS::create( $parent_id );
 
 		$post_css->update();
 	}
@@ -238,53 +237,22 @@ class Revisions_Manager {
 			throw new \Exception( 'You must set the revision ID.' );
 		}
 
-		$revision = get_post( $data['id'] );
+		$revision = Plugin::$instance->documents->get( $data['id'] );
 
-		if ( empty( $revision ) ) {
+		if ( ! $revision ) {
 			throw new \Exception( 'Invalid revision.' );
 		}
 
-		if ( ! current_user_can( 'edit_post', $revision->ID ) ) {
+		if ( ! current_user_can( 'edit_post', $revision->get_id() ) ) {
 			throw new \Exception( __( 'Access denied.', 'elementor' ) );
 		}
 
 		$revision_data = [
-			'settings' => Manager::get_settings_managers( 'page' )->get_model( $revision->ID )->get_settings(),
-			'elements' => Plugin::$instance->db->get_plain_editor( $revision->ID ),
+			'settings' => $revision->get_settings(),
+			'elements' => $revision->get_elements_data(),
 		];
 
 		return $revision_data;
-	}
-
-	/**
-	 * @since 2.3.0
-	 * @access public
-	 * @static
-	 *
-	 * @param array $data
-	 *
-	 * @throws \Exception
-	 */
-	public static function ajax_delete_revision( array $data ) {
-		if ( empty( $data['id'] ) ) {
-			throw new \Exception( 'You must set the revision ID.' );
-		}
-
-		$revision = get_post( $data['id'] );
-
-		if ( empty( $revision ) ) {
-			throw new \Exception( 'Invalid revision.' );
-		}
-
-		if ( ! current_user_can( 'delete_post', $revision->ID ) ) {
-			throw new \Exception( __( 'Access denied.', 'elementor' ) );
-		}
-
-		$deleted = wp_delete_post_revision( $revision->ID );
-
-		if ( ! $deleted || is_wp_error( $deleted ) ) {
-			throw new \Exception( __( 'Cannot delete this revision.', 'elementor' ) );
-		}
 	}
 
 	/**
@@ -400,7 +368,6 @@ class Revisions_Manager {
 	public static function register_ajax_actions( Ajax $ajax ) {
 		$ajax->register_ajax_action( 'get_revisions', [ __CLASS__, 'ajax_get_revisions' ] );
 		$ajax->register_ajax_action( 'get_revision_data', [ __CLASS__, 'ajax_get_revision_data' ] );
-		$ajax->register_ajax_action( 'delete_revision', [ __CLASS__, 'ajax_delete_revision' ] );
 	}
 
 	/**
@@ -421,7 +388,7 @@ class Revisions_Manager {
 		add_filter( 'edit_post_content', [ __CLASS__, 'avoid_delete_auto_save' ], 10, 2 );
 		add_action( 'edit_form_after_title', [ __CLASS__, 'remove_temp_post_content' ] );
 
-		if ( Utils::is_ajax() ) {
+		if ( wp_doing_ajax() ) {
 			add_filter( 'elementor/documents/ajax_save/return_data', [ __CLASS__, 'on_ajax_save_builder_data' ], 10, 2 );
 		}
 	}

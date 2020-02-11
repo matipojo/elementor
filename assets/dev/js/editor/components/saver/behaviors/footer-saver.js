@@ -21,6 +21,7 @@ module.exports = Marionette.Behavior.extend( {
 	},
 
 	initialize: function() {
+		// TODO: $e.
 		elementor.saver
 			.on( 'before:save', this.onBeforeSave.bind( this ) )
 			.on( 'after:save', this.onAfterSave.bind( this ) )
@@ -53,8 +54,8 @@ module.exports = Marionette.Behavior.extend( {
 			this.refreshWpPreview();
 
 			// Refresh page-settings post-status value.
-			if ( 'page_settings' === elementor.getPanelView().getCurrentPageName() ) {
-				elementor.getPanelView().getCurrentPageView().render();
+			if ( $e.routes.isPartOf( 'panel/page-settings' ) ) {
+				$e.routes.refreshContainer( 'panel' );
 			}
 		}
 	},
@@ -115,7 +116,7 @@ module.exports = Marionette.Behavior.extend( {
 				elementor.saver.isSaving = false;
 			}
 
-			elementor.saver.doAutoSave();
+			$e.run( 'document/save/auto' );
 		}
 	},
 
@@ -124,11 +125,11 @@ module.exports = Marionette.Behavior.extend( {
 			return;
 		}
 
-		elementor.saver.defaultSave();
+		$e.run( 'document/save/default' );
 	},
 
 	onClickMenuSaveDraft: function() {
-		elementor.saver.saveDraft();
+		$e.run( 'document/save/draft' );
 	},
 
 	setMenuItems: function( postStatus ) {

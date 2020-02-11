@@ -4,7 +4,7 @@ namespace Elementor\Core\Settings\General;
 use Elementor\Controls_Manager;
 use Elementor\Core\Files\CSS\Base;
 use Elementor\Core\Files\CSS\Global_CSS;
-use Elementor\Core\Settings\Base\Manager as BaseManager;
+use Elementor\Core\Settings\Base\CSS_Manager;
 use Elementor\Core\Settings\Base\Model as BaseModel;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.6.0
  */
-class Manager extends BaseManager {
+class Manager extends CSS_Manager {
 
 	/**
 	 * Lightbox panel tab.
@@ -98,7 +98,7 @@ class Manager extends BaseManager {
 					$saved_setting = get_option( $control_name, null );
 
 					if ( null !== $saved_setting ) {
-						$settings[ $control_name ] = get_option( $control_name );
+						$settings[ $control_name ] = $saved_setting;
 					}
 				}
 			}
@@ -193,7 +193,7 @@ class Manager extends BaseManager {
 	 * @return Global_CSS The global CSS file object.
 	 */
 	protected function get_css_file_for_update( $id ) {
-		return new Global_CSS( 'global.css' );
+		return Global_CSS::create( 'global.css' );
 	}
 
 	/**

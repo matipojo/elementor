@@ -74,10 +74,7 @@
 	}
 
 	.elementor-video-container {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translateX(-50%) translateY(-50%);
+		@include absolute-center;
 
 		@media (min-width: $screen-lg-min) {
 			width: 75%;
@@ -85,6 +82,14 @@
 
 		@media (max-width: $screen-md-max) {
 			width: 100%;
+		}
+	}
+
+	@media (min-width: $editor-screen-md-min) and (max-width: $editor-screen-md-max) {
+		.elementor-aspect-ratio-916 {
+			.elementor-video-container {
+				width: 70%;
+			}
 		}
 	}
 

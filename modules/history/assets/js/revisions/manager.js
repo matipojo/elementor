@@ -1,89 +1,72 @@
-var RevisionsCollection = require( './collection' ),
-	RevisionsManager;
+const RevisionsCollection = require( './collection' );
 
-RevisionsManager = function() {
-	const self = this;
+/**
+ * TODO: consider refactor this class.
+ */
+export default class RevisionsManager {
+	history;
+	revisions;
 
-	let revisions;
+	constructor( document ) {
+		this.attachEvents();
 
-	var onEditorSaved = function( data ) {
+		this.history = document.history;
+	}
+
+	onEditorSaved( data ) {
 		if ( data.latest_revisions ) {
-			self.addRevisions( data.latest_revisions );
+			this.addRevisions( data.latest_revisions );
 		}
 
-		self.requestRevisions( () => {
+		this.requestRevisions( () => {
 			if ( data.revisions_ids ) {
-				var revisionsToKeep = revisions.filter( function( revision ) {
+				const revisionsToKeep = this.revisions.filter( ( revision ) => {
 					return -1 !== data.revisions_ids.indexOf( revision.get( 'id' ) );
 				} );
 
-				revisions.reset( revisionsToKeep );
+				this.revisions.reset( revisionsToKeep );
 			}
 		} );
-	};
+	}
 
-	var attachEvents = function() {
-		elementor.channels.editor.on( 'saved', onEditorSaved );
-	};
+	attachEvents() {
+		elementor.channels.editor.on( 'saved', this.onEditorSaved.bind( this ) );
+	}
 
-	var addHotKeys = function() {
-		var UP_ARROW_KEY = 38,
-			DOWN_ARROW_KEY = 40;
+	getItems() {
+		return this.revisions;
+	}
 
-		var navigationHandler = {
-			isWorthHandling: function() {
-				var panel = elementor.getPanelView();
-
-				if ( 'historyPage' !== panel.getCurrentPageName() ) {
-					return false;
-				}
-
-				var revisionsTab = panel.getCurrentPageView().getCurrentTab();
-
-				return revisionsTab.currentPreviewId && revisionsTab.currentPreviewItem && revisionsTab.children.length > 1;
-			},
-			handle: function( event ) {
-				elementor.getPanelView().getCurrentPageView().getCurrentTab().navigate( UP_ARROW_KEY === event.which );
-			},
-		};
-
-		elementorCommon.hotKeys.addHotKeyHandler( UP_ARROW_KEY, 'revisionNavigation', navigationHandler );
-
-		elementorCommon.hotKeys.addHotKeyHandler( DOWN_ARROW_KEY, 'revisionNavigation', navigationHandler );
-	};
-
-	this.getItems = function() {
-		return revisions;
-	};
-
-	this.requestRevisions = function( callback ) {
-		if ( revisions ) {
-			callback( revisions );
+	requestRevisions( callback ) {
+		if ( this.revisions ) {
+			callback( this.revisions );
 
 			return;
 		}
 
 		elementorCommon.ajax.addRequest( 'get_revisions', {
 			success: ( data ) => {
-				revisions = new RevisionsCollection( data );
+				this.revisions = new RevisionsCollection( data );
 
-				revisions.on( 'update', this.onRevisionsUpdate.bind( this ) );
+				this.revisions.on( 'update', this.onRevisionsUpdate.bind( this ) );
 
-				callback( revisions );
+				callback( this.revisions );
 			},
 		} );
-	};
+	}
 
-	this.setEditorData = function( data ) {
-		var collection = elementor.getRegion( 'sections' ).currentView.collection;
+	setEditorData( data ) {
+		const collection = elementor.getRegion( 'sections' ).currentView.collection;
 
 		// Don't track in history.
-		elementor.history.history.setActive( false );
-		collection.reset( data );
-		elementor.history.history.setActive( true );
-	};
+		this.history.setActive( false );
 
-	this.getRevisionDataAsync = function( id, options ) {
+		collection.reset( data );
+
+		this.history.setActive( true );
+	}
+
+	getRevisionDataAsync( id, options ) {
 		_.extend( options, {
 			data: {
 				id: id,
@@ -91,28 +74,28 @@ RevisionsManager = function() {
 		} );
 
 		return elementorCommon.ajax.addRequest( 'get_revision_data', options );
-	};
+	}
 
-	this.addRevisions = function( items ) {
+	addRevisions( items ) {
 		this.requestRevisions( () => {
-			items.forEach( function( item ) {
-				var existedModel = revisions.findWhere( {
+			items.forEach( ( item ) => {
+				const existedModel = this.revisions.findWhere( {
 					id: item.id,
 				} );
 
 				if ( existedModel ) {
-					revisions.remove( existedModel, { silent: true } );
+					this.revisions.remove( existedModel, { silent: true } );
 				}
 
-				revisions.add( item, { silent: true } );
+				this.revisions.add( item, { silent: true } );
 			} );
 
-			revisions.trigger( 'update' );
+			this.revisions.trigger( 'update' );
 		} );
-	};
+	}
 
-	this.deleteRevision = function( revisionModel, options ) {
-		var params = {
+	deleteRevision( revisionModel, options ) {
+		const params = {
 			data: {
 				id: revisionModel.get( 'id' ),
 			},
@@ -130,21 +113,11 @@ RevisionsManager = function() {
 		}
 
 		elementorCommon.ajax.addRequest( 'delete_revision', params );
-	};
+	}
 
-	this.init = function() {
-		attachEvents();
-
-		addHotKeys();
-	};
-
-	this.onRevisionsUpdate = function() {
-		const panel = elementor.getPanelView();
-
-		if ( 'historyPage' === panel.getCurrentPageName() ) {
-			panel.getCurrentPageView().activateTab( 'revisions' );
+	onRevisionsUpdate() {
+		if ( $e.routes.is( 'panel/history/revisions' ) ) {
+			$e.routes.refreshContainer( 'panel' );
 		}
-	};
-};
-
-module.exports = new RevisionsManager();
+	}
+}

@@ -46,11 +46,11 @@ class Frontend extends App {
 	 * Holds the list of fonts that are being used in the current page.
 	 *
 	 * @since 1.9.4
-	 * @access private
+	 * @access public
 	 *
 	 * @var array Used fonts. Default is an empty array.
 	 */
-	private $fonts_to_enqueue = [];
+	public $fonts_to_enqueue = [];
 
 	/**
 	 * Registered fonts.
@@ -63,6 +63,30 @@ class Frontend extends App {
 	 * @var array Registered fonts. Default is an empty array.
 	 */
 	private $registered_fonts = [];
+
+	/**
+	 * Icon Fonts to enqueue
+	 *
+	 * Holds the list of Icon fonts that are being used in the current page.
+	 *
+	 * @since 2.4.0
+	 * @access private
+	 *
+	 * @var array Used icon fonts. Default is an empty array.
+	 */
+	private $icon_fonts_to_enqueue = [];
+
+	/**
+	 * Enqueue Icon Fonts
+	 *
+	 * Holds the list of Icon fonts already enqueued  in the current page.
+	 *
+	 * @since 2.4.0
+	 * @access private
+	 *
+	 * @var array enqueued icon fonts. Default is an empty array.
+	 */
+	private $enqueued_icon_fonts = [];
 
 	/**
 	 * Whether the page is using Elementor.
@@ -125,7 +149,7 @@ class Frontend extends App {
 	 */
 	public function __construct() {
 		// We don't need this class in admin side, but in AJAX requests.
-		if ( is_admin() && ! Utils::is_ajax() ) {
+		if ( is_admin() && ! wp_doing_ajax() ) {
 			return;
 		}
 
@@ -281,7 +305,7 @@ class Frontend extends App {
 
 		wp_register_script(
 			'elementor-frontend-modules',
-			ELEMENTOR_ASSETS_URL . 'js/frontend-modules.js',
+			$this->get_js_assets_url( 'frontend-modules' ),
 			[
 				'jquery',
 			],
@@ -330,15 +354,16 @@ class Frontend extends App {
 		);
 
 		wp_register_script(
-			'jquery-swiper',
-			$this->get_js_assets_url( 'swiper.jquery', 'assets/lib/swiper/' ),
-			[
-				'jquery',
-			],
-			'4.4.3',
+			'swiper',
+			$this->get_js_assets_url( 'swiper', 'assets/lib/swiper/' ),
+			[],
+			'4.4.6',
 			true
 		);
 
+		/**
+		 * @deprecated since 2.7.0 Use Swiper instead
+		 */
 		wp_register_script(
 			'jquery-slick',
 			$this->get_js_assets_url( 'slick', 'assets/lib/slick/' ),
@@ -355,7 +380,27 @@ class Frontend extends App {
 			[
 				'jquery-ui-position',
 			],
-			'4.7.1',
+			'4.7.3',
+			true
+		);
+
+		wp_register_script(
+			'elementor-gallery',
+			$this->get_js_assets_url( 'e-gallery', 'assets/lib/e-gallery/js/' ),
+			[
+				'jquery',
+			],
+			'1.1.0',
+			true
+		);
+
+		wp_register_script(
+			'share-link',
+			$this->get_js_assets_url( 'share-link', 'assets/lib/share-link/' ),
+			[
+				'jquery',
+			],
+			ELEMENTOR_VERSION,
 			true
 		);
 
@@ -366,7 +411,8 @@ class Frontend extends App {
 				'elementor-frontend-modules',
 				'elementor-dialog',
 				'elementor-waypoints',
-				'jquery-swiper',
+				'swiper',
+				'share-link',
 			],
 			ELEMENTOR_VERSION,
 			true
@@ -403,17 +449,17 @@ class Frontend extends App {
 		do_action( 'elementor/frontend/before_register_styles' );
 
 		wp_register_style(
-			'elementor-icons',
-			$this->get_css_assets_url( 'elementor-icons', 'assets/lib/eicons/css/' ),
-			[],
-			'4.2.0'
-		);
-
-		wp_register_style(
 			'font-awesome',
 			$this->get_css_assets_url( 'font-awesome', 'assets/lib/font-awesome/css/' ),
 			[],
 			'4.7.0'
+		);
+
+		wp_register_style(
+			'elementor-icons',
+			$this->get_css_assets_url( 'elementor-icons', 'assets/lib/eicons/css/' ),
+			[],
+			'5.5.0'
 		);
 
 		wp_register_style(
@@ -428,6 +474,13 @@ class Frontend extends App {
 			$this->get_css_assets_url( 'flatpickr', 'assets/lib/flatpickr/' ),
 			[],
 			'4.1.4'
+		);
+
+		wp_register_style(
+			'elementor-gallery',
+			$this->get_css_assets_url( 'e-gallery', 'assets/lib/e-gallery/css/' ),
+			[],
+			'1.0.2'
 		);
 
 		$min_suffix = Utils::is_script_debug() ? '' : '.min';
@@ -522,7 +575,6 @@ class Frontend extends App {
 		do_action( 'elementor/frontend/before_enqueue_styles' );
 
 		wp_enqueue_style( 'elementor-icons' );
-		wp_enqueue_style( 'font-awesome' );
 		wp_enqueue_style( 'elementor-animations' );
 		wp_enqueue_style( 'elementor-frontend' );
 
@@ -538,8 +590,12 @@ class Frontend extends App {
 		if ( ! Plugin::$instance->preview->is_preview_mode() ) {
 			$this->parse_global_css_code();
 
-			$css_file = new Post_CSS( get_the_ID() );
-			$css_file->enqueue();
+			$post_id = get_the_ID();
+			// Check $post_id for virtual pages. check is singular because the $post_id is set to the first post on archive pages.
+			if ( $post_id && is_singular() ) {
+				$css_file = Post_CSS::create( get_the_ID() );
+				$css_file->enqueue();
+			}
 		}
 	}
 
@@ -592,6 +648,9 @@ class Frontend extends App {
 					$google_fonts['early'][] = $font;
 					break;
 
+				case false:
+					$this->maybe_enqueue_icon_font( $font );
+					break;
 				default:
 					/**
 					 * Print font links.
@@ -610,6 +669,37 @@ class Frontend extends App {
 		$this->fonts_to_enqueue = [];
 
 		$this->enqueue_google_fonts( $google_fonts );
+		$this->enqueue_icon_fonts();
+	}
+
+	private function maybe_enqueue_icon_font( $icon_font_type ) {
+		if ( ! Icons_Manager::is_migration_allowed() ) {
+			return;
+		}
+
+		$icons_types = Icons_Manager::get_icon_manager_tabs();
+		if ( ! isset( $icons_types[ $icon_font_type ] ) ) {
+			return;
+		}
+
+		$icon_type = $icons_types[ $icon_font_type ];
+		if ( isset( $icon_type['url'] ) ) {
+			$this->icon_fonts_to_enqueue[ $icon_font_type ] = [ $icon_type['url'] ];
+		}
+	}
+
+	private function enqueue_icon_fonts() {
+		if ( empty( $this->icon_fonts_to_enqueue ) || ! Icons_Manager::is_migration_allowed() ) {
+			return;
+		}
+
+		foreach ( $this->icon_fonts_to_enqueue as $icon_type => $css_url ) {
+			wp_enqueue_style( 'elementor-icons-' . $icon_type );
+			$this->enqueued_icon_fonts[] = $css_url;
+		}
+
+		//clear enqueued icons
+		$this->icon_fonts_to_enqueue = [];
 	}
 
 	/**
@@ -717,7 +807,7 @@ class Frontend extends App {
 	 * @access protected
 	 */
 	protected function parse_global_css_code() {
-		$scheme_css_file = new Global_CSS( 'global.css' );
+		$scheme_css_file = Global_CSS::create( 'global.css' );
 
 		$scheme_css_file->enqueue();
 	}
@@ -812,9 +902,9 @@ class Frontend extends App {
 
 		if ( ! $this->_is_excerpt ) {
 			if ( $document->is_autosave() ) {
-				$css_file = new Post_Preview( $document->get_post()->ID );
+				$css_file = Post_Preview::create( $document->get_post()->ID );
 			} else {
-				$css_file = new Post_CSS( $post_id );
+				$css_file = Post_CSS::create( $post_id );
 			}
 
 			$css_file->enqueue();
@@ -823,7 +913,7 @@ class Frontend extends App {
 		ob_start();
 
 		// Handle JS and Customizer requests, with CSS inline.
-		if ( is_customize_preview() || Utils::is_ajax() ) {
+		if ( is_customize_preview() || wp_doing_ajax() ) {
 			$with_css = true;
 		}
 
@@ -1017,6 +1107,10 @@ class Frontend extends App {
 		return $this->_has_elementor_in_page;
 	}
 
+	public function create_action_hash( $action, array $settings = [] ) {
+		return rawurlencode( sprintf( '#elementor-action:action=%1$s settings=%2$s', $action, base64_encode( wp_json_encode( $settings ) ) ) );
+	}
+
 	/**
 	 * Get Init Settings
 	 *
@@ -1048,33 +1142,28 @@ class Frontend extends App {
 
 		if ( is_singular() ) {
 			$post = get_post();
+
 			$settings['post'] = [
 				'id' => $post->ID,
-				'title' => $post->post_title,
+				'title' => wp_get_document_title(),
 				'excerpt' => $post->post_excerpt,
+				'featuredImage' => get_the_post_thumbnail_url(),
 			];
 		} else {
 			$settings['post'] = [
 				'id' => 0,
 				'title' => wp_get_document_title(),
-				'excerpt' => '',
+				'excerpt' => get_the_archive_description(),
 			];
 		}
 
+		$empty_object = (object) [];
+
 		if ( $is_preview_mode ) {
-			$elements_manager = Plugin::$instance->elements_manager;
-
-			$elements_frontend_keys = [
-				'section' => $elements_manager->get_element_types( 'section' )->get_frontend_settings_keys(),
-				'column' => $elements_manager->get_element_types( 'column' )->get_frontend_settings_keys(),
-			];
-
-			$elements_frontend_keys += Plugin::$instance->widgets_manager->get_widgets_frontend_settings_keys();
-
 			$settings['elements'] = [
-				'data' => (object) [],
-				'editSettings' => (object) [],
-				'keys' => $elements_frontend_keys,
+				'data' => $empty_object,
+				'editSettings' => $empty_object,
+				'keys' => $empty_object,
 			];
 		}
 

@@ -4,6 +4,13 @@
 
 .elementor-widget {
 
+	&.elementor-icon-list--layout-inline {
+
+		.elementor-widget-container {
+			overflow: hidden;
+		}
+	}
+
 	.elementor-icon-list-items.elementor-inline-items {
 
 		margin-right: -8px;
@@ -65,6 +72,14 @@
 
 	.elementor-icon-list-icon {
 		flex-shrink: 0;
+
+		i {
+			width: 1.25em;
+		}
+
+		svg {
+			width: 1em;
+		}
 	}
 
 	&.elementor-align-center {

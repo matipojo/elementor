@@ -1,12 +1,13 @@
 /* global elementorFrontendConfig */
 import DocumentsManager from './documents-manager';
-import HotKeys from '../../../../core/common/assets/js/utils/hot-keys';
-import Storage from '../../../../core/common/assets/js/utils/storage';
-import environment from '../../../../core/common/assets/js/utils/environment';
+import Storage from 'elementor-common/utils/storage';
+import environment from 'elementor-common/utils/environment';
+import YouTubeApiLoader from './utils/video-api/youtube-loader';
+import VimeoApiLoader from './utils/video-api/vimeo-loader';
+import URLActions from './utils/url-actions';
 
 const EventManager = require( 'elementor-utils/hooks' ),
 	ElementsHandler = require( 'elementor-frontend/elements-handler' ),
-	YouTubeModule = require( 'elementor-frontend/utils/youtube' ),
 	AnchorsModule = require( 'elementor-frontend/utils/anchors' ),
 	LightboxModule = require( 'elementor-frontend/utils/lightbox' );
 
@@ -15,8 +16,15 @@ class Frontend extends elementorModules.ViewModule {
 		super( ...args );
 
 		this.config = elementorFrontendConfig;
+	}
 
-		this.Module = require( './handler-module' );
+	// TODO: BC since 2.5.0
+	get Module() {
+		if ( this.isEditMode() ) {
+			parent.elementorCommon.helpers.hardDeprecated( 'elementorFrontend.Module', '2.5.0', 'elementorModules.frontend.handlers.Base' );
+		}
+
+		return elementorModules.frontend.handlers.Base;
 	}
 
 	getDefaultSettings() {
@@ -32,19 +40,17 @@ class Frontend extends elementorModules.ViewModule {
 	}
 
 	getDefaultElements() {
-		const selectors = this.getSettings( 'selectors' );
-
-		const elements = {
+		const defaultElements = {
 			window: window,
 			$window: jQuery( window ),
 			$document: jQuery( document ),
 			$head: jQuery( document.head ),
 			$body: jQuery( document.body ),
+			$deviceMode: jQuery( '<span>', { id: 'elementor-device-mode', class: 'elementor-screen-only' } ),
 		};
+		defaultElements.$body.append( defaultElements.$deviceMode );
 
-		elements.$wpAdminBar = elements.$document.find( selectors.adminBar );
-
-		return elements;
+		return defaultElements;
 	}
 
 	bindEvents() {
@@ -74,7 +80,31 @@ class Frontend extends elementorModules.ViewModule {
 	}
 
 	getCurrentDeviceMode() {
-		return getComputedStyle( this.elements.$head[ 0 ], ':after' ).content.replace( /"/g, '' );
+		return getComputedStyle( this.elements.$deviceMode[ 0 ], ':after' ).content.replace( /"/g, '' );
+	}
+
+	getDeviceSetting( deviceMode, settings, settingKey ) {
+		const devices = [ 'desktop', 'tablet', 'mobile' ];
+
+		let deviceIndex = devices.indexOf( deviceMode );
+
+		while ( deviceIndex > 0 ) {
+			const currentDevice = devices[ deviceIndex ],
+				fullSettingKey = settingKey + '_' + currentDevice,
+				deviceValue = settings[ fullSettingKey ];
+
+			if ( deviceValue ) {
+				return deviceValue;
+			}
+
+			deviceIndex--;
+		}
+
+		return settings[ settingKey ];
+	}
+
+	getCurrentDeviceSetting( settings, settingKey ) {
+		return this.getDeviceSetting( elementorFrontend.getCurrentDeviceMode(), settings, settingKey );
 	}
 
 	isEditMode() {
@@ -97,17 +127,13 @@ class Frontend extends elementorModules.ViewModule {
 		};
 	}
 
-	initHotKeys() {
-		this.hotKeys = new HotKeys();
-
-		this.hotKeys.bindListener( this.elements.$window );
-	}
-
 	initOnReadyComponents() {
 		this.utils = {
-			youtube: new YouTubeModule(),
+			youtube: new YouTubeApiLoader(),
+			vimeo: new VimeoApiLoader(),
 			anchors: new AnchorsModule(),
 			lightbox: new LightboxModule(),
+			urlActions: new URLActions(),
 		};
 
 		// TODO: BC since 2.4.0
@@ -121,6 +147,10 @@ class Frontend extends elementorModules.ViewModule {
 		this.documentsManager = new DocumentsManager();
 
 		this.trigger( 'components:init' );
+	}
+
+	initOnReadyElements() {
+		this.elements.$wpAdminBar = this.elements.$document.find( this.getSettings( 'selectors.adminBar' ) );
 	}
 
 	addIeCompatibility() {
@@ -179,47 +209,28 @@ class Frontend extends elementorModules.ViewModule {
 	}
 
 	// Based on underscore function
-	throttle( func, wait ) {
-		let timeout,
-			context,
-			args,
-			result,
-			previous = 0;
-
-		const later = () => {
-			previous = Date.now();
-			timeout = null;
-			result = func.apply( context, args );
-
-			if ( ! timeout ) {
-				context = args = null;
-			}
-		};
+	debounce( func, wait ) {
+		let timeout;
 
 		return function() {
-			const now = Date.now(),
-				remaining = wait - ( now - previous );
+			const context = this,
+				args = arguments;
 
-			context = this;
-			args = arguments;
+			const later = () => {
+				timeout = null;
 
-			if ( remaining <= 0 || remaining > wait ) {
-				if ( timeout ) {
-					clearTimeout( timeout );
-					timeout = null;
-				}
+				func.apply( context, args );
+			};
 
-				previous = now;
-				result = func.apply( context, args );
+			const callNow = ! timeout;
 
-				if ( ! timeout ) {
-					context = args = null;
-				}
-			} else if ( ! timeout ) {
-				timeout = setTimeout( later, remaining );
+			clearTimeout( timeout );
+
+			timeout = setTimeout( later, wait );
+
+			if ( callNow ) {
+				func.apply( context, args );
 			}
-
-			return result;
 		};
 	}
 
@@ -270,9 +281,7 @@ class Frontend extends elementorModules.ViewModule {
 		// Keep this line before `initOnReadyComponents` call
 		this.elements.$window.trigger( 'elementor/frontend/init' );
 
-		if ( ! this.isEditMode() ) {
-			this.initHotKeys();
-		}
+		this.initOnReadyElements();
 
 		this.initOnReadyComponents();
 	}

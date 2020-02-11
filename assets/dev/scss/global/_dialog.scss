@@ -34,12 +34,12 @@
 	.dialog-header {
 		font-size: 15px;
 		color: $editor-darkest;
-		padding: 20px 0;
+		padding: 30px 0 10px;
 		font-weight: 500;
 	}
 
 	.dialog-message {
-		padding: 0 20px 20px;
+		padding: 0 30px 30px;
 		min-height: 50px;
 	}
 
@@ -56,21 +56,18 @@
 		text-align: center;
 
 		> .dialog-button {
+			font-family: $admin-font-family;
 			width: 50%;
 			border: none;
 			background: none;
+			color: $editor-dark;
 			font-size: 15px;
 			cursor: pointer;
 			padding: 13px 0;
 			outline: 0;
 
-			&:first-child {
-				color: $editor-dark;
-				@include border-end(1px solid $editor-background);
-			}
-
 			&:hover {
-				background-color: lighten( $editor-background, 5%);
+				background-color: lighten($editor-background, 5%);
 			}
 
 			&.dialog-ok {
@@ -96,7 +93,7 @@
 	cursor: pointer;
 	position: absolute;
 	top: 30px;
-	right: 30px;
+	@include end(30px);
 	font-size: 15px;
 	line-height: 1;
 
@@ -115,8 +112,19 @@
 	}
 }
 
+.dialog-confirm-widget {
+
+	.dialog-button {
+
+		&:first-child {
+			@include border-end(1px solid $editor-background);
+		}
+	}
+}
+
 .dialog-prevent-scroll {
 	overflow: hidden;
+	max-height: 100vh;
 }
 
 @media (max-width: $editor-screen-sm-max) {

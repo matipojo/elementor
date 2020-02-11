@@ -1,3 +1,5 @@
+import Component from './component';
+
 const BaseRegion = require( 'elementor-regions/base' );
 
 import NavigatorLayout from './layout';
@@ -6,17 +8,30 @@ export default class extends BaseRegion {
 	constructor( options ) {
 		super( options );
 
+		$e.components.register( new Component( { manager: this } ) );
+
 		this.isDocked = false;
 
 		this.opened = false;
+
+		this.indicators = {
+			customPosition: {
+				title: elementor.translate( 'custom_positioning' ),
+				icon: 'cursor-move',
+				settingKeys: [ '_position', '_element_width' ],
+				section: '_section_position',
+			},
+		};
 
 		this.ensurePosition = this.ensurePosition.bind( this );
 
 		this.listenTo( elementor.channels.dataEditMode, 'switch', this.onEditModeSwitched );
 
-		if ( this.storage.visible ) {
-			this.open();
-		}
+		elementor.on( 'navigator:init', () => {
+			if ( this.storage.visible ) {
+				$e.route( 'navigator' );
+			}
+		} );
 	}
 
 	getStorageKey() {

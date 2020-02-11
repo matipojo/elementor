@@ -3,6 +3,7 @@ namespace Elementor\Core;
 
 use Elementor\Core\Base\Document;
 use Elementor\Core\Common\Modules\Ajax\Module as Ajax;
+use Elementor\Core\DocumentTypes\Page;
 use Elementor\Core\DocumentTypes\Post;
 use Elementor\DB;
 use Elementor\Plugin;
@@ -87,6 +88,7 @@ class Documents_Manager {
 		add_filter( 'post_row_actions', [ $this, 'filter_post_row_actions' ], 11, 2 );
 		add_filter( 'page_row_actions', [ $this, 'filter_post_row_actions' ], 11, 2 );
 		add_filter( 'user_has_cap', [ $this, 'remove_user_edit_cap' ], 10, 3 );
+		add_filter( 'elementor/editor/localize_settings', [ $this, 'localize_settings' ] );
 	}
 
 	/**
@@ -116,7 +118,9 @@ class Documents_Manager {
 	 */
 	public function register_default_types() {
 		$default_types = [
-			'post' => Post::get_class_full_name(),
+			'post' => Post::get_class_full_name(), // BC.
+			'wp-post' => Post::get_class_full_name(),
+			'wp-page' => Page::get_class_full_name(),
 		];
 
 		foreach ( $default_types as $type => $class ) {
@@ -343,7 +347,7 @@ class Documents_Manager {
 		$class = $this->get_document_type( $type, false );
 
 		if ( ! $class ) {
-			wp_die( sprintf( 'Type %s does not exist.', $type ) );
+			return new \WP_Error( 500, sprintf( 'Type %s does not exist.', $type ) );
 		}
 
 		if ( empty( $post_data['post_title'] ) ) {
@@ -382,8 +386,8 @@ class Documents_Manager {
 			'post_id' => $post_id,
 		] );
 
-		// Let the $document to re-save the template type by his way.
-		$document->save_template_type();
+		// Let the $document to re-save the template type by his way + version.
+		$document->save( [] );
 
 		return $document;
 	}
@@ -403,6 +407,11 @@ class Documents_Manager {
 		global $pagenow;
 
 		if ( ! in_array( $pagenow, [ 'post.php', 'edit.php' ], true ) ) {
+			return $allcaps;
+		}
+
+		// Don't touch not existing or not allowed caps.
+		if ( empty( $caps[0] ) || empty( $allcaps[ $caps[0] ] ) ) {
 			return $allcaps;
 		}
 
@@ -625,7 +634,21 @@ class Documents_Manager {
 	 * @return array
 	 */
 	public function get_groups() {
+		_deprecated_function( __METHOD__, '2.4.0' );
+
 		return [];
+	}
+
+	public function localize_settings( $settings ) {
+		$translations = [];
+
+		foreach ( $this->get_document_types() as $type => $class ) {
+			$translations[ $type ] = $class::get_title();
+		}
+
+		return array_replace_recursive( $settings, [
+			'i18n' => $translations,
+		] );
 	}
 
 	private function register_types() {

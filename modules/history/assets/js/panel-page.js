@@ -1,5 +1,4 @@
-var TabHistoryView = require( './history/panel-tab' ),
-	TabHistoryEmptyView = require( './history/empty' );
+var TabHistoryView = require( './history/panel-tab' );
 
 import TabRevisionsLoadingView from './revisions/loading';
 import TabRevisionsView from './revisions/panel-tab';
@@ -16,37 +15,37 @@ module.exports = Marionette.LayoutView.extend( {
 		tabs: '.elementor-panel-navigation-tab',
 	},
 
-	events: {
-		'click @ui.tabs': 'onTabClick',
-	},
-
 	regionViews: {},
 
 	currentTab: null,
 
-	initialize: function() {
+	/**
+	 * @type {Document}
+	 */
+	document: null,
+
+	initialize: function( options ) {
+		this.document = options.document || elementor.documents.getCurrent();
+
 		this.initRegionViews();
 	},
 
 	initRegionViews: function() {
-		const historyItems = elementor.history.history.getItems();
+		const historyItems = this.document.history.getItems();
 
 		this.regionViews = {
-			history: {
-				view: function() {
-					if ( historyItems.length ) {
-						return TabHistoryView;
-					}
-
-					return TabHistoryEmptyView;
+			actions: {
+				view: () => {
+					return TabHistoryView;
 				},
 				options: {
 					collection: historyItems,
+					history: this.document.history,
 				},
 			},
 			revisions: {
 				view: () => {
-					const revisionsItems = elementor.history.revisions.getItems();
+					const revisionsItems = this.document.revisions.getItems();
 
 					if ( ! revisionsItems ) {
 						return TabRevisionsLoadingView;
@@ -58,17 +57,11 @@ module.exports = Marionette.LayoutView.extend( {
 
 					return TabRevisionsView;
 				},
+				options: {
+					document: this.document,
+				},
 			},
 		};
-	},
-
-	activateTab: function( tabName ) {
-		this.ui.tabs
-			.removeClass( 'elementor-active' )
-			.filter( '[data-view="' + tabName + '"]' )
-			.addClass( 'elementor-active' );
-
-		this.showView( tabName );
 	},
 
 	getCurrentTab: function() {
@@ -87,17 +80,5 @@ module.exports = Marionette.LayoutView.extend( {
 		this.currentTab = new View( options );
 
 		this.content.show( this.currentTab );
-	},
-
-	onRender: function() {
-		this.showView( 'history' );
-	},
-
-	onTabClick: function( event ) {
-		this.activateTab( event.currentTarget.dataset.view );
-	},
-
-	onDestroy: function() {
-		elementor.getPanelView().getFooterView().ui.history.removeClass( 'elementor-open' );
 	},
 } );

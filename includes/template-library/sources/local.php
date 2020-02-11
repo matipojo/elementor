@@ -2,13 +2,12 @@
 namespace Elementor\TemplateLibrary;
 
 use Elementor\Core\Base\Document;
+use Elementor\Core\Editor\Editor;
 use Elementor\DB;
 use Elementor\Core\Settings\Manager as SettingsManager;
 use Elementor\Core\Settings\Page\Model;
-use Elementor\Editor;
 use Elementor\Modules\Library\Documents\Library_Document;
 use Elementor\Plugin;
-use Elementor\Settings;
 use Elementor\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -164,8 +163,13 @@ class Source_Local extends Source_Base {
 		}
 	}
 
-	public static function get_admin_url() {
-		return add_query_arg( 'tabs_group', 'library', admin_url( self::ADMIN_MENU_SLUG ) );
+	public static function get_admin_url( $relative = false ) {
+		$base_url = self::ADMIN_MENU_SLUG;
+		if ( ! $relative ) {
+			$base_url = admin_url( $base_url );
+		}
+
+		return add_query_arg( 'tabs_group', 'library', $base_url );
 	}
 
 	/**
@@ -320,6 +324,9 @@ class Source_Local extends Source_Base {
 	public function admin_menu_reorder() {
 		global $submenu;
 
+		if ( ! isset( $submenu[ self::ADMIN_MENU_SLUG ] ) ) {
+			return;
+		}
 		$library_submenu = &$submenu[ self::ADMIN_MENU_SLUG ];
 
 		// Remove 'All Templates' menu.
@@ -353,7 +360,7 @@ class Source_Local extends Source_Base {
 	}
 
 	public function admin_menu() {
-		add_submenu_page( self::ADMIN_MENU_SLUG, '', __( 'Saved Templates', 'elementor' ), Editor::EDITING_CAPABILITY, self::get_admin_url() );
+		add_submenu_page( self::ADMIN_MENU_SLUG, '', __( 'Saved Templates', 'elementor' ), Editor::EDITING_CAPABILITY, self::get_admin_url( true ) );
 	}
 
 	public function admin_title( $admin_title, $title ) {
@@ -384,12 +391,18 @@ class Source_Local extends Source_Base {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param array $args Optional. Filter templates list based on a set of
+	 * @param array $args Optional. Filter templates based on a set of
 	 *                    arguments. Default is an empty array.
 	 *
 	 * @return array Local templates.
 	 */
 	public function get_items( $args = [] ) {
+		$template_types = array_values( self::$template_types );
+
+		if ( ! empty( $args['type'] ) ) {
+			$template_types = $args['type'];
+		}
+
 		$templates_query = new \WP_Query(
 			[
 				'post_type' => self::CPT,
@@ -400,7 +413,7 @@ class Source_Local extends Source_Base {
 				'meta_query' => [
 					[
 						'key' => Document::TYPE_META_KEY,
-						'value' => array_values( self::$template_types ),
+						'value' => $template_types,
 					],
 				],
 			]
@@ -412,10 +425,6 @@ class Source_Local extends Source_Base {
 			foreach ( $templates_query->get_posts() as $post ) {
 				$templates[] = $this->get_item( $post->ID );
 			}
-		}
-
-		if ( ! empty( $args ) ) {
-			$templates = wp_list_filter( $templates, $args );
 		}
 
 		return $templates;
@@ -434,36 +443,44 @@ class Source_Local extends Source_Base {
 	 * @return \WP_Error|int The ID of the saved/updated template, `WP_Error` otherwise.
 	 */
 	public function save_item( $template_data ) {
-		$type = Plugin::$instance->documents->get_document_type( $template_data['type'], false );
-
-		if ( ! $type ) {
-			return new \WP_Error( 'save_error', sprintf( 'Invalid template type "%s".', $template_data['type'] ) );
-		}
-
-		// TODO: Work with the documents system.
 		if ( ! current_user_can( $this->post_type_object->cap->edit_posts ) ) {
 			return new \WP_Error( 'save_error', __( 'Access denied.', 'elementor' ) );
 		}
 
-		$template_id = wp_insert_post( [
-			'post_title' => ! empty( $template_data['title'] ) ? $template_data['title'] : __( '(no title)', 'elementor' ),
-			'post_status' => current_user_can( 'publish_posts' ) ? 'publish' : 'pending',
-			'post_type' => self::CPT,
+		$defaults = [
+			'title' => __( '(no title)', 'elementor' ),
+			'page_settings' => [],
+			'status' => current_user_can( 'publish_posts' ) ? 'publish' : 'pending',
+		];
+
+		$template_data = wp_parse_args( $template_data, $defaults );
+
+		$document = Plugin::$instance->documents->create(
+			$template_data['type'],
+			[
+				'post_title' => $template_data['title'],
+				'post_status' => $template_data['status'],
+				'post_type' => self::CPT,
+			]
+		);
+
+		if ( is_wp_error( $document ) ) {
+			/**
+			 * @var \WP_Error $document
+			 */
+			return $document;
+		}
+
+		if ( ! empty( $template_data['content'] ) ) {
+			$template_data['content'] = $this->replace_elements_ids( $template_data['content'] );
+		}
+
+		$document->save( [
+			'elements' => $template_data['content'],
+			'settings' => $template_data['page_settings'],
 		] );
 
-		if ( is_wp_error( $template_id ) ) {
-			return $template_id;
-		}
-
-		Plugin::$instance->db->set_is_elementor_page( $template_id );
-
-		Plugin::$instance->db->save_editor( $template_id, $template_data['content'] );
-
-		$this->save_item_type( $template_id, $template_data['type'] );
-
-		if ( ! empty( $template_data['page_settings'] ) ) {
-			SettingsManager::get_settings_managers( 'page' )->save_settings( $template_data['page_settings'], $template_id );
-		}
+		$template_id = $document->get_main_id();
 
 		/**
 		 * After template library save.
@@ -509,7 +526,15 @@ class Source_Local extends Source_Base {
 			return new \WP_Error( 'save_error', __( 'Access denied.', 'elementor' ) );
 		}
 
-		Plugin::$instance->db->save_editor( $new_data['id'], $new_data['content'] );
+		$document = Plugin::$instance->documents->get( $new_data['id'] );
+
+		if ( ! $document ) {
+			return new \WP_Error( 'save_error', __( 'Template not exist.', 'elementor' ) );
+		}
+
+		$document->save( [
+			'elements' => $new_data['content'],
+		] );
 
 		/**
 		 * After template library update.
@@ -600,7 +625,8 @@ class Source_Local extends Source_Base {
 		if ( ! empty( $args['display'] ) ) {
 			$content = $db->get_builder( $template_id );
 		} else {
-			$content = $db->get_plain_editor( $template_id );
+			$document = Plugin::$instance->documents->get( $template_id );
+			$content = $document ? $document->get_elements_data() : [];
 		}
 
 		if ( ! empty( $content ) ) {
@@ -611,7 +637,7 @@ class Source_Local extends Source_Base {
 			'content' => $content,
 		];
 
-		if ( ! empty( $args['page_settings'] ) ) {
+		if ( ! empty( $args['with_page_settings'] ) ) {
 			$page = SettingsManager::get_settings_managers( 'page' )->get_model( $args['template_id'] );
 
 			$data['page_settings'] = $page->get_data( 'settings' );
@@ -722,7 +748,7 @@ class Source_Local extends Source_Base {
 		}
 
 		// Create temporary .zip file
-		$zip_archive_filename = 'elementor-templates-' . date( 'Y-m-d' ) . '.zip';
+		$zip_archive_filename = 'elementor-templates-' . gmdate( 'Y-m-d' ) . '.zip';
 
 		$zip_archive = new \ZipArchive();
 
@@ -786,7 +812,20 @@ class Source_Local extends Source_Base {
 
 			$zip->open( $path );
 
-			$zip->extractTo( $temp_path );
+			$valid_entries = [];
+
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+				$zipped_file_name = $zip->getNameIndex( $i );
+				$zipped_extension = pathinfo( $zipped_file_name, PATHINFO_EXTENSION );
+				if ( 'json' === $zipped_extension ) {
+					$valid_entries[] = $zipped_file_name;
+				}
+			}
+
+			if ( ! empty( $valid_entries ) ) {
+				$zip->extractTo( $temp_path, $valid_entries );
+			}
 
 			$zip->close();
 
@@ -1189,6 +1228,12 @@ class Source_Local extends Source_Base {
 
 		$current_type = get_query_var( 'elementor_library_type' );
 
+		$document_types = Plugin::instance()->documents->get_document_types();
+
+		if ( empty( $document_types[ $current_type ] ) ) {
+			return;
+		}
+
 		// TODO: Better way to exclude widget type.
 		if ( 'widget' === $current_type ) {
 			return;
@@ -1355,7 +1400,7 @@ class Source_Local extends Source_Base {
 		$export_data += $template_data;
 
 		return [
-			'name' => 'elementor-' . $template_id . '-' . date( 'Y-m-d' ) . '.json',
+			'name' => 'elementor-' . $template_id . '-' . gmdate( 'Y-m-d' ) . '.json',
 			'content' => wp_json_encode( $export_data ),
 		];
 	}

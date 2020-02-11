@@ -1160,6 +1160,17 @@ class Frontend extends App {
 		$empty_object = (object) [];
 
 		if ( $is_preview_mode ) {
+			$elements_manager = Plugin::$instance->elements_manager;
+
+			$elements_frontend_keys = [
+				'section' => $elements_manager->get_element_types( 'section' )->get_frontend_settings_keys(),
+				'column' => $elements_manager->get_element_types( 'column' )->get_frontend_settings_keys(),
+				'container' => $elements_manager->get_element_types( 'container' )->get_frontend_settings_keys(),
+				'flex_container' => $elements_manager->get_element_types( 'flex_container' )->get_frontend_settings_keys(),
+			];
+
+			$elements_frontend_keys += Plugin::$instance->widgets_manager->get_widgets_frontend_settings_keys();
+
 			$settings['elements'] = [
 				'data' => $empty_object,
 				'editSettings' => $empty_object,

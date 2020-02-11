@@ -17,6 +17,9 @@ module.exports = {
 					container: {
 						column: null,
 					},
+					flex_container: {
+						column: null,
+					},
 				},
 			},
 		},

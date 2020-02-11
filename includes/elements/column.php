@@ -1023,6 +1023,14 @@ class Element_Column extends Element_Base {
 			return Plugin::$instance->elements_manager->get_element_types( $element_data['elType'] );
 		}
 
+		if ( 'container' === $element_data['elType'] ) {
+			return Plugin::$instance->elements_manager->get_element_types( 'container' );
+		}
+
+		if ( 'flex_container' === $element_data['elType'] ) {
+			return Plugin::$instance->elements_manager->get_element_types( 'flex_container' );
+		}
+
 		return Plugin::$instance->widgets_manager->get_widget_types( $element_data['widgetType'] );
 	}
 

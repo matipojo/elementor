@@ -329,7 +329,7 @@ BaseElementView = BaseContainer.extend( {
 
 		if ( 'widget' === model.elType ) {
 			model.widgetType = elementView.model.get( 'widgetType' );
-		} else if (  itemData.isContainer ) {
+		} else if ( model.isContainer ) {
 			model.isInner = true;
 		} else {
 			return;

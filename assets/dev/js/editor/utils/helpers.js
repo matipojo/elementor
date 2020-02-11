@@ -10,12 +10,13 @@ module.exports = {
 
 	elementsHierarchy: {
 		document: {
-		section: {
-			column: {
-				widget: null,
-				section: null,
-				container: {
-					column: null,
+			section: {
+				column: {
+					widget: null,
+					section: null,
+					container: {
+						column: null,
+					},
 				},
 			},
 		},

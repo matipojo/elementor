@@ -179,13 +179,11 @@ ColumnView = BaseElementView.extend( {
 		$e.run( 'document/elements/create', {
 			model: {
 				elType: 'column',
-	},
+			},
 			container: this.getContainer().parent,
 			options: {
 				at: this.$el.index() + 1,
-
-		this.trigger( 'collection:change' );
-	},
+			},
 		} );
 	},
 

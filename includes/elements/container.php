@@ -7,29 +7,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class Element_Container extends Element_Base {
 
-	protected function _get_initial_config() {
-		$config = parent::_get_initial_config();
+	protected function get_initial_config() {
+		$config = parent::get_initial_config();
 
 		$config['isContainer'] = true;
 
 		return $config;
-	}
-
-	protected static function get_default_edit_tools() {
-		$section_label = __( 'Container', 'elementor' );
-
-		return [
-			'edit' => [
-				/* translators: %s: Section label */
-				'title' => sprintf( __( 'Edit %s', 'elementor' ), $section_label ),
-				'icon' => 'handle',
-			],
-			'remove' => [
-				/* translators: %s: Section label */
-				'title' => sprintf( __( 'Remove %s', 'elementor' ), $section_label ),
-				'icon' => 'close',
-			],
-		];
 	}
 
 	protected function _register_controls() {

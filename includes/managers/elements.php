@@ -284,7 +284,7 @@ class Elements_Manager {
 	private function init_elements() {
 		$this->_element_types = [];
 
-		foreach ( [ 'section', 'column', 'collection' ] as $element_name ) {
+		foreach ( [ 'section', 'column', 'collection', 'container' ] as $element_name ) {
 			$class_name = __NAMESPACE__ . '\Element_' . $element_name;
 
 			$this->register_element_type( new $class_name() );

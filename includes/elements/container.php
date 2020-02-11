@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-abstract class Element_Container extends Element_Base {
+class Element_Container extends Element_Base {
 
 	protected function get_initial_config() {
 		$config = parent::get_initial_config();
@@ -13,6 +13,10 @@ abstract class Element_Container extends Element_Base {
 		$config['isContainer'] = true;
 
 		return $config;
+	}
+
+	public function get_name() {
+		return 'container';
 	}
 
 	protected function _register_controls() {

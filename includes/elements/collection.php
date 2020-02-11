@@ -19,6 +19,10 @@ class Element_Collection extends Element_Container {
 		return 'eicon-post-list';
 	}
 
+	public function get_name() {
+		return 'collection';
+	}
+
 	/**
 	 * Register section controls.
 	 *

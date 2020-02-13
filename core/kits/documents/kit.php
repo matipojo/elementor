@@ -70,8 +70,20 @@ class Kit extends PageBase {
 		return $config;
 	}
 
+	public function get_body_class() {
+		return 'elementor-kit-' . $this->get_main_id();
+	}
+
 	public function get_css_wrapper_selector() {
-		return 'body.elementor-kit-' . $this->get_main_id();
+		return 'body.' . $this->get_body_class();
+	}
+
+	public function get_initial_config() {
+		$config = parent::get_initial_config();
+
+		$config['panel']['body_class'] = $this->get_body_class();
+
+		return $config;
 	}
 
 	/**

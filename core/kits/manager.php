@@ -94,7 +94,7 @@ class Manager {
 			}
 
 			$css_file->enqueue();
-			Plugin::$instance->frontend->add_body_class( 'elementor-kit-' . $kit->get_main_id() );
+			Plugin::$instance->frontend->add_body_class( $kit->get_body_class() );
 		}
 	}
 

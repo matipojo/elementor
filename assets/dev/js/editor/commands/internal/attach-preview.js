@@ -48,10 +48,7 @@ export class AttachPreview extends CommandInternalBaseBase {
 
 			elementor.initElements();
 
-			const iframeRegion = new Marionette.Region( {
-				// Make sure you get the DOM object out of the jQuery object
-				el: document.$element[ 0 ],
-			} );
+			elementor.initPreviewView( document );
 
 			elementor.addRegions( {
 				sections: iframeRegion,

@@ -4,6 +4,7 @@ import Ajax from 'elementor-common-modules/ajax/assets/js/ajax';
 import Finder from 'elementor-common-modules/finder/assets/js/finder';
 import Connect from 'elementor-common-modules/connect/assets/js/connect';
 import API from './api/';
+import BulkComponent from './components/bulk/component';
 
 class ElementorCommonApp extends elementorModules.ViewModule {
 	setMarionetteTemplateCompiler() {
@@ -36,6 +37,11 @@ class ElementorCommonApp extends elementorModules.ViewModule {
 		this.api = new API();
 
 		this.initModules();
+		this.registerComponents();
+	}
+
+	registerComponents() {
+		this.api.components.register( new BulkComponent( { manager: this } ) );
 	}
 
 	initModules() {

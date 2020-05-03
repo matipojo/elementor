@@ -27,11 +27,16 @@ class Manager extends BaseModule {
 	 * Manager constructor.
 	 */
 	public function __construct() {
+		$this->register_common_controllers();
 		$this->register_editor_controllers();
 	}
 
 	public function get_name() {
 		return 'data-manager';
+	}
+
+	public function register_common_controllers() {
+		$this->register_controller( Common\Bulk\Controller::class );
 	}
 
 	/**

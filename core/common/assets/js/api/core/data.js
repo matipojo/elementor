@@ -97,7 +97,15 @@ export default class Data extends Commands {
 				endPoint += '?';
 
 				queryEntries.forEach( ( [ name, value ] ) => {
-					endPoint += name + '=' + value + '&';
+					if ( Array.isArray( value ) ) {
+						value.forEach( ( item ) => {
+							endPoint += name + '[]=' + item + '&';
+						} );
+					} else if ( 'string' === typeof value || 'number' === typeof value ) {
+						endPoint += name + '=' + value + '&';
+					} else {
+						throw new Error( 'Invalid type of value' );
+					}
 				} );
 			}
 		}

@@ -61,7 +61,7 @@ export default class Routes extends Commands {
 		return true;
 	}
 
-	beforeRun( route, args ) {
+	async beforeRun( route, args ) {
 		if ( ! super.beforeRun( route, args ) ) {
 			return false;
 		}
@@ -79,7 +79,7 @@ export default class Routes extends Commands {
 		}
 
 		if ( ! component.isOpen || args.reOpen ) {
-			component.isOpen = component.open( args );
+			component.isOpen = await component.open( args );
 		}
 
 		return component.isOpen;

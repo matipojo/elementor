@@ -66,6 +66,26 @@ export default class extends $e.modules.ComponentBase {
 		return this.importHooks( hooks );
 	}
 
+	async open() {
+		// Don't run if it's on opening process.
+		if ( this.isOpening ) {
+			return false;
+		}
+
+		this.isOpening = true;
+
+		let isOpen = null;
+
+		await $e.run( 'panel/global/open' )
+			.then( () => {
+				// Set true only if the document has been opened.
+				isOpen = true;
+			} );
+
+		this.isOpening = false;
+		return isOpen;
+	}
+
 	renderTab( tab ) {
 		elementor.getPanelView().setPage( 'kit_settings' ).content.currentView.activateTab( tab );
 	}

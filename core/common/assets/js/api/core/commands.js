@@ -258,8 +258,8 @@ export default class Commands extends CommandsBackwardsCompatibility {
 	 *
 	 * @returns {boolean|*} results
 	 */
-	run( command, args = {} ) {
-		if ( ! this.beforeRun( command, args ) ) {
+	async run( command, args = {} ) {
+		if ( ! await this.beforeRun( command, args ) ) {
 			return false;
 		}
 

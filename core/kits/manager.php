@@ -155,6 +155,12 @@ class Manager {
 
 			$css_file->enqueue();
 
+			// On edit mode the global variables are handled by client side.
+			if ( ! Plugin::$instance->preview->is_preview() ) {
+				$design_system_css = Design_System_CSS::create( $kit->get_id() );
+				$design_system_css->enqueue();
+			}
+
 			Plugin::$instance->frontend->add_body_class( 'elementor-kit-' . $kit->get_main_id() );
 		}
 	}

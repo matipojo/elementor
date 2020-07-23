@@ -3,6 +3,7 @@ namespace Elementor\Core\Kits\Documents;
 
 use Elementor\Core\DocumentTypes\PageBase;
 use Elementor\Core\Files\CSS\Post as Post_CSS;
+use Elementor\Core\Kits\Design_System_CSS;
 use Elementor\Core\Kits\Documents\Tabs;
 use Elementor\Core\Settings\Manager as SettingsManager;
 use Elementor\Core\Settings\Page\Manager as PageManager;
@@ -80,6 +81,10 @@ class Kit extends PageBase {
 				$tab->on_save( $data );
 			}
 		}
+
+		// Remove Post CSS
+		$design_system_css = Design_System_CSS::create( $this->post->ID );
+		$design_system_css->delete();
 
 		return $saved;
 	}

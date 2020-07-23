@@ -824,7 +824,7 @@ abstract class Base extends Base_File {
 				$control['style_fields'] = $style_fields;
 			}
 
-			if ( ! empty( $control['selectors'] ) || ! empty( $control['dynamic'] ) || $this->is_global_control( $controls_stack, $control_name, $controls ) || ! empty( $control['style_fields'] ) ) {
+			if ( $this->has_style_settings( $control ) || $this->is_global_control( $controls_stack, $control_name, $controls ) ) {
 				$style_controls[ $control_name ] = $control;
 			}
 		}
@@ -879,5 +879,10 @@ abstract class Base extends Base_File {
 		$globals = $controls_stack->get_settings( '__globals__' );
 
 		return ! empty( $globals[ $control_global_key ] );
+	}
+
+	protected function has_style_settings( $control ) {
+		// Controls with `css_file` are handled by their file owner.
+		return empty( $control['css_file'] ) && ( ! empty( $control['selectors'] ) || ! empty( $control['dynamic'] ) || ! empty( $control['style_fields'] ) );
 	}
 }

@@ -3,6 +3,7 @@ namespace Elementor\Core\Kits\Documents\Tabs;
 
 use Elementor\Controls_Manager;
 use Elementor\Core\Kits\Controls\Repeater as Global_Style_Repeater;
+use Elementor\Core\Kits\Design_System_CSS;
 use Elementor\Repeater;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -57,6 +58,7 @@ class Global_Colors extends Tab_Base {
 				'global' => [
 					'active' => false,
 				],
+				'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 			]
 		);
 
@@ -93,6 +95,7 @@ class Global_Colors extends Tab_Base {
 					'add' => false,
 					'remove' => false,
 				],
+				'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 			]
 		);
 
@@ -101,6 +104,7 @@ class Global_Colors extends Tab_Base {
 			[
 				'type' => Global_Style_Repeater::CONTROL_TYPE,
 				'fields' => $repeater->get_controls(),
+				'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 			]
 		);
 

@@ -3,6 +3,7 @@ namespace Elementor\Core\Kits\Documents\Tabs;
 
 use Elementor\Controls_Manager;
 use Elementor\Core\Kits\Controls\Repeater as Global_Style_Repeater;
+use Elementor\Core\Kits\Design_System_CSS;
 use Elementor\Group_Control_Typography;
 use Elementor\Repeater;
 
@@ -61,43 +62,52 @@ class Global_Typography extends Tab_Base {
 						'selectors' => [
 							'{{SELECTOR}}' => '--e-global-typography-{{external._id.VALUE}}-font-family: "{{VALUE}}"',
 						],
+						'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 					],
 					'font_size' => [
 						'selectors' => [
 							'{{SELECTOR}}' => '--e-global-typography-{{external._id.VALUE}}-font-size: {{SIZE}}{{UNIT}}',
 						],
+						'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 					],
 					'font_weight' => [
 						'selectors' => [
 							'{{SELECTOR}}' => '--e-global-typography-{{external._id.VALUE}}-font-weight: {{VALUE}}',
 						],
+						'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 					],
 					'text_transform' => [
 						'selectors' => [
 							'{{SELECTOR}}' => '--e-global-typography-{{external._id.VALUE}}-text-transform: {{VALUE}}',
 						],
+						'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 					],
 					'font_style' => [
 						'selectors' => [
 							'{{SELECTOR}}' => '--e-global-typography-{{external._id.VALUE}}-font-style: {{VALUE}}',
 						],
+						'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 					],
 					'text_decoration' => [
 						'selectors' => [
 							'{{SELECTOR}}' => '--e-global-typography-{{external._id.VALUE}}-text-decoration: {{VALUE}}',
 						],
+						'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 					],
 					'line_height' => [
 						'selectors' => [
 							'{{SELECTOR}}' => '--e-global-typography-{{external._id.VALUE}}-line-height: {{SIZE}}{{UNIT}}',
 						],
+						'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 					],
 					'letter_spacing' => [
 						'selectors' => [
 							'{{SELECTOR}}' => '--e-global-typography-{{external._id.VALUE}}-letter-spacing: {{SIZE}}{{UNIT}}',
 						],
+						'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 					],
 				],
+				'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 			]
 		);
 
@@ -146,6 +156,7 @@ class Global_Typography extends Tab_Base {
 					'add' => false,
 					'remove' => false,
 				],
+				'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 			]
 		);
 
@@ -154,6 +165,7 @@ class Global_Typography extends Tab_Base {
 			[
 				'type' => Global_Style_Repeater::CONTROL_TYPE,
 				'fields' => $repeater->get_controls(),
+				'css_file' => Design_System_CSS::FILE_HANDLER_ID,
 			]
 		);
 

@@ -92,7 +92,7 @@ class Module extends BaseModule {
 	}
 
 	private function render_temp_import_export_content() {
-		$intro_text_link = sprintf( '<a href="#">%s</a>', __( 'Learn more', 'elementor' ) );
+		$intro_text_link = sprintf( '<a href="#">%s</a>', esc_html__( 'Learn more', 'elementor' ) );
 
 		$intro_text = sprintf(
 		/* translators: %1$s: New line break, %2$s: Learn More link. */
@@ -103,32 +103,32 @@ class Module extends BaseModule {
 
 		$content_data = [
 			'export' => [
-				'title' => __( 'Export a Template Kit', 'elementor' ),
+				'title' => esc_html__( 'Export a Template Kit', 'elementor' ),
 				'button' => [
 					'url' => Plugin::$instance->app->get_base_url() . '#/export',
-					'text' => __( 'Start Export', 'elementor' ),
+					'text' => esc_html__( 'Start Export', 'elementor' ),
 				],
-				'description' => __( 'Bundle your whole site - or just some of its elements - to be used for another website.', 'elementor' ),
+				'description' => esc_html__( 'Bundle your whole site - or just some of its elements - to be used for another website.', 'elementor' ),
 				'link' => [
 					'url' => '#',
-					'text' => __( 'Learn More', 'elementor' ),
+					'text' => esc_html__( 'Learn More', 'elementor' ),
 				],
 			],
 			'import' => [
-				'title' => __( 'Import a Template Kit', 'elementor' ),
+				'title' => esc_html__( 'Import a Template Kit', 'elementor' ),
 				'button' => [
 					'url' => Plugin::$instance->app->get_base_url() . '#/import',
-					'text' => __( 'Start Import', 'elementor' ),
+					'text' => esc_html__( 'Start Import', 'elementor' ),
 				],
-				'description' => __( 'Apply the design and settings of another site to this one.', 'elementor' ),
+				'description' => esc_html__( 'Apply the design and settings of another site to this one.', 'elementor' ),
 				'link' => [
 					'url' => '#',
-					'text' => __( 'Learn More', 'elementor' ),
+					'text' => esc_html__( 'Learn More', 'elementor' ),
 				],
 			],
 		];
 
-		$info_text_link = sprintf( '<a href="#">%s</a>', __( 'Click here.', 'elementor' ) );
+		$info_text_link = sprintf( '<a href="#">%s</a>', esc_html__( 'Click here.', 'elementor' ) );
 
 		$info_text = sprintf(
 		/* translators: %s: Click here. */
@@ -218,10 +218,10 @@ class Module extends BaseModule {
 
 	public function register_settings_tab( Tools $tools ) {
 		$tools->add_tab( 'import-export-kit', [
-			'label' => __( 'Import / Export Kit', 'elementor' ),
+			'label' => esc_html__( 'Import / Export Kit', 'elementor' ),
 			'sections' => [
 				'intro' => [
-					'label' => __( 'Template Kits', 'elementor' ),
+					'label' => esc_html__( 'Template Kits', 'elementor' ),
 					'callback' => function() {
 						$this->render_temp_import_export_content();
 					},

@@ -460,7 +460,23 @@ class Settings extends Settings_Page {
 			],
 			self::TAB_INTEGRATIONS => [
 				'label' => __( 'Integrations', 'elementor' ),
-				'sections' => [],
+				'sections' => [
+					'google_maps' => [
+						'label' => __( 'Google Maps Embed API', 'elementor' ),
+						'callback' => function() {
+							printf( __( 'Google Maps Embed API is a free service by Google that allows embedding Google Maps in your site. For more details, visit Google Maps\' <a href="%s" target="_blank">Using API Keys</a> page.', 'elementor' ), esc_url( 'https://developers.google.com/maps/documentation/embed/get-api-key' ) );
+						},
+						'fields' => [
+							'google_maps_api_key' => [
+								'label' => __( 'API Key', 'elementor' ),
+								'field_args' => [
+									'class' => 'elementor_google_maps_api_key',
+									'type' => 'text',
+								],
+							],
+						],
+					],
+				],
 			],
 			self::TAB_ADVANCED => [
 				'label' => __( 'Advanced', 'elementor' ),
@@ -500,6 +516,21 @@ class Settings extends Settings_Page {
 										1 => __( 'Enable', 'elementor' ),
 									],
 									'desc' => __( 'Please note! Allowing uploads of any files (SVG & JSON included) is a potential security risk.', 'elementor' ) . '<br>' . __( 'Elementor will try to sanitize the unfiltered files, removing potential malicious code and scripts.', 'elementor' ) . '<br>' . __( 'We recommend you only enable this feature if you understand the security risks involved.', 'elementor' ),
+								],
+							],
+							'font_display' => [
+								'label' => __( 'Google Fonts Load', 'elementor' ),
+								'field_args' => [
+									'type' => 'select',
+									'std' => 'auto',
+									'options' => [
+										'auto' => __( 'Default', 'elementor' ),
+										'block' => __( 'Blocking', 'elementor' ),
+										'swap' => __( 'Swap', 'elementor' ),
+										'fallback' => __( 'Fallback', 'elementor' ),
+										'optional' => __( 'Optional', 'elementor' ),
+									],
+									'desc' => __( 'Font-display property defines how font files are loaded and displayed by the browser.', 'elementor' ) . '<br>' . __( 'Set the way Google Fonts are being loaded by selecting the font-display property (Default: Auto).', 'elementor' ),
 								],
 							],
 						],

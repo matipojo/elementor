@@ -4,7 +4,7 @@
   "port": 3333,
   "testsPort": 3334,
   "plugins": [
-	"../../"
+	"./../../"
   ],
   "themes": [
 	"https://downloads.wordpress.org/theme/hello-elementor.2.3.1.zip"

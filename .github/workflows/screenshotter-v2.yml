@@ -1,61 +1,35 @@
-name: Elementor-ScreenShotter
+name: Elementor-ScreenShotter v2
 
 on: [ push, pull_request ]
 
 jobs:
-  build-plugin:
-    name: Build plugin
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v2
-      - name: Install Node.js 14.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14.x
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npx grunt build
-      - name: Save build to cache
-        uses: actions/cache@v2
-        id: restore-build
-        with:
-          path: ./build/*
-          key: ${{ github.sha }}
-
   screenshotter:
     name: ScreenShotter v2
     runs-on: ubuntu-latest
-    needs: [ build-plugin ]
     timeout-minutes: 20
     steps:
-      - name: Install wp-env
+      - name: Checkout source code
+        uses: actions/checkout@master
+      - name: Install Dependencies
         run: |
-          cd ${GITHUB_WORKSPACE}/tests/screenshotter
+          cd ${{ github.workspace }}/tests/screenshotter
           npm i
       - name: Install WordPress environment
         run: |
-          npx wp-env start
-          npx wp-env run cli theme activate hello-elementor
-          npx wp-env run cli option set blogname test
+          cd ${{ github.workspace }}/tests/screenshotter
+          wp-env start
+          wp-env run cli theme activate hello-elementor
+          wp-env run cli option set blogname test
       - name: Import Templates
-        run: npx wp-env run cli "wp --user=admin elementor library import_dir /var/www/html/wp-content/plugins/elementor/tests/screenshotter/config"
+        run: |
+          cd ${{ github.workspace }}/tests/screenshotter
+          wp-env run cli "wp --user=admin elementor library import_dir /var/www/html/wp-content/plugins/elementor/tests/screenshotter/config"
       - name: Run Tests
-        run: node ./node_modules/backstopjs/cli/index.js test --config=${GITHUB_WORKSPACE}/tests/screenshotter/backstop.js
+        run: |
+          cd ${{ github.workspace }}/tests/screenshotter
+          node ./node_modules/backstopjs/cli/index.js test --config=${{ github.workspace }}/tests/screenshotter/backstop.js
       - uses: actions/upload-artifact@master
         if: failure()
         with:
           name: backstop-output
-          path: ${GITHUB_WORKSPACE}/tests/screenshotter/backstop_data
+          path: ${{ github.workspace }}/tests/screenshotter/backstop_data

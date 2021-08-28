@@ -850,7 +850,7 @@ class Source_Local extends Source_Base {
 			$import_result = $this->import_single_template( $path );
 
 			if ( is_wp_error( $import_result ) ) {
-				Plugin::$instance->uploads_manager->remove_file_or_dir( $import_result );
+//				Plugin::$instance->uploads_manager->remove_file_or_dir( $import_result );
 
 				return $import_result;
 			}
@@ -1391,7 +1391,7 @@ class Source_Local extends Source_Base {
 		] );
 
 		// Remove the temporary file, now that we're done with it.
-		Plugin::$instance->uploads_manager->remove_file_or_dir( $file_path );
+//		Plugin::$instance->uploads_manager->remove_file_or_dir( $file_path );
 
 		if ( is_wp_error( $template_id ) ) {
 			return $template_id;

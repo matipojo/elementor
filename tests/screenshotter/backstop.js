@@ -41,7 +41,7 @@ module.exports = {
 	viewports: testsViewports(),
 	scenarios: getScenarios(),
 	paths: {
-		bitmaps_reference: `backstop_data/reference`,
+		bitmaps_reference: `reference`,
 		bitmaps_test: `backstop_data/bitmaps_test`,
 		engine_scripts: `backstop_data/engine_scripts`,
 		html_report: `backstop_data/html_report`,

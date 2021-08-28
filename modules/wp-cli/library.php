@@ -97,6 +97,74 @@ class Library extends \WP_CLI_Command {
 		\WP_CLI::success( count( $imported_items ) . ' item(s) has been imported.' );
 	}
 
+
+	/**
+	 * Import all template files from a directory.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *  1. wp elementor library import_dir <file-path>
+	 *      - This will import a file or a zip of multiple files to the library.
+	 *
+	 * @param $args
+	 * @param $assoc_args
+	 *
+	 * @since  2.8.0
+	 * @access public
+	 */
+	public function import_dir( $args, $assoc_args ) {
+		if ( empty( $args[0] ) ) {
+			\WP_CLI::error( 'Please set dir path.' );
+		}
+
+		$dir = $args[0];
+
+		if ( ! file_exists( $dir ) ) {
+			\WP_CLI::error( "Dir `{$dir}` not found." );
+		}
+
+		$files = glob( $dir . '/*.json' );
+
+		if ( empty( $files ) ) {
+			\WP_CLI::error( 'Files not found.' );
+		}
+
+		/** @var Source_Local $source */
+		$source = Plugin::$instance->templates_manager->get_source( 'local' );
+
+		$succeed = [];
+		$errors = [];
+
+		foreach ( $files as $file ) {
+			$basename = basename( $file );
+
+			if ( ! file_exists( $file ) ) {
+				$errors[ $basename ] = $file . ' file not found.';
+				continue;
+			}
+
+			$imported_items = $source->import_template( $basename, $file );
+
+			if ( is_wp_error( $imported_items ) ) {
+				$errors[ $basename ] = $imported_items->get_error_message();
+			} else {
+				$succeed[ $basename ] = true;
+			}
+		}
+
+		$succeed_message = count($succeed) . ' item(s) has been imported.';
+
+		if ( ! empty( $errors ) ) {
+			$error_message = var_export( $errors, 1 );
+			if ( ! empty( $succeed ) ) {
+				$error_message = $succeed_message . ' ' . count( $errors ) . ' has errors: ' . $error_message;
+			}
+			\WP_CLI::error( $error_message );
+		}
+
+		\WP_CLI::success( $succeed_message );
+	}
+
 	/**
 	 * Connect site to Elementor Library.
 	 * (Network is not supported)

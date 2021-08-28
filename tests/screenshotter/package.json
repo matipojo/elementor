@@ -1,0 +1,19 @@
+{
+  "name": "screenshotter",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "wp-env start",
+    "cleanup": "wp-env clean development",
+    "activate-theme": "wp-env run cli theme activate hello-elementor",
+    "set-site-title": "wp-env run cli option set blogname test",
+    "import-files": "wp-env run cli \"wp --user=admin elementor library import_dir /var/www/html/wp-content/plugins/elementor/tests/screenshotter/config\"",
+    "test": "node ./node_modules/backstopjs/cli/index.js test --config=\"./backstop.js\"",
+    "full-test": "npm i && npm run start && npm run activate-theme && npm run set-site-title && npm run import-files && npm run test",
+    "local-full-test": "npm run cleanup && npm run full-test"
+  },
+  "dependencies": {
+    "@wordpress/env": "4.0.0",
+    "backstopjs": "5.3.7"
+  }
+}

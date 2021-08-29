@@ -8,5 +8,9 @@
   ],
   "themes": [
 	"https://downloads.wordpress.org/theme/hello-elementor.2.3.1.zip"
-  ]
+  ],
+  "config": {
+	"WP_DEBUG": false,
+	"SCRIPT_DEBUG": false
+  }
 }

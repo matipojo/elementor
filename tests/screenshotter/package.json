@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-	"preinstall": "npm i -g @wordpress/env@4.0.0",
-	"wp-env": "node ./node_modules/@wordpress/env/bin/wp-env",
-	"start": "wp-env start",
+    "preinstall": "npm i -g @wordpress/env@4.0.0",
+    "start": "wp-env start",
     "cleanup": "wp-env clean development",
     "activate-theme": "wp-env run cli theme activate hello-elementor",
     "set-site-title": "wp-env run cli option set blogname test",
@@ -16,6 +15,6 @@
   },
   "dependencies": {
     "backstopjs": "5.3.7",
-	"chalk": "4.1.2"
+    "chalk": "4.1.2"
   }
 }

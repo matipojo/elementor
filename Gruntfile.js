@@ -29,6 +29,9 @@ module.exports = function( grunt ) {
 		clean: require( './.grunt-config/clean' ),
 		webpack: require( './.grunt-config/webpack' ),
 		karma: require( './.grunt-config/karma' ),
+		concurrent: {
+			buildAssets: [ 'scripts', 'styles' ],
+		},
 	} );
 
 	// Default task(s).
@@ -37,6 +40,8 @@ module.exports = function( grunt ) {
 		'scripts',
 		'styles',
 	] );
+
+	grunt.registerTask( 'build-assets', [ 'concurrent:buildAssets' ] );
 
 	grunt.registerTask( 'create_widgets_temp_scss_files', () => widgetsCss.createWidgetsTempScssFiles() );
 

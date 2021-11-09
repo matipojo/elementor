@@ -32,8 +32,11 @@ jobs:
         run: |
           elementor-screenshotter-import-templates --config=${screenshotter_config_path} --debug=true
       - name: Build Package & Run Test
-        run: |
-          elementor-screenshotter-run-test --config=${screenshotter_config_path} --debug=true
+        uses: nick-invision/retry@v2
+        with:
+          max_attempts: 2
+          retry_on: error
+          command: elementor-screenshotter-run-test --config=${screenshotter_config_path} --debug=true
       - name: Clean up report data
         if: failure()
         run: |

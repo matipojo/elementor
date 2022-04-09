@@ -1,4 +1,4 @@
-import Content from 'elementor/core/app/assets/js/layout/content';
+import Content from 'elementor/apps/assets/js/layout/content';
 import ElementorLoading from '../../components/elementor-loading';
 import ItemHeader from '../../components/item-header';
 import Layout from '../../components/layout';

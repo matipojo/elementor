@@ -732,7 +732,7 @@ class Plugin {
 		$this->upgrade = new Core\Upgrade\Manager();
 		$this->custom_tasks = new Core\Upgrade\Custom_Tasks_Manager();
 
-		$this->app = new Core\App\App();
+		$this->app = new Apps\App();
 
 		if ( is_admin() ) {
 			$this->heartbeat = new Heartbeat();

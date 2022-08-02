@@ -18,11 +18,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout next release branch
+    - name: Checkout
       uses: actions/checkout@v3
       with:
-        ref: ${{ inputs.BRANCH }}
-    - shell: bash
+        ref: master
+    - name: Generate JSON
+      shell: bash
       env:
         TOKEN: ${{ inputs.TOKEN }}
         REPOSITORY: ${{ inputs.REPOSITORY }}

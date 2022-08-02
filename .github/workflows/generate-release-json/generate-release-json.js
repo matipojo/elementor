@@ -21,9 +21,11 @@ const octokit = new Octokit({ auth: TOKEN });
 		}
 
 		const releasesJson = JSON.stringify(cloudReleases, null, 2);
-		const releasesFile = `./releases/${TAG_NAME_FILTER}.json`;
-		const releasesFilePath = `${releasesFile}`;
+		const releasesDir = `./releases`;
+		const releasesFilePath = `${releasesDir}/${TAG_NAME_FILTER}.json`;
 		console.log(`Saving ${releasesFilePath}`);
+		// Ensure the releases' directory exists
+		await fs.mkdir(`${releasesDir}`, { recursive: true });
 		await fs.writeFile(releasesFilePath, releasesJson);
 		console.log(`Saved ${releasesFilePath}`);
 		process.exit(0);

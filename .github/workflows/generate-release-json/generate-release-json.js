@@ -23,7 +23,6 @@ const octokit = new Octokit({ auth: TOKEN });
 		const releasesJson = JSON.stringify(cloudReleases, null, 2);
 		const releasesDir = `./releases`;
 		const releasesFilePath = `${releasesDir}/${TAG_NAME_FILTER}.json`;
-		console.log(`Saving ${releasesFilePath}`);
 		// get real path to releases dir
 		const realReleasesDir = await fs.realpath(releasesDir);
 		console.log(`Real path to releases dir: ${realReleasesDir}`);
@@ -32,6 +31,7 @@ const octokit = new Octokit({ auth: TOKEN });
 		// log if dir exist
 		console.log(`${realReleasesDir} exists: ${fs.existsSync(realReleasesDir)? 'yes' : 'no'}`);
 
+		console.log(`Saving ${releasesFilePath}`);
 		await fs.writeFile(releasesFilePath, releasesJson);
 		console.log(`Saved ${releasesFilePath}`);
 		process.exit(0);

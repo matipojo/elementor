@@ -14,11 +14,14 @@ const octokit = new Octokit({ auth: TOKEN });
 			repo,
 			per_page: 100
 		});
-		console.log(releases);
+		console.log('Releases URL: ' + releases.url);
+		console.log('Number of releases: ' + releases.data.length);
 		let cloudReleases = releases.data.filter(release => release.tag_name.includes(TAG_NAME_FILTER));
 		if (!cloudReleases) {
 			throw new Error(`No releases found with tag name containing "${TAG_NAME_FILTER}"`);
 		}
+
+		console.log('Number of cloud releases: ' + cloudReleases.length);
 
 		const releasesJson = JSON.stringify(cloudReleases, null, 2);
 		const releasesDir = `./releases`;
@@ -36,6 +39,7 @@ const octokit = new Octokit({ auth: TOKEN });
 		console.log(`Saved ${releasesFilePath}`);
 		process.exit(0);
 	} catch (err) {
+		console.error( err )
 		console.error(`Failed to update cloudReleases.json: ${err}`);
 		process.exit(1);
 	}

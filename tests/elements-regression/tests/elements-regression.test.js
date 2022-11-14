@@ -4,13 +4,44 @@ const elementsConfig = require( '../elements-config.json' );
 const testConfig = require( '../test.config' );
 const ConfigProvider = require( '../src/config-provider' );
 const controlHandlers = require( '../src/controls' );
+const v8toIstanbul = require( 'v8-to-istanbul' );
 
 const configMediator = ConfigProvider.make( { elementsConfig, testConfig } );
 
-test.describe( 'Elements regression', () => {
+async function convertCoverage( coverage ) {
+	for ( const entry of coverage ) {
+		const converter = v8toIstanbul( entry.url, 0, { source: entry.source } );
+		await converter.load();
+		converter.applyCoverage( entry.functions );
+		console.log( JSON.stringify( converter.toIstanbul() ) );
+	}
+}
+
+let coverageStarted = false;
+
+test.describe( 'Elements regression', ( ) => {
 	const testedElements = {};
 
-	test.afterAll( async ( {}, testInfo ) => {
+	test.beforeEach( async ( { editorPage }, testInfo ) => {
+		if ( ! coverageStarted ) {
+			await editorPage.page.coverage.startJSCoverage( {
+				resetOnNavigation: false,
+			} );
+			await editorPage.page.coverage.startCSSCoverage( {
+				resetOnNavigation: false,
+			} );
+			coverageStarted = true;
+		}
+	} );
+
+	test.afterAll( async ( { editorPage }, testInfo ) => {
+		const jsCoverage = await editorPage.page.coverage.stopJSCoverage();
+		const cssCoverage = await editorPage.page.coverage.stopCSSCoverage();
+		// Console.log( 'jsCoverage', jsCoverage );
+		// console.log( 'cssCoverage', cssCoverage );
+		await convertCoverage( jsCoverage );
+		await convertCoverage( cssCoverage );
+
 		// TODO: Need to find a better solution for now this is not working well.
 
 		if ( 'on' === testInfo.project.use.validateAllPreviousCasesChecked ) {

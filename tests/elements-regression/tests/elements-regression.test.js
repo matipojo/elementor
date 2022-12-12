@@ -40,10 +40,9 @@ test.describe( 'Elements regression', () => {
 
 				await editorPage.publish();
 
-				//
-				// expect(
-				// 	await frontendPage.screenshotElement( elementId ),
-				// ).toMatchSnapshot( [ widgetType, 'default.jpeg' ] );
+				expect(
+					await frontendPage.screenshotElement( elementId ),
+				).toMatchSnapshot( [ widgetType, 'default.jpeg' ] );
 
 				await editorPage.resetElementSettings( elementId );
 			} );
@@ -84,11 +83,10 @@ test.describe( 'Elements regression', () => {
 
 							await editorPage.publish();
 
-							//
-							// expect(
-							// 	await frontendPage.screenshotElement( elementId ),
-							// ).toMatchSnapshot( [ widgetType, controlId, `${ valueLabel }.jpeg` ] );
-                            
+							expect(
+								await frontendPage.screenshotElement( elementId ),
+							).toMatchSnapshot( [ widgetType, controlId, `${ valueLabel }.jpeg` ] );
+
 							await control.teardown();
 						} );
 					}

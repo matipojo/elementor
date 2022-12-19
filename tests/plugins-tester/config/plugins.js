@@ -1,5 +1,5 @@
-// eslint-disable-next-line
-import topPluginsConfig from "./top-plugins.json" assert {type: 'json'};
+const fs = require( 'fs' );
+const topPluginsConfig = JSON.parse( fs.readFileSync( './top-plugins.json', 'utf8' ) );
 
 const notCompatiblePlugins = [
 	'embedpress',

@@ -26,7 +26,7 @@ const checkTextDomain = {
 				'**/*.php',
 				'!docs/**',
 				'!bin/**',
-				'!node_modules/**',
+				'!**/node_modules/**',
 				'!build/**',
 				'!tests/**',
 				'!tmp/**',

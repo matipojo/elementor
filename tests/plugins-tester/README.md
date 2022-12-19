@@ -3,8 +3,13 @@
 Requirements:
 - Docker
 
-Run:
-```javascript
-npm i
-npm run test
+Run from Elementor root folder:
+```shell
+npm run test:plugins-tester:linux
 ```
+It will run:
+- npm install (plugin dependencies)
+- npx grunt build
+- cd tests/plugins-tester
+- npm install (test dependencies)
+- npm test

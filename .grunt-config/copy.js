@@ -4,6 +4,7 @@
  */
 const getBuildFiles = [
 	'**',
+	'!**/node_modules/**',
 	'!.git/**',
 	'!.github/**',
 	'!.run/**',

@@ -1,5 +1,11 @@
-const fs = require( 'fs' );
-const topPluginsConfig = JSON.parse( fs.readFileSync( './top-plugins.json', 'utf8' ) );
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath( import.meta.url );
+const __dirname = path.dirname( __filename );
+
+const topPluginsConfig = JSON.parse( fs.readFileSync( __dirname + '/top-plugins.json', 'utf8' ) );
 
 const notCompatiblePlugins = [
 	'embedpress',

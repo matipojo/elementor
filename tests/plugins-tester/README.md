@@ -4,7 +4,7 @@ Requirements:
 - Docker
 
 Run:
-```javascript
+```shell
 npm i
 npm run test
 ```

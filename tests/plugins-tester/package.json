@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+	"wp-env:start": "bash ./scripts/run-local-server.sh",
 	"test": "node index.js",
 	"update-baseline": "node ./scripts/run-backstop.js --slug='elementor'"
   },

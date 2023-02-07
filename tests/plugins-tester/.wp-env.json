@@ -9,6 +9,7 @@
     ],
     "mappings": {
         "elementor-templates": "./elementor-templates",
+        "elementor-config": "../wp-env/config",
         "scripts": "./scripts"
     },
     "port": 7777,

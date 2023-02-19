@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import fetch from 'node-fetch';
 
 export class PluginsTester {
 	options = {
@@ -16,10 +17,7 @@ export class PluginsTester {
 	}
 
 	async run() {
-		if ( this.options.runServer ) {
-			this.setCwd();
-			this.runServer();
-		}
+		this.setCwd();
 
 		this.checkPlugins();
 	}
@@ -40,7 +38,24 @@ export class PluginsTester {
 	checkPlugins() {
 		const errors = [];
 		this.options.pluginsToTest.forEach( ( slug ) => {
-			this.runWP( `npx wp-env run cli wp plugin install ${ slug } --activate` );
+			// This.runWP( `npx wp-env run cli wp plugin install ${ slug } --activate` );
+
+			// install wp plugin via rest
+			let pluginInfo;
+			fetch( 'http://localhost:7777/wp-json/wp/v2/plugins', {
+				method: 'POST',
+				body: JSON.stringify( {
+					slug,
+					status: 'active',
+				} ),
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': 'e2e-tests',
+				},
+			} ).then( ( response ) => {
+				pluginInfo = response;
+				console.log( response );
+ 			} );
 
 			try {
 				this.cmd( `node ./scripts/run-backstop.js --slug=${ slug } --diffThreshold=${ this.options.diffThreshold }` );
@@ -52,7 +67,21 @@ export class PluginsTester {
 				} );
 			}
 
-			this.runWP( `npx wp-env run cli wp plugin deactivate ${ slug }` );
+			// This.runWP( `npx wp-env run cli wp plugin deactivate ${ slug }` );
+
+			// install wp plugin via rest api
+			fetch( 'http://localhost:7777/wp-json/wp/v2/plugins/' + pluginInfo.plugin, {
+				method: 'POST',
+				body: JSON.stringify( {
+					status: 'inactive',
+				} ),
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': 'e2e-tests',
+				},
+			} ).then( ( response ) => {
+				console.log( response );
+			} );
 		} );
 
 		if ( errors.length ) {
@@ -70,19 +99,7 @@ export class PluginsTester {
 		}
 	}
 
-	runServer() {
-		if ( process.env.CI ) {
-			this.cmd( '   npm run wp-env start' );
-		} else {
-			this.prepareTestSite();
-		}
-	}
-
 	setCwd() {
 		this.cmd( `cd ${ this.options.cwd }` );
-	}
-
-	prepareTestSite() {
-		this.cmd( 'bash ./scripts/prepare-local-test.sh' );
 	}
 }

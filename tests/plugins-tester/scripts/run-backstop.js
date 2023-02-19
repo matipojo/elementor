@@ -3,10 +3,12 @@ import backstop from 'backstopjs'; // It's not included in global package.json.
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { mergeReportFromDir } from '../src/merge-images-utils.js';
-import config from '../backstop.json' assert {type: 'json'};
+import fs from 'fs';
 
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = dirname( __filename );
+
+const config = JSON.parse( fs.readFileSync( __dirname + '/../backstop.json' ) );
 
 // Extract all arg and split to key => value
 const args = process.argv.slice( 2 ).reduce( ( acc, arg ) => {

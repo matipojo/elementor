@@ -1,5 +1,10 @@
-// eslint-disable-next-line
-import topPluginsConfig from "./top-plugins.json" assert {type: 'json'};
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath( import.meta.url );
+const __dirname = dirname( __filename );
+
+const topPluginsConfig = JSON.parse( fs.readFileSync( __dirname + '/top-plugins.json' ) );
 
 const notCompatiblePlugins = [
 	'complianz-gdpr', // SQL Error

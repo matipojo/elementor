@@ -7,6 +7,10 @@
 
 // Auto login to WordPress as administrator
 add_action('init', function () {
+	remove_all_filters( 'rest_authentication_errors');
+	// set rest api to be public
+	add_filter( 'rest_authentication_errors', '__return_true');
+
 	if ( ! is_user_logged_in() ) {
 		$user = get_user_by( 'login', 'admin' );
 		wp_set_current_user( $user->ID );

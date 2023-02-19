@@ -328,7 +328,31 @@ BaseElementView = BaseContainer.extend( {
 
 		$handlesOverlay.append( $overlayList );
 
+		this.addBreadcrumb( $handlesOverlay );
+
 		return $handlesOverlay;
+	},
+
+	addBreadcrumb( $handlesOverlay ) {
+		const $wrapper = jQuery( '<div>', { class: 'elementor-element-breadcrumb' } );
+
+		let containerToCheck = this.container;
+		let maxDepth = 3;
+		const breadcrumbs = [];
+
+		while ( containerToCheck.view?.getElementType ) {
+			if ( ! maxDepth-- ) {
+				break;
+			}
+
+			breadcrumbs.push( containerToCheck.model.get( 'widgetType' ) || containerToCheck.view.getElementType() );
+
+			containerToCheck = containerToCheck.parent;
+		}
+
+		breadcrumbs.reverse();
+		$wrapper.text( breadcrumbs.join( ' > ' ) );
+		$handlesOverlay.append( $wrapper );
 	},
 
 	attachElContent( html ) {

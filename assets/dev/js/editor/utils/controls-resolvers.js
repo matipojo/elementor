@@ -1,4 +1,4 @@
-import { normalize4Sizes, parseSize } from './controls-parsers';
+import { normalize4Sizes, parseGradient, parseSize } from './controls-parsers';
 
 export function common() {
 	return {
@@ -29,6 +29,10 @@ export function common() {
 export function border( attrName, prefix ) {
 	return {
 		[ attrName ]: ( value, settings ) => {
+			if ( 'none' === value ) {
+				return [ `${ prefix }_width`, normalize4Sizes( '0' ) ];
+			}
+
 			const [ size, style, color ] = value.split( ' ' );
 
 			settings[ `${ prefix }_border` ] = style;
@@ -45,6 +49,22 @@ export function bgColor( attrName, prefix ) {
 			settings[ `${ prefix }_background` ] = 'classic';
 
 			return [ `${ prefix }_color`, value ];
+		},
+	};
+}
+
+export function bgGradient( attrName, prefix ) {
+	return {
+		[ attrName ]: ( value, settings ) => {
+			settings[ `${ prefix }_background` ] = 'gradient';
+
+			const { type, angle, colors } = parseGradient( value );
+
+			settings[ `${ prefix }_color` ] = colors[ 0 ];
+			settings[ `${ prefix }_color_b` ] = colors[ 1 ];
+			settings[ `${ prefix }_gradient_angle` ] = angle;
+
+			return [ `${ prefix }_gradient_type`, type ];
 		},
 	};
 }

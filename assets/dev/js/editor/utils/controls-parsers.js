@@ -67,3 +67,39 @@ export function normalize4Sizes( value ) {
 		isLinked: true,
 	};
 }
+
+export function parseGradient( bgGradient ) {
+	// Define the regular expression patterns to match different types of gradients
+	const linearPattern = /linear-gradient\((.+)\)/;
+	const radialPattern = /radial-gradient\((.+)\)/;
+
+	// Check if the gradient is linear or radial
+	if ( bgGradient.match( linearPattern ) ) {
+		const gradientParams = bgGradient.match( linearPattern )[ 1 ].split( ',' );
+
+		// Extract angle and colors
+		let angle = null;
+		if ( gradientParams[ 0 ].includes( 'deg' ) ) {
+			angle = parseSize( gradientParams[ 0 ], true );
+		}
+		const colors = gradientParams.slice( 1 ).map( ( color ) => color.trim() );
+
+		return {
+			type: 'linear',
+			angle,
+			colors,
+		};
+	} else if ( bgGradient.match( radialPattern ) ) {
+		const gradientParams = bgGradient.match( radialPattern )[ 1 ].split( ',' );
+
+		// Extract colors
+		const colors = gradientParams.map( ( color ) => color.trim() );
+
+		return {
+			type: 'radial',
+			colors,
+		};
+	}
+	// Invalid gradient format
+	return null;
+}

@@ -1,4 +1,4 @@
-import { bgColor, border, common, typography } from './controls-resolvers';
+import { bgColor, bgGradient, border, common, typography } from './controls-resolvers';
 import { normalize4Sizes, parseSize } from './controls-parsers';
 
 export class HTML4Parser {
@@ -59,6 +59,10 @@ export class HTML4Parser {
 				result = this.parseButton( node );
 				break;
 
+			case 'img':
+				result = this.parseImg( node );
+				break;
+
 			default:
 				break;
 		}
@@ -77,10 +81,13 @@ export class HTML4Parser {
 	 * @param {Element} node
 	 */
 	parseContainer( node ) {
+		const isRootNode = 'document' === node.parentNode.tagName;
+
 		const result = {
 			elType: 'container',
 			settings: {
 				flex_direction: node.tagName,
+				content_width: isRootNode ? 'boxed' : 'full',
 			},
 		};
 
@@ -137,6 +144,8 @@ export class HTML4Parser {
 			margin: ( value ) => {
 				return [ 'margin', normalize4Sizes( value ) ];
 			},
+			...bgGradient( 'bgGradient', 'background' ),
+			...bgGradient( 'hover_bgGradient', 'background_hover' ),
 			...bgColor( 'bgColor', 'background' ),
 			...bgColor( 'hover_bgColor', 'background_hover' ),
 		};
@@ -193,6 +202,21 @@ export class HTML4Parser {
 		return result;
 	}
 
+	parseImg( node ) {
+		const result = {
+			elType: 'widget',
+			widgetType: 'image',
+		};
+
+		const attrsMap = {
+			...common(),
+		};
+
+		result.settings = this.parseAttributes( node, attrsMap );
+
+		return result;
+	}
+
 	parseButton( node ) {
 		const result = {
 			elType: 'widget',
@@ -207,6 +231,9 @@ export class HTML4Parser {
 			},
 			color: ( value ) => {
 				return [ 'button_text_color', value ];
+			},
+			hover_color: ( value ) => {
+				return [ 'hover_color', value ];
 			},
 			// Override things from common.
 			...border( 'border', 'border' ),

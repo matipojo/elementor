@@ -51,6 +51,9 @@ export class HTML4Parser {
 				result = this.parseHeading( node );
 				break;
 
+			case 'text':
+				result = this.parseText( node );
+
 			case 'button':
 				result = this.parseButton( node );
 				break;
@@ -95,6 +98,7 @@ export class HTML4Parser {
 		// font,
 		// fontSize,
 		// fontWeight
+		// align -> text
 
 		const attrsMap = {
 			width: ( value ) => {
@@ -166,6 +170,34 @@ export class HTML4Parser {
 			},
 			color: ( value ) => {
 				return [ 'title_color', value ];
+			},
+			align: ( value ) => {
+				return [ 'align', value ];
+			},
+		};
+
+		result.settings = this.parseAttributes( node, attrsMap );
+
+		return result;
+	}
+
+	parseText( node ) {
+		const result = {
+			elType: 'widget',
+			widgetType: 'text-editor',
+		};
+
+		const attrsMap = {
+			...common(),
+			...typography(),
+			__text: ( value ) => {
+				return [ 'editor', value ];
+			},
+			color: ( value ) => {
+				return [ 'text_color', value ];
+			},
+			align: ( value ) => {
+				return [ 'align', value ];
 			},
 		};
 

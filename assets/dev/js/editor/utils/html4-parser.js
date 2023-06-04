@@ -53,6 +53,7 @@ export class HTML4Parser {
 
 			case 'text':
 				result = this.parseText( node );
+				break;
 
 			case 'button':
 				result = this.parseButton( node );
@@ -171,9 +172,6 @@ export class HTML4Parser {
 			color: ( value ) => {
 				return [ 'title_color', value ];
 			},
-			align: ( value ) => {
-				return [ 'align', value ];
-			},
 		};
 
 		result.settings = this.parseAttributes( node, attrsMap );
@@ -195,9 +193,6 @@ export class HTML4Parser {
 			},
 			color: ( value ) => {
 				return [ 'text_color', value ];
-			},
-			align: ( value ) => {
-				return [ 'align', value ];
 			},
 		};
 

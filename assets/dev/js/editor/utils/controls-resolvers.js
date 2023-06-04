@@ -20,6 +20,9 @@ export function common() {
 		borderRadius: ( value ) => {
 			return [ '_border_radius', normalize4Sizes( value ) ];
 		},
+		align: ( value ) => {
+			return [ 'align', value ];
+		},
 	};
 }
 

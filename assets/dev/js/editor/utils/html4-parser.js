@@ -1,3 +1,6 @@
+import { common, typography } from './controls-resolvers';
+import { normalize4Sizes, parseSize } from './controls-parsers';
+
 export class HTML4Parser {
 	parse( xml ) {
 		const parser = new DOMParser();
@@ -91,13 +94,13 @@ export class HTML4Parser {
 
 		const attrsMap = {
 			width: ( value ) => {
-				return [ 'boxed_width', this.parseSize( value, true ) ];
+				return [ 'boxed_width', parseSize( value, true ) ];
 			},
 			height: ( value ) => {
-				return [ 'min_height', this.parseSize( value, true ) ];
+				return [ 'min_height', parseSize( value, true ) ];
 			},
 			gap: ( value ) => {
-				return [ 'flex_gap', this.parseSize( value, true ) ];
+				return [ 'flex_gap', parseSize( value, true ) ];
 			},
 			alignItems: ( value ) => {
 				// Normalize start/end.
@@ -112,18 +115,18 @@ export class HTML4Parser {
 
 				// TODO: By reference???
 				settings.border_border = style;
-				settings.border_width = this.normalize4Sizes( size );
+				settings.border_width = normalize4Sizes( size );
 
 				return [ 'border_color', color ];
 			},
 			borderRadius: ( value ) => {
-				return [ 'border_radius', this.normalize4Sizes( value ) ];
+				return [ 'border_radius', normalize4Sizes( value ) ];
 			},
 			padding: ( value ) => {
-				return [ 'padding', this.normalize4Sizes( value ) ];
+				return [ 'padding', normalize4Sizes( value ) ];
 			},
 			margin: ( value ) => {
-				return [ 'margin', this.normalize4Sizes( value ) ];
+				return [ 'margin', normalize4Sizes( value ) ];
 			},
 			bgColor: ( value, settings ) => {
 				settings.background_background = 'classic';
@@ -152,8 +155,8 @@ export class HTML4Parser {
 		};
 
 		const attrsMap = {
-			...this.common(),
-			...this.typography(),
+			...common(),
+			...typography(),
 			__text: ( value ) => {
 				return [ 'title', value ];
 			},
@@ -183,132 +186,5 @@ export class HTML4Parser {
 		} );
 
 		return settings;
-	}
-
-	parseSize( value, asObject = false ) {
-		let [ , size, unit ] = value.match( /^(\d+)(\D*)$/ );
-
-		if ( ! unit ) {
-			unit = 'px';
-		}
-
-		if ( asObject ) {
-			return { size, unit };
-		}
-
-		return [ size, unit ];
-	}
-
-	normalize4Sizes( value ) {
-		const split = value.split( ' ' );
-
-		if ( 1 === split.length ) {
-			const [ size, unit ] = this.parseSize( split[ 0 ] );
-
-			return {
-				top: size,
-				right: size,
-				bottom: size,
-				left: size,
-				unit,
-				isLinked: true,
-			};
-		}
-
-		if ( 2 === split.length ) {
-			const [ ySize, unit ] = this.parseSize( split[ 0 ] );
-			const [ xSize ] = this.parseSize( split[ 1 ] );
-
-			return {
-				top: ySize,
-				bottom: ySize,
-				right: xSize,
-				left: xSize,
-				unit,
-				isLinked: false,
-			};
-		}
-
-		if ( 4 === split.length ) {
-			const [ topSize, unit ] = this.parseSize( split[ 0 ] );
-			const [ rightSize ] = this.parseSize( split[ 1 ] );
-			const [ bottomSize ] = this.parseSize( split[ 2 ] );
-			const [ leftSize ] = this.parseSize( split[ 3 ] );
-
-			return {
-				top: topSize,
-				bottom: bottomSize,
-				right: rightSize,
-				left: leftSize,
-				unit,
-				isLinked: false,
-			};
-		}
-
-		return {
-			top: 0,
-			right: 0,
-			bottom: 0,
-			left: 0,
-			unit: 'px',
-			isLinked: true,
-		};
-	}
-
-	common() {
-		return {
-			bgColor: ( value, settings ) => {
-				settings._background_background = 'classic';
-
-				return [ '_background_color', value ];
-			},
-			hover_bgColor: ( value, settings ) => {
-				settings._background_hover_background = 'classic';
-
-				return [ '_background_hover_color', value ];
-			},
-			width: ( value, settings ) => {
-				settings._element_width = 'initial';
-
-				return [ '_element_custom_width', this.parseSize( value, true ) ];
-			},
-			padding: ( value ) => {
-				return [ '_padding', this.normalize4Sizes( value ) ];
-			},
-			margin: ( value ) => {
-				return [ '_margin', this.normalize4Sizes( value ) ];
-			},
-			border: ( value, settings ) => {
-				const [ size, style, color ] = value.split( ' ' );
-
-				settings._border_border = style;
-				settings._border_width = this.normalize4Sizes( size );
-
-				return [ '_border_color', color ];
-			},
-			borderRadius: ( value ) => {
-				return [ '_border_radius', this.normalize4Sizes( value ) ];
-			},
-		};
-	}
-
-	typography( prefix = 'typography' ) {
-		return {
-			font: ( value, settings ) => {
-				settings[ `${ prefix }_typography` ] = 'custom';
-
-				return [ `${ prefix }_font_family`, value ];
-			},
-			fontSize: ( value, settings ) => {
-				settings[ `${ prefix }_typography` ] = 'custom';
-
-				return [ `${ prefix }_font_size`, this.parseSize( value, true ) ];
-			},
-			fontWeight: ( value, settings ) => {
-				settings[ `${ prefix }_typography` ] = 'custom';
-
-				return [ `${ prefix }_font_weight`, value ];
-			},
-		};
 	}
 }

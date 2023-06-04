@@ -99,7 +99,7 @@ export class HTML4Parser {
 		// font,
 		// fontSize,
 		// fontWeight
-		// align -> text
+		// align
 
 		const attrsMap = {
 			width: ( value ) => {
@@ -137,16 +137,8 @@ export class HTML4Parser {
 			margin: ( value ) => {
 				return [ 'margin', normalize4Sizes( value ) ];
 			},
-			bgColor: ( value, settings ) => {
-				settings.background_background = 'classic';
-
-				return [ 'background_color', value ];
-			},
-			hover_bgColor: ( value, settings ) => {
-				settings.background_hover_background = 'classic';
-
-				return [ 'background_hover_color', value ];
-			},
+			...bgColor( 'bgColor', 'background' ),
+			...bgColor( 'hover_bgColor', 'background_hover' ),
 		};
 
 		result.settings = {

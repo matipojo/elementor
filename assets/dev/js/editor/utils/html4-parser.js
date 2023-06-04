@@ -1,4 +1,4 @@
-import { common, typography } from './controls-resolvers';
+import { border, common, typography } from './controls-resolvers';
 import { normalize4Sizes, parseSize } from './controls-parsers';
 
 export class HTML4Parser {
@@ -49,6 +49,10 @@ export class HTML4Parser {
 
 			case 'title':
 				result = this.parseHeading( node );
+				break;
+
+			case 'button':
+				result = this.parseButton( node );
 				break;
 
 			default:
@@ -163,6 +167,42 @@ export class HTML4Parser {
 			color: ( value ) => {
 				return [ 'title_color', value ];
 			},
+		};
+
+		result.settings = this.parseAttributes( node, attrsMap );
+
+		return result;
+	}
+
+	parseButton( node ) {
+		const result = {
+			elType: 'widget',
+			widgetType: 'button',
+		};
+
+		const attrsMap = {
+			...common(),
+			...typography(),
+			__text: ( value ) => {
+				return [ 'text', value ];
+			},
+			color: ( value ) => {
+				return [ 'button_text_color', value ];
+			},
+			// Override things from common.
+			...border( 'border', 'border' ),
+			...border( 'hover_border', 'button_hover_border' ),
+			bgColor: ( value, settings ) => {
+				settings.background_background = 'classic';
+
+				return [ 'background_color', value ];
+			},
+			hover_bgColor: ( value, settings ) => {
+				settings.button_background_hover_background = 'classic';
+
+				return [ 'button_background_hover_color', value ];
+			},
+
 		};
 
 		result.settings = this.parseAttributes( node, attrsMap );

@@ -2,16 +2,8 @@ import { normalize4Sizes, parseSize } from './controls-parsers';
 
 export function common() {
 	return {
-		bgColor: ( value, settings ) => {
-			settings._background_background = 'classic';
-
-			return [ '_background_color', value ];
-		},
-		hover_bgColor: ( value, settings ) => {
-			settings._background_hover_background = 'classic';
-
-			return [ '_background_hover_color', value ];
-		},
+		...bgColor( 'bgColor', '_background' ),
+		...bgColor( 'hover_bgColor', '_background_hover' ),
 		width: ( value, settings ) => {
 			settings._element_width = 'initial';
 
@@ -23,16 +15,33 @@ export function common() {
 		margin: ( value ) => {
 			return [ '_margin', normalize4Sizes( value ) ];
 		},
-		border: ( value, settings ) => {
-			const [ size, style, color ] = value.split( ' ' );
-
-			settings._border_border = style;
-			settings._border_width = normalize4Sizes( size );
-
-			return [ '_border_color', color ];
-		},
+		...border( 'border', '_border' ),
+		...border( 'hover_border', '_border_hover' ),
 		borderRadius: ( value ) => {
 			return [ '_border_radius', normalize4Sizes( value ) ];
+		},
+	};
+}
+
+export function border( attrName, prefix ) {
+	return {
+		[ attrName ]: ( value, settings ) => {
+			const [ size, style, color ] = value.split( ' ' );
+
+			settings[ `${ prefix }_border` ] = style;
+			settings[ `${ prefix }_width` ] = normalize4Sizes( size );
+
+			return [ `${ prefix }_color`, color ];
+		},
+	};
+}
+
+export function bgColor( attrName, prefix ) {
+	return {
+		[ attrName ]: ( value, settings ) => {
+			settings[ `${ prefix }_background` ] = 'classic';
+
+			return [ `${ prefix }_color`, value ];
 		},
 	};
 }

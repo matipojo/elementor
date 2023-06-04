@@ -1,4 +1,4 @@
-import { border, common, typography } from './controls-resolvers';
+import { bgColor, border, common, typography } from './controls-resolvers';
 import { normalize4Sizes, parseSize } from './controls-parsers';
 
 export class HTML4Parser {
@@ -219,17 +219,8 @@ export class HTML4Parser {
 			// Override things from common.
 			...border( 'border', 'border' ),
 			...border( 'hover_border', 'button_hover_border' ),
-			bgColor: ( value, settings ) => {
-				settings.background_background = 'classic';
-
-				return [ 'background_color', value ];
-			},
-			hover_bgColor: ( value, settings ) => {
-				settings.button_background_hover_background = 'classic';
-
-				return [ 'button_background_hover_color', value ];
-			},
-
+			...bgColor( 'bgColor', 'background' ),
+			...bgColor( 'hover_bgColor', 'button_background_hover' ),
 		};
 
 		result.settings = this.parseAttributes( node, attrsMap );

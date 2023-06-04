@@ -81,7 +81,7 @@ export class HTML4Parser {
 	 * @param {Element} node
 	 */
 	parseContainer( node ) {
-		const isRootNode = 'document' === node.parentNode.tagName;
+		const isRootNode = ! node.parentElement;
 
 		const result = {
 			elType: 'container',

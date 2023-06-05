@@ -1,5 +1,9 @@
 export function parseSize( value, asObject = false ) {
-	let [ , size, unit ] = value.match( /^(\d+)(\D*)$/ );
+	let [ , size, unit ] = value.match( /^(\d+)(\D*)$/ ) || [];
+
+	if ( ! size ) {
+		size = 0;
+	}
 
 	if ( ! unit ) {
 		unit = 'px';
@@ -102,4 +106,10 @@ export function parseGradient( bgGradient ) {
 	}
 	// Invalid gradient format
 	return null;
+}
+
+export function parseFont( font ) {
+	const [ family ] = font.split( ',' );
+
+	return family.trim();
 }

@@ -37,7 +37,8 @@ export class HTML4Parser {
 		const text = [ ...node.childNodes ]
 			.filter( ( n ) => n.nodeType === Node.TEXT_NODE )
 			.map( ( n ) => n.textContent )
-			.join( ' ' );
+			.join( ' ' )
+			.trim();
 
 		node.setAttribute( '__text', text );
 
@@ -59,8 +60,8 @@ export class HTML4Parser {
 				result = this.parseButton( node );
 				break;
 
-			case 'img':
-				result = this.parseImg( node );
+			case 'image':
+				result = this.parseImage( node );
 				break;
 
 			default:
@@ -125,6 +126,20 @@ export class HTML4Parser {
 				}
 
 				return [ 'flex_align_items', value ];
+			},
+			justifyContent: ( value ) => {
+				// Normalize start/end.
+				if ( [ 'start', 'end' ].includes( value ) ) {
+					value = `flex-${ value }`;
+				}
+
+				return [ 'flex_justify_content', value ];
+			},
+			fullWidth: () => {
+				return [ 'content_width', 'full' ];
+			},
+			boxed: () => {
+				return [ 'content_width', 'boxed' ];
 			},
 			border: ( value, settings ) => {
 				const [ size, style, color ] = value.split( ' ' );
@@ -202,7 +217,7 @@ export class HTML4Parser {
 		return result;
 	}
 
-	parseImg( node ) {
+	parseImage( node ) {
 		const result = {
 			elType: 'widget',
 			widgetType: 'image',
@@ -232,6 +247,9 @@ export class HTML4Parser {
 			color: ( value ) => {
 				return [ 'button_text_color', value ];
 			},
+			href: ( value ) => {
+				return [ 'link', { url: value } ];
+			},
 			hover_color: ( value ) => {
 				return [ 'hover_color', value ];
 			},
@@ -240,6 +258,9 @@ export class HTML4Parser {
 			...border( 'hover_border', 'button_hover_border' ),
 			...bgColor( 'bgColor', 'background' ),
 			...bgColor( 'hover_bgColor', 'button_background_hover' ),
+			padding: ( value ) => {
+				return [ 'text_padding', normalize4Sizes( value ) ];
+			},
 		};
 
 		result.settings = this.parseAttributes( node, attrsMap );

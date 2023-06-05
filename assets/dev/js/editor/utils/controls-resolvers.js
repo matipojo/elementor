@@ -1,4 +1,4 @@
-import { normalize4Sizes, parseGradient, parseSize } from './controls-parsers';
+import { normalize4Sizes, parseFont, parseGradient, parseSize } from './controls-parsers';
 
 export function common() {
 	return {
@@ -74,7 +74,7 @@ export function typography( prefix = 'typography' ) {
 		font: ( value, settings ) => {
 			settings[ `${ prefix }_typography` ] = 'custom';
 
-			return [ `${ prefix }_font_family`, value ];
+			return [ `${ prefix }_font_family`, parseFont( value ) ];
 		},
 		fontSize: ( value, settings ) => {
 			settings[ `${ prefix }_typography` ] = 'custom';

@@ -221,6 +221,9 @@ export class HTML4Parser {
 		const result = {
 			elType: 'widget',
 			widgetType: 'image',
+			__ai: {
+				prompt: node.getAttribute( '__text' ) || node.getAttribute( 'alt' ) || node.getAttribute( 'bgImage' ) || node.getAttribute( 'src' ),
+			},
 		};
 
 		const attrsMap = {

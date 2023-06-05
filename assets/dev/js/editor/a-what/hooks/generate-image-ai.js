@@ -14,6 +14,9 @@ export class GenerateImageAI extends After {
 	}
 
 	apply( args ) {
+		// TODO: Working with background in containers.
+		// TODO: Add loading to the images.
+
 		const elements = this.getAiElements( [ args.model ] );
 
 		console.log( elements );

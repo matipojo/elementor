@@ -60,6 +60,10 @@ export class HTML4Parser {
 				result = this.parseButton( node );
 				break;
 
+			case 'divider':
+				result = this.parseDivider( node );
+				break;
+
 			case 'image':
 				result = this.parseImage( node );
 				break;
@@ -70,7 +74,7 @@ export class HTML4Parser {
 
 		result.elements = [ ...node.children ].map( ( child ) => {
 			return this.parseNode( child );
-		} );
+		} ).filter( ( el ) => !! el.elType );
 
 		result.id = elementorCommon.helpers.getUniqueId();
 
@@ -263,6 +267,28 @@ export class HTML4Parser {
 			...bgColor( 'hover_bgColor', 'button_background_hover' ),
 			padding: ( value ) => {
 				return [ 'text_padding', normalize4Sizes( value ) ];
+			},
+		};
+
+		result.settings = this.parseAttributes( node, attrsMap );
+
+		return result;
+	}
+
+	parseDivider( node ) {
+		const result = {
+			elType: 'widget',
+			widgetType: 'divider',
+		};
+
+		const attrsMap = {
+			...common(),
+			color: ( value ) => {
+				return [ 'color', value ];
+			},
+			// Override things from common.
+			width: ( value ) => {
+				return [ 'width', parseSize( value, true ) ];
 			},
 		};
 

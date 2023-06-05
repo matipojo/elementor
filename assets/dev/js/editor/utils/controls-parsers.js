@@ -1,5 +1,5 @@
 export function parseSize( value, asObject = false ) {
-	let [ , size, unit ] = value.match( /^(\d+)(\D*)$/ ) || [];
+	let [ , size, unit ] = value.match( /^(-?\d+)(\D*)$/ ) || [];
 
 	if ( ! size ) {
 		size = 0;

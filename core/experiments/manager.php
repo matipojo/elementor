@@ -458,7 +458,7 @@ class Manager extends Base_Object {
 			), '<a target="_blank" href="https://go.elementor.com/wp-dash-ai-images/">', '</a>'),
 			'release_status' => self::RELEASE_STATUS_ALPHA,
 			'default' => self::STATE_INACTIVE,
-			'hidden' => true,
+			'hidden' => false,
 		] );
 	}
 

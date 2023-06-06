@@ -48,6 +48,10 @@ export class HTML4Parser {
 				result = this.parseContainer( node );
 				break;
 
+			case 'form':
+				result = this.parseForm( node );
+				break;
+
 			case 'title':
 				result = this.parseHeading( node );
 				break;
@@ -72,10 +76,7 @@ export class HTML4Parser {
 				break;
 		}
 
-		result.elements = [ ...node.children ].map( ( child ) => {
-			return this.parseNode( child );
-		} ).filter( ( el ) => !! el.elType );
-
+		result.elements = result.elements || [];
 		result.id = elementorCommon.helpers.getUniqueId();
 
 		return result;
@@ -173,6 +174,139 @@ export class HTML4Parser {
 			...result.settings,
 			...this.parseAttributes( node, attrsMap ),
 		};
+
+		result.elements = [ ...node.children ].map( ( child ) => {
+			return this.parseNode( child );
+		} ).filter( ( el ) => !! el.elType );
+
+		return result;
+	}
+
+	parseForm( node ) {
+		const result = {
+			elType: 'widget',
+			widgetType: 'form',
+			settings: {},
+		};
+
+		const attrsMap = {
+			...common(),
+		};
+
+		result.settings = {
+			...result.settings,
+			...this.parseAttributes( node, attrsMap ),
+		};
+
+		const inputs = [ ...node.querySelectorAll( 'input:not( [type="button"] ):not( [type="submit"] )' ) ];
+		result.settings.form_fields = inputs.map( ( input ) => this.parseFormTextInput( input ) );
+
+		const fieldsSettings = this.parseFormFields( inputs );
+
+		const button = node.querySelector( 'input[type="button"], input[type="submit"], button' );
+		const buttonSettings = this.parseFormButton( button );
+
+		result.settings = {
+			...result.settings,
+			...buttonSettings,
+			...fieldsSettings,
+		};
+
+		return result;
+	}
+
+	parseFormTextInput( node ) {
+		const allowedWidths = [ 20, 25, 30, 33, 40, 50, 60, 66, 70, 75, 80, 100 ];
+
+		const getClosestWidth = ( width ) => {
+			return allowedWidths.reduce( ( prev, curr ) => {
+				return ( Math.abs( curr - width ) < Math.abs( prev - width ) ? curr : prev );
+			} ).toString();
+		};
+
+		const getLabel = ( input ) => {
+			const id = input.getAttribute( 'id' );
+			const label = input.closest( 'form' ).querySelector( `label[for="${ id }"]` );
+
+			return label?.textContent || '';
+		};
+
+		return {
+			_id: elementorCommon.helpers.getUniqueId(),
+			field_label: getLabel( node ),
+			field_type: node.getAttribute( 'type' ) || 'text',
+			placeholder: node.getAttribute( 'placeholder' ) || '',
+			width: getClosestWidth( parseInt( node.getAttribute( 'width' ) ) || '100' ),
+		};
+	}
+
+	parseFormButton( node ) {
+		if ( ! node ) {
+			return {};
+		}
+
+		const allowedWidths = [ 20, 25, 30, 33, 40, 50, 60, 66, 70, 75, 80, 100 ];
+
+		const getClosestWidth = ( width ) => {
+			return allowedWidths.reduce( ( prev, curr ) => {
+				return ( Math.abs( curr - width ) < Math.abs( prev - width ) ? curr : prev );
+			} ).toString();
+		};
+
+		const attrsMap = {
+			...typography( 'button_typography' ),
+			...border( 'border', 'button_border' ),
+			bgColor: ( value ) => {
+				return [ 'button_background_color', value ];
+			},
+			color: ( value ) => {
+				return [ 'button_text_color', value ];
+			},
+			borderRadius: ( value ) => {
+				return [ 'button_border_radius', normalize4Sizes( value ) ];
+			},
+			padding: ( value ) => {
+				return [ 'button_text_padding', normalize4Sizes( value ) ];
+			},
+			hover_bgColor: ( value ) => {
+				return [ 'button_background_hover_color', value ];
+			},
+			hover_color: ( value ) => {
+				return [ 'button_hover_color', value ];
+			},
+		};
+
+		return {
+			button_width: getClosestWidth( parseInt( node.getAttribute( 'width' ) ) || '100' ),
+			button_align: node.getAttribute( 'align' ) || '',
+			button_text: node.textContent || node.getAttribute( 'value' ) || '',
+			...this.parseAttributes( node, attrsMap ),
+		};
+	}
+
+	parseFormFields( inputs ) {
+		const result = {};
+
+		const attrsMap = {
+			...typography( 'field_typography' ),
+			...border( 'border', 'field_border' ),
+			bgColor: ( value ) => {
+				return [ 'field_background_color', value ];
+			},
+			color: ( value ) => {
+				return [ 'field_text_color', value ];
+			},
+			borderRadius: ( value ) => {
+				return [ 'field_border_radius', normalize4Sizes( value ) ];
+			},
+			padding: ( value ) => {
+				return [ 'field_text_padding', normalize4Sizes( value ) ];
+			},
+		};
+
+		inputs.forEach( ( input ) => {
+			Object.assign( result, this.parseAttributes( input, attrsMap ) );
+		} );
 
 		return result;
 	}

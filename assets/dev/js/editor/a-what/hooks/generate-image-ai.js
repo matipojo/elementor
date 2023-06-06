@@ -63,7 +63,7 @@ export class GenerateImageAI extends After {
 		return elements
 			.flatMap( ( element ) => [
 				element,
-				...( element.elements.length > 0 ? this.getAiElements( element.elements ) : [] ),
+				...( element.elements?.length > 0 ? this.getAiElements( element.elements ) : [] ),
 			] )
 			.filter( ( element ) => element.__ai && 'image' === element.widgetType );
 	}

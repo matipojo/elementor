@@ -74,7 +74,7 @@
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
-	gap: 5px;
+	gap: 8px;
 }
 
 .elementor-add-section-area-button {
@@ -86,27 +86,31 @@
 	display: flex;
 	outline: none;
 	border: none;
-	background-color: var(--e-a-btn-bg);
-	color: var(--e-a-btn-color-invert);
+	background-color: $e-gray-100;
+	color: $e-gray-900;
 	transition: var(--e-a-transition-hover);
 	cursor: pointer;
 
 	&:hover {
-		background-color: var(--e-a-btn-bg-hover);
-		color: var(--e-a-btn-color-invert);
+		background-color: darken( $e-gray-100, 5% );
+		color: darken( $e-gray-900, 5% );
 	}
 
 	i {
 		margin: 0;
 	}
 
-	&.elementor-add-section-button {
+	&.e-block-ai-button {
 		background-color: var(--e-a-btn-bg-primary);
 		color: var(--e-a-btn-color);
 
 		&:hover {
 			background-color: var(--e-a-btn-bg-primary-hover);
 			color: var(--e-a-btn-color);
+		}
+
+		path {
+			fill: currentColor;
 		}
 	}
 }

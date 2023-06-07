@@ -23,6 +23,9 @@ export function common() {
 		align: ( value ) => {
 			return [ 'align', value ];
 		},
+		zIndex: ( value ) => {
+			return [ '_z_index', value ];
+		},
 	};
 }
 

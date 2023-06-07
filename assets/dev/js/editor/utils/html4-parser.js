@@ -140,6 +140,9 @@ export class HTML4Parser {
 
 				return [ 'flex_justify_content', value ];
 			},
+			wrap: () => {
+				return [ 'flex_wrap', 'wrap' ];
+			},
 			fullWidth: () => {
 				return [ 'content_width', 'full' ];
 			},

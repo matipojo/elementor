@@ -1,0 +1,35 @@
+.e-ai-prompt {
+
+	&-form {
+		position: fixed;
+		bottom: 12px;
+		left: 50%;
+		transform: translateX( -50% );
+		z-index: 9999;
+		background: #333;
+		display: flex;
+
+		&.e-hidden {
+			display: none;
+		}
+	}
+
+	&-input {
+		flex: 1;
+		padding: 0 12px;
+		border: 0;
+		background: transparent;
+		color: #fff;
+		font-size: 14px;
+		line-height: 1.5;
+	}
+
+	&-button {
+		padding: 0 12px;
+		border: 0;
+		background: transparent;
+		color: #fff;
+		font-size: 14px;
+		line-height: 1.5;
+	}
+}

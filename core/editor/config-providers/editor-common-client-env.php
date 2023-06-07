@@ -19,6 +19,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Editor_Common_Client_Env {
 	public static function get_client_env() {
+		if ( ! defined( 'OPEN_AI_API_KEY' ) ) {
+			wp_die( 'Define `OPEN_AI_API_KEY` in your wp-config!' );
+		}
+
 		$settings = SettingsManager::get_settings_managers_config();
 		// Moved to document since 2.9.0.
 		unset( $settings['page'] );
@@ -31,6 +35,7 @@ class Editor_Common_Client_Env {
 		$page_title_selector .= ', .elementor-page-title .elementor-heading-title';
 
 		$client_env = [
+			'openAiAPIKey' => OPEN_AI_API_KEY,
 			'initial_document' => $document->get_config(),
 			'version' => ELEMENTOR_VERSION,
 			'home_url' => home_url(),

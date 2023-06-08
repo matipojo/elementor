@@ -30,14 +30,11 @@ import ControlConditions from './utils/control-conditions';
 
 import * as elementTypes from './elements/types';
 import ElementBase from './elements/types/base/element-base';
-import { HTML4Parser } from 'elementor-editor-utils/html4-parser';
 
 /**
  * @typedef {import('./container/container')} Container
  */
 export default class EditorBase extends Marionette.Application {
-	html4Parser = new HTML4Parser();
-
 	widgetsCache = {};
 
 	config = {};

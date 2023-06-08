@@ -1,15 +1,22 @@
 import AWhatComponent from './component';
 import { listenTo, v1ReadyEvent } from '@elementor/editor-v1-adapters';
 import { injectIntoTop } from '@elementor/editor';
-// Import { registerSlice } from '@elementor/store';
+import { registerSlice } from '@elementor/store';
+import { slice } from './store';
 import Main from './components/main';
+import { Parser } from './parser/parser';
 
 export default function init() {
-	// RegisterSlice();
+	registerSlice( slice );
 
 	listenTo(
 		v1ReadyEvent(),
 		() => $e.components.register( new AWhatComponent() ),
+	);
+
+	listenTo(
+		v1ReadyEvent(),
+		() => window.elementor.html4Parser = new Parser(),
 	);
 
 	injectIntoTop( {

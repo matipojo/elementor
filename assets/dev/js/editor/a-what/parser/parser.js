@@ -1,7 +1,7 @@
 import { bgColor, bgGradient, border, common, typography } from './controls-resolvers';
 import { normalize4Sizes, parseSize } from './controls-parsers';
 
-export class HTML4Parser {
+export class Parser {
 	parse( xml ) {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString( xml, 'application/xml' );

@@ -1,6 +1,6 @@
 import { createSlice } from '@elementor/store';
 
-export default createSlice( {
+export const slice = createSlice( {
 	name: 'a-what',
 	initialState: {
 		results: {},

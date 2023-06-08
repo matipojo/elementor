@@ -186,6 +186,10 @@ class AddSectionBase extends Marionette.ItemView {
 	}
 
 	onRender() {
+		setTimeout( () => {
+			window.dispatchEvent( new CustomEvent( 'elementor/add-new-section' ) );
+		}, 0 );
+
 		this.$el.html5Droppable( {
 			axis: [ 'vertical' ],
 			groups: [ 'elementor-element' ],

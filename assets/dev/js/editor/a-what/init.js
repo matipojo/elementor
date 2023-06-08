@@ -1,7 +1,7 @@
 import AWhatComponent from './component';
 import { listenTo, v1ReadyEvent } from '@elementor/editor-v1-adapters';
 import { injectIntoTop } from '@elementor/editor';
-import GenerateWithAiButton from './components/generate-with-ai-button';
+import Main from './components/main';
 
 export default function init() {
 	listenTo(
@@ -11,6 +11,6 @@ export default function init() {
 
 	injectIntoTop( {
 		id: 'a-what-buttons',
-		filler: GenerateWithAiButton,
+		filler: Main,
 	} );
 }

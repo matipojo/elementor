@@ -1,6 +1,4 @@
-import After from 'elementor-api/modules/hooks/data/after';
-
-export class GenerateImageAI extends After {
+export class GenerateImageAI extends $e.modules.hookData.After {
 	getCommand() {
 		return 'document/elements/create';
 	}

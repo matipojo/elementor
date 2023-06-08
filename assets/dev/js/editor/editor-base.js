@@ -26,7 +26,6 @@ import Breakpoints from 'elementor-utils/breakpoints';
 import Events from 'elementor-utils/events';
 import DocumentComponent from './document/component';
 import DataGlobalsComponent from './data/globals/component';
-import AWhatComponent from './a-what/component';
 import ControlConditions from './utils/control-conditions';
 
 import * as elementTypes from './elements/types';
@@ -425,8 +424,6 @@ export default class EditorBase extends Marionette.Application {
 		$e.components.register( new DocumentComponent() );
 
 		$e.components.register( new PreviewComponent() );
-
-		$e.components.register( new AWhatComponent() );
 
 		// TODO: Remove, BC Since 2.9.0.
 		elementor.saver = $e.components.get( 'document/save' );

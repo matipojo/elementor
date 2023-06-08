@@ -29,6 +29,13 @@ const packages = Object.keys( dependencies )
 	   }
 	} );
 
+packages.push({
+	packageName: '@elementor/a-what',
+	type: 'extension',
+	name: 'a-what',
+	path: path.resolve( __dirname, '../assets/dev/js/editor/a-what/index.js' ),
+})
+
 const common = {
 	name: 'packages',
 	entry: Object.fromEntries(
@@ -46,6 +53,30 @@ const common = {
 		} ),
 		new ExternalizeWordPressAssetsWebpackPlugin( { globalKey: '__UNSTABLE__elementorPackages' } ),
 	],
+	module: {
+		rules: [
+			{
+				test: /\.js$/,
+				exclude: /node_modules/,
+				use: [
+					{
+						loader: 'babel-loader',
+						options: {
+							presets: [ '@wordpress/default' ],
+							plugins: [
+								[ '@wordpress/babel-plugin-import-jsx-pragma' ],
+								[ '@babel/plugin-transform-react-jsx', {
+									'pragmaFrag': 'React.Fragment',
+								} ],
+								[ '@babel/plugin-transform-runtime' ],
+								[ '@babel/plugin-transform-modules-commonjs' ],
+							],
+						},
+					},
+				],
+			},
+		],
+	},
 	output: {
 		path: path.resolve( __dirname, '../assets/js/packages/' ),
 	},

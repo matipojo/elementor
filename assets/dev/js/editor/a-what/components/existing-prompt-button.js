@@ -28,6 +28,8 @@ export default function ExistingPromptButton( { elementId } ) {
 			},
 			options: { at },
 		} );
+
+		console.log( ! container ? `${ elementId } created` : `${ elementId } updated` );
 	}, [ results.current?.id ] );
 
 	// TODO: Here should be a portal to the element with button to open the prompt modal.

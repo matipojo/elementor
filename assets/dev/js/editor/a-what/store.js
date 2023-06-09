@@ -2,7 +2,9 @@ import { createSelector, createSlice } from '@elementor/store';
 
 let id = 1;
 
-const selectResults = ( state ) => state.aWhat.results;
+// Selectors
+export const selectResults = ( state ) => state.aWhat.results;
+export const selectStatus = ( state ) => state.aWhat.status;
 
 export const selectElementResults = createSelector(
 	selectResults,
@@ -31,29 +33,40 @@ export const selectElementsIds = createSelector(
 	}, [] ),
 );
 
+// Slice
 export const slice = createSlice( {
 	name: 'aWhat',
 	initialState: {
 		results: {},
+		status: 'idle',
 	},
 	reducers: {
-		push( state, { payload: { elementId, prompt, result } } ) {
-			const lastResult = Object.values( state.results )
+		start( state, { payload: { elementId, prompt } } ) {
+			state.status = 'pending';
+
+			const lastResult = Object
+				.values( state.results )
 				.find( ( item ) => item.elementId === elementId && 0 === item.position );
 
 			if ( lastResult ) {
 				lastResult.nextPrompt = prompt;
-			} else {
-				state.results[ id ] = {
-					id,
-					elementId,
-					nextPrompt: prompt,
-					result: null,
-					position: 0,
-				};
 
-				id++;
+				return;
 			}
+
+			state.results[ id ] = {
+				id,
+				elementId,
+				nextPrompt: prompt,
+				result: null,
+				position: 0,
+			};
+
+			id++;
+		},
+
+		end( state, { payload: { elementId, result } } ) {
+			state.status = 'idle';
 
 			Object.values( state.results ).forEach( ( item ) => {
 				if ( item.elementId !== elementId ) {

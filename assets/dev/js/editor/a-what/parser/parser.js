@@ -2,7 +2,7 @@ import { bgColor, bgGradient, border, common, typography } from './controls-reso
 import { normalize4Sizes, parseSize } from './controls-parsers';
 
 export class Parser {
-	parse( xml ) {
+	parse( xml, elementId = null ) {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString( xml, 'application/xml' );
 
@@ -10,7 +10,7 @@ export class Parser {
 
 		return {
 			content: [
-				this.parseNode( node ),
+				this.parseNode( node, elementId ),
 			],
 		};
 	}
@@ -29,8 +29,9 @@ export class Parser {
 
 	/**
 	 * @param {Element} node
+	 * @param {string}  id
 	 */
-	parseNode( node ) {
+	parseNode( node, id = null ) {
 		let result = {};
 
 		// Add text content as attribute.
@@ -77,7 +78,7 @@ export class Parser {
 		}
 
 		result.elements = result.elements || [];
-		result.id = elementorCommon.helpers.getUniqueId();
+		result.id = id || elementorCommon.helpers.getUniqueId();
 
 		return result;
 	}

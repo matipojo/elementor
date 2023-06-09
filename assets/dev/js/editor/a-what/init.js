@@ -1,4 +1,4 @@
-import AWhatComponent from './component';
+import AWhatComponent from './e-component/component';
 import { listenTo, v1ReadyEvent } from '@elementor/editor-v1-adapters';
 import { injectIntoTop } from '@elementor/editor';
 import { registerSlice } from '@elementor/store';

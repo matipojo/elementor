@@ -18,6 +18,19 @@ export const selectElementResults = createSelector(
 	},
 );
 
+export const selectElementsIds = createSelector(
+	selectResults,
+	( results ) => Object.values( results ).reduce( ( acc, item ) => {
+		if ( acc.includes( item.elementId ) ) {
+			return acc;
+		}
+
+		acc.push( item.elementId );
+
+		return acc;
+	}, [] ),
+);
+
 export const slice = createSlice( {
 	name: 'aWhat',
 	initialState: {
@@ -29,13 +42,13 @@ export const slice = createSlice( {
 				.find( ( item ) => item.elementId === elementId && 0 === item.position );
 
 			if ( lastResult ) {
-				lastResult.prompt = prompt;
+				lastResult.nextPrompt = prompt;
 			} else {
 				state.results[ id ] = {
 					id,
 					elementId,
-					prompt,
-					prevResult: null,
+					nextPrompt: prompt,
+					result: null,
 					position: 0,
 				};
 
@@ -57,8 +70,8 @@ export const slice = createSlice( {
 			state.results[ id ] = {
 				id,
 				elementId,
-				prevResult: result,
-				prompt: null,
+				result,
+				nextPrompt: null,
 				position: 0,
 			};
 

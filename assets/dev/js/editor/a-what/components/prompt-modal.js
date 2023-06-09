@@ -21,7 +21,8 @@ export default function PromptModal( { open, onClose } ) {
 		// 3. Pass it the the "push" action
 
 		setTimeout( () => {
-			const aiPromptResult = '<row><image>Pikachu<image><row>';
+			const prompt = event.target.prompt.value;
+			const aiPromptResult = `<row><text>${ prompt }</text></row>`;
 
 			const { content: [ element ] } = window.elementor.html4Parser.parse(
 				aiPromptResult,
@@ -32,13 +33,12 @@ export default function PromptModal( { open, onClose } ) {
 
 			dispatch( slice.actions.push( {
 				elementId: element.id,
-				prompt: event.target.prompt.value,
+				prompt,
 				result: JSON.stringify( element ),
 			} ) );
 
 			setLoading( false );
-
-			onClose();
+			event.target.prompt.value = '';
 		}, 1500 );
 	};
 
@@ -77,11 +77,11 @@ export default function PromptModal( { open, onClose } ) {
 				<TextField
 					sx={ { width: '100%' } }
 					name="prompt"
-					defaultValue={ results.current?.prompt || '' }
-					key={ results.current?.prompt || '__EMPTY__' }
+					defaultValue={ results.current?.nextPrompt || '' }
+					key={ results.current?.nextPrompt || '__EMPTY__' }
 				/>
 				<Button variant="contained" type="submit" disabled={ loading }>
-					{ results.current?.prompt ? 'Regenerate' : 'Generate' }
+					{ results.current?.nextPrompt ? 'Regenerate' : 'Generate' }
 				</Button>
 			</form>
 		</Drawer>

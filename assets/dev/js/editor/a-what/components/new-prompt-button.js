@@ -3,7 +3,7 @@ import { Portal } from '@elementor/ui';
 import { AIIcon } from '@elementor/icons';
 import { useListenTo, windowEvent } from '@elementor/editor-v1-adapters';
 
-export default function GenerateWithAiButton( { onClick } ) {
+export default function NewPromptButton( { onClick } ) {
 	const [ elements, setElements ] = useState( [] );
 
 	useListenTo(

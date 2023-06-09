@@ -50,11 +50,6 @@ export default function PromptModal( { open, onClose } ) {
 		dispatch( slice.actions.redo( { elementId } ) );
 	};
 
-	// TODO:
-	// 1. Create a component for side effects
-	// 2. When new result created, update the preview
-	// 3. When current result changes, update the editor
-
 	return (
 		<Drawer
 			anchor="bottom"

@@ -17,16 +17,9 @@ export default function PromptModal( { open, onClose } ) {
 
 		dispatch( slice.actions.start( { elementId, prompt } ) );
 
-		// TODO
-		// 1. Send the request to the server
-		// 2. Get the response and parse it
-		// 3. Pass it the the "push" action
-		const result = await send( { prompt, elementId } );
+		const result = await request( prompt );
 
-		dispatch( slice.actions.end( {
-			elementId: result.id,
-			result: JSON.stringify( result ),
-		} ) );
+		dispatch( slice.actions.end( { elementId, result } ) );
 	};
 
 	const undo = ( { elementId } ) => dispatch( slice.actions.undo( { elementId } ) );
@@ -82,17 +75,6 @@ export default function PromptModal( { open, onClose } ) {
 			</form>
 		</Drawer>
 	);
-}
-
-async function send( { elementId, prompt } ) {
-	const aiPromptResult = await request( prompt );
-
-	const { content: [ element ] } = window.elementor.html4Parser.parse(
-		aiPromptResult,
-		elementId || null,
-	);
-
-	return element;
 }
 
 function request( prompt ) {

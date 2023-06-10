@@ -9,7 +9,11 @@ export default function ExistingPromptButton( { elementId } ) {
 		const container = window.elementor.getContainer( elementId );
 		const previewContainer = elementor.getPreviewContainer();
 
-		const content = JSON.parse( results.current?.result );
+		const { content: [ model ] } = window.elementor.html4Parser.parse(
+			results.current?.result || '<row></row>',
+			elementId || null,
+		);
+
 		let at = null;
 
 		if ( container ) {
@@ -20,12 +24,7 @@ export default function ExistingPromptButton( { elementId } ) {
 
 		$e.run( 'document/elements/create', {
 			container: previewContainer,
-			model: content || {
-				elType: 'container',
-				settings: {},
-				elements: [],
-				id: elementId,
-			},
+			model,
 			options: { at },
 		} );
 

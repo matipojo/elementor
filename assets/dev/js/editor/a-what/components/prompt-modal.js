@@ -20,6 +20,8 @@ export default function PromptModal( { open, onClose } ) {
 		const result = await request( prompt );
 
 		dispatch( slice.actions.end( { elementId, result } ) );
+
+		setDebugElementId( elementId );
 	};
 
 	const undo = ( { elementId } ) => dispatch( slice.actions.undo( { elementId } ) );

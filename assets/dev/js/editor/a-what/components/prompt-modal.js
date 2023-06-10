@@ -17,7 +17,10 @@ export default function PromptModal( { open, onClose } ) {
 
 		dispatch( slice.actions.start( { elementId, prompt } ) );
 
-		const result = await request( prompt );
+		const result = await request( {
+			prompt,
+			results: [ results.current, ...results.past ].filter( Boolean ),
+		} );
 
 		dispatch( slice.actions.end( { elementId, result } ) );
 
@@ -79,10 +82,27 @@ export default function PromptModal( { open, onClose } ) {
 	);
 }
 
-function request( prompt ) {
+function request( { prompt, results } ) {
 	const body = {
 		messages: [
 			...defaultMessages,
+			...results.reduce( ( acc, result ) => {
+				if ( result.nextPrompt ) {
+					acc.push( {
+						role: 'user',
+						content: result.nextPrompt,
+					} );
+				}
+
+				if ( result.result ) {
+					acc.push( {
+						role: 'assistant',
+						content: result.result,
+					} );
+				}
+
+				return acc;
+			}, [] ),
 			{
 				role: 'user',
 				content: prompt,

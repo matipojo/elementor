@@ -76,6 +76,8 @@ class Editor_V2_Config_Provider implements Config_Provider_Interface {
 	}
 
 	public function get_client_env() {
+		$this->register_ai_client_env();
+
 		$client_env = apply_filters( 'elementor/editor-v2/packages/client-env', [] );
 
 		$v2_env = [
@@ -143,5 +145,16 @@ class Editor_V2_Config_Provider implements Config_Provider_Interface {
 		}
 
 		return $this->packages_data;
+	}
+
+	private function register_ai_client_env() {
+		add_filter( 'elementor/editor-v2/packages/client-env', function( $env ) {
+			$env['@elementor/a-what'] = [
+				'apiURL' => 'https://api.openai.com/v1/chat/completions',
+				'apiKey' => OPEN_AI_API_KEY,
+			];
+
+			return $env;
+		} );
 	}
 }

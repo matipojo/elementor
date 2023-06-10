@@ -5,8 +5,11 @@ import { registerSlice } from '@elementor/store';
 import { slice } from './store';
 import Main from './components/main';
 import { Parser } from './parser/parser';
+import { validateEnv } from './env';
 
 export default function init() {
+	validateEnv();
+
 	registerSlice( slice );
 
 	listenTo(

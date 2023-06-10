@@ -56,7 +56,6 @@ class AddSectionBase extends Marionette.ItemView {
 		return {
 			'click @ui.addSectionButton': 'onAddSectionButtonClick',
 			'click @ui.addTemplateButton': 'onAddTemplateButtonClick',
-			'click @ui.aiButton': 'onAiBlockButtonClick',
 			'click @ui.closeButton': 'onCloseButtonClick',
 			'click @ui.backButton': () => this.setView( AddSectionBase.getSelectType() ),
 			'click @ui.presets': 'onPresetSelected',
@@ -65,26 +64,6 @@ class AddSectionBase extends Marionette.ItemView {
 			'click @ui.gridPresetButton': () => this.setView( AddSectionBase.VIEW_CONTAINER_GRID_PRESET ),
 			'click @ui.chooseGridPreset': 'onGridPresetSelected',
 		};
-	}
-
-	promptArea = null;
-
-	constructor( ...args ) {
-		super( ...args );
-
-		const element = document.createElement( 'div' );
-
-		element.innerHTML = document.getElementById( 'e-ai-prompt-form' ).innerHTML;
-
-		this.promptArea = element.querySelector( '.e-ai-prompt-form' );
-
-		this.promptArea.classList.add( 'e-hidden' );
-
-		document.body.appendChild( this.promptArea );
-	}
-
-	onAiBlockButtonClick() {
-		this.promptArea.classList.remove( 'e-hidden' );
 	}
 
 	behaviors() {

@@ -15,13 +15,6 @@ function echo_select_your_structure_title() {
 	</div>
 </script>
 
-<template id="e-ai-prompt-form">
-	<form class="e-ai-prompt-form">
-		<input type="text" class="e-ai-prompt-input" placeholder="Enter your prompt" />
-		<button class="e-ai-prompt-button">Submit</button>
-	</form>
-</template>
-
 <script type="text/template" id="tmpl-elementor-add-section">
 	<div class="elementor-add-section-inner">
 		<div class="elementor-add-section-close elementor-wizard-icon">

@@ -4,9 +4,9 @@ import { normalize4Sizes, parseSize } from './controls-parsers';
 export class Parser {
 	parse( xml, elementId = null ) {
 		const parser = new DOMParser();
-		const doc = parser.parseFromString( xml, 'application/xml' );
+		const doc = parser.parseFromString( xml, 'text/html' );
 
-		const node = doc.firstElementChild;
+		const node = doc.body.firstElementChild;
 
 		return {
 			content: [
@@ -43,7 +43,7 @@ export class Parser {
 
 		node.setAttribute( '__text', text );
 
-		switch ( node.tagName ) {
+		switch ( node.tagName.toLocaleLowerCase() ) {
 			case 'row':
 			case 'column':
 				result = this.parseContainer( node );
@@ -93,7 +93,7 @@ export class Parser {
 		const result = {
 			elType: 'container',
 			settings: {
-				flex_direction: node.tagName,
+				flex_direction: node.tagName.toLocaleLowerCase(),
 				content_width: isRootNode ? 'boxed' : 'full',
 			},
 		};

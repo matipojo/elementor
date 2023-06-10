@@ -2,6 +2,8 @@ import { Box, Button, Divider, Drawer, TextField, Typography } from '@elementor/
 import { useDispatch, useSelector } from '@elementor/store';
 import { useState } from 'react';
 import { selectElementResults, selectStatus, slice } from '../store';
+import defaultMessages from '../api/messages';
+import { env } from '../env';
 
 export default function PromptModal( { open, onClose } ) {
 	const [ debugElementId, setDebugElementId ] = useState( '' );
@@ -82,15 +84,40 @@ export default function PromptModal( { open, onClose } ) {
 	);
 }
 
-function send( { elementId, prompt } ) {
-	return new Promise( ( resolve ) => {
-		const aiPromptResult = `<row><text>${ prompt }</text></row>`;
+async function send( { elementId, prompt } ) {
+	const aiPromptResult = await request( prompt );
 
-		const { content: [ element ] } = window.elementor.html4Parser.parse(
-			aiPromptResult,
-			elementId || null,
-		);
+	const { content: [ element ] } = window.elementor.html4Parser.parse(
+		aiPromptResult,
+		elementId || null,
+	);
 
-		setTimeout( () => resolve( element ), 1500 );
-	} );
+	return element;
+}
+
+function request( prompt ) {
+	const body = {
+		messages: [
+			...defaultMessages,
+			{
+				role: 'user',
+				content: prompt,
+			},
+		],
+		model: 'gpt-3.5-turbo',
+	};
+
+	const headers = {
+		'Content-Type': 'application/json',
+		Authorization: `Bearer ${ env.apiKey }`,
+	};
+
+	return fetch( env.apiURL, {
+		method: 'POST',
+		headers,
+		body: JSON.stringify( body ),
+	} )
+		.then( ( response ) => response.json() )
+		.then( ( data ) => data.choices[ 0 ].message.content )
+		.catch( ( error ) => console.log( error ) );
 }

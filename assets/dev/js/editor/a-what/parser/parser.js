@@ -70,6 +70,7 @@ export class Parser {
 				break;
 
 			case 'image':
+			case 'img':
 				result = this.parseImage( node );
 				break;
 

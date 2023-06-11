@@ -7,7 +7,7 @@ const defaultMessages = [
 			the allowed attributes are color, bgColor, bgImage, bgGradient, height, width, padding, margin, gap, alignItems, justifyContent, border, borderRadius, font, fontSize, fontWeight, align, fullWidth, boxed.
 			image tags and bgImage attributes don't have URLs of images but descriptions of them.
 			based on this XML guidelines, create a section about fitness and training.
-			create 2 columns. the left one should have subtitle, title, text and button. the right one should only have a background image.
+			create a modern layout of 2 columns. the left one should have subtitle, title, text and button. the right one should only have a background image.
 			use red, yellow, white and black color scheme`,
 	},
 	{
@@ -30,7 +30,7 @@ const defaultMessages = [
 	},
 	{
 		role: 'user',
-		content: `now, based on this knowledge, create a section for digital agency company with subtle pink gradient background, with some text and 4 images of people`,
+		content: `create a gallery based layout for digital agency company with subtle pink gradient background, with some text and 4 images of people`,
 	},
 	{
 		role: 'assistant',
@@ -51,7 +51,7 @@ const defaultMessages = [
 	},
 	{
 		role: 'user',
-		content: `create a "meet our team" block with high-end layout design, with alternating images positions`,
+		content: `create a complex layout with overlapping images using negative margins of "meet our team" block with high-end layout design, with alternating images positions`,
 	},
 	{
 		role: 'assistant',
@@ -72,7 +72,7 @@ const defaultMessages = [
 	},
 	{
 		role: 'user',
-		content: `create a cool about section for graphic design agency, with cool layout and modern design`,
+		content: `create a detailed "about" section for graphic design agency, with cool layout and modern design. use interesting layout.`,
 	},
 	{
 		role: 'assistant',
@@ -85,17 +85,17 @@ const defaultMessages = [
 					<text align="center" color="#8D8D8D" font="Poppins" fontWeight="400" fontSize="18px" padding="0 10%">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
 				</column>
 				<row boxed="true" width="1050px" justifyContent="space-between" gap="5%">
-						<column width="45%">
-								<image width="100%">Creative graphic designer brainstorming ideas at office desk</image>
-							</column>
-							<column width="45%">
-									<column boxed="true" width="100%" gap="30px" padding="0">
-										<divider width="90px" color="#5E5E5E"></divider>
-										<title color="#5C5B5B" font="Poppins" fontWeight="700" fontSize="22px">The best of your ideas combined with our creativity</title>
-										<text color="#8D8D8D" font="Poppins" fontWeight="400" fontSize="18px" padding="20px 0">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
-										<button href="/services" color="#fff" bgColor="#5E5E5E" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">See our services</button>
-									</column>
+					<column width="45%">
+							<image width="100%">Creative graphic designer brainstorming ideas at office desk</image>
+					</column>
+					<column width="45%">
+						<column boxed="true" width="100%" gap="30px" padding="0">
+							<divider width="90px" color="#5E5E5E"></divider>
+							<title color="#5C5B5B" font="Poppins" fontWeight="700" fontSize="22px">The best of your ideas combined with our creativity</title>
+							<text color="#8D8D8D" font="Poppins" fontWeight="400" fontSize="18px" padding="20px 0">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
+							<button href="/services" color="#fff" bgColor="#5E5E5E" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">See our services</button>
 						</column>
+					</column>
 				</row>
 			</column>`,
 	},

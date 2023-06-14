@@ -427,7 +427,6 @@ export class Parser {
 		return result;
 	}
 
-	//TODO: alignment & icon pattern (user and etc)
 	parseIcon( node ) {
 		const result = {
 			elType: 'widget',
@@ -442,10 +441,12 @@ export class Parser {
 			fontSize: ( value ) => {
 				return [ 'size', parseSize( value, true ) ];
 			},
+			selected_icon: ( value ) => {
+				return  [ 'selected_icon',  { value, library: 'fa-solid' } ];
+			}
 		};
 
 		result.settings = this.parseAttributes( node, attrsMap );
-
 		return result;
 	}
 

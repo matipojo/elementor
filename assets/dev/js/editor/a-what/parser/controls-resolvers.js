@@ -24,7 +24,9 @@ export function common() {
 			return [ 'align', value ];
 		},
 		zIndex: ( value ) => {
-			return [ '_z_index', value ];
+			value = Math.max( 0, parseInt( value ) );
+
+			return [ '_z_index', value.toString() ];
 		},
 	};
 }

@@ -25,8 +25,8 @@
 	--e-p-border-column-invert: 	#{$e-gray-900};
 
 	//Inner container handle like columns
-	--e-p-border-con-in:			#{$e-gray-300};
-	--e-p-border-con-in-hover: 		#{$e-gray-400};
+	--e-p-border-con-in:			#e6e8ea;
+	--e-p-border-con-in-hover: 		#{darken(#e6e8ea, 8%)};
 	--e-p-border-con-in-invert: 	#{$e-gray-900};
 
 	--e-p-border-widget: 			#{$e-pink-300};

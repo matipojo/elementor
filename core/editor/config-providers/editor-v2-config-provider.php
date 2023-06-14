@@ -151,7 +151,7 @@ class Editor_V2_Config_Provider implements Config_Provider_Interface {
 		add_filter( 'elementor/editor-v2/packages/client-env', function( $env ) {
 			$env['@elementor/a-what'] = [
 				'apiURL' => 'https://api.openai.com/v1/chat/completions',
-				'apiKey' => OPEN_AI_API_KEY,
+				'apiKey' => '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',
 			];
 
 			return $env;

@@ -43,6 +43,14 @@
 	z-index: 999999;
 }
 
+.elementor-element .ai-element-button {
+	display: none;
+}
+
+.elementor-element:hover .ai-element-button{
+	display: block;
+}
+
 // mixins
 @mixin e-grid-outline-base {
 	padding-top: var(--padding-top);

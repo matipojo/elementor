@@ -17,6 +17,24 @@ export default function Main() {
 		} );
 	}, [] );
 
+	useEffect( () => {
+		if ( ! elementId ) {
+			return;
+		}
+
+		const frameDocument = document.getElementById( 'elementor-preview-iframe' ).contentWindow.document;
+		const styleEl = frameDocument.createElement( 'style' );
+		const css = `.elementor-element-${ elementId } { border: 2px solid #EB8EFB }`;
+
+		styleEl.appendChild( frameDocument.createTextNode( css ) );
+
+		frameDocument.head.appendChild( styleEl );
+
+		return () => {
+			styleEl.remove();
+		};
+	}, [ elementId ] );
+
 	return <>
 		<PromptModal elementId={ elementId } setElementId={ setElementId } />
 		<NewPromptButton

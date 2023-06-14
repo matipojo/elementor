@@ -9,9 +9,9 @@ const siteTypes = [
 export default function BusinessStep( { setData } ) {
 	const setState = ( key, value ) => setData( ( prev ) => ( { ...prev, [ key ]: value } ) );
 
-	const handleType = ( e ) => setState( 'businessType', siteTypes[ e.target.value ] );
-	const handleName = ( e ) => setState( 'businessName', e.target.value );
-	const handleDescription = ( e ) => setState( 'businessDescription', e.target.value );
+	const handleType = ( e ) => setState( 'type', siteTypes[ e.target.value ] );
+	const handleName = ( e ) => setState( 'name', e.target.value );
+	const handleDescription = ( e ) => setState( 'description', e.target.value );
 
 	return (
 		<Stack spacing={ 7 } width="100%">
@@ -32,7 +32,7 @@ export default function BusinessStep( { setData } ) {
 								disablePortal
 								id="combo-box-demo"
 								options={ siteTypes }
-								renderInput={ ( params ) => <TextField color="secondary" { ...params } label="Movie" /> }
+								renderInput={ ( params ) => <TextField color="secondary" { ...params } label="Select a business type" /> }
 								onChange={ handleType }
 								color="secondary"
 							/>

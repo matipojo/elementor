@@ -1,26 +1,26 @@
 import { Box, Stepper, Step, StepLabel, Stack, Button } from '@elementor/ui';
 import { useState } from 'react';
 import BusinessStep from './steps/business-step';
-import StyleStep from './steps/style-step';
 import BlocksStep from './steps/blocks-step';
+import StyleStep from './steps/style-step';
 
-export default function Steps( { activeStep, setActiveStep, setData, data } ) {
+export default function Steps( { activeStep, setActiveStep, data, setData } ) {
+	const [ skipped, setSkipped ] = useState( new Set() );
+
 	const steps = [
 		{
 			label: 'Business Info',
-			filler: <BusinessStep setData={ setData } />,
-		},
-		{
-			label: 'Look and Feel',
-			filler: <StyleStep setData={ setData } />,
+			filler: <BusinessStep data={ data } setData={ setData } />,
 		},
 		{
 			label: 'Building Blocks',
-			filler: <BlocksStep setData={ setData } />,
+			filler: <BlocksStep data={ data } setData={ setData } />,
+		},
+		{
+			label: 'Look and Feel',
+			filler: <StyleStep data={ data } setData={ setData } />,
 		},
 	];
-
-	const [ skipped, setSkipped ] = useState( new Set() );
 
 	const isStepSkipped = ( step ) => {
 		return skipped.has( step );
@@ -42,14 +42,12 @@ export default function Steps( { activeStep, setActiveStep, setData, data } ) {
 	};
 
 	const handleFinish = () => {
-
+		console.log( 'data', data );
 	};
 
 	return (
 		<Box sx={ { height: '100vh' } } >
-			{ /* <DialogHeader /> */ }
-
-			<Stepper activeStep={ 1 } alternativeLabel sx={ { py: 10 } }>
+			<Stepper activeStep={ activeStep } alternativeLabel sx={ { py: 10 } }>
 				{ steps.map( ( step ) => (
 					<Step key={ step.label }>
 						<StepLabel>{ step.label }</StepLabel>

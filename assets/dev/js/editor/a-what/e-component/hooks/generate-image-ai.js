@@ -14,25 +14,23 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 	apply( args ) {
 		window.prompt_image_map = window.prompt_image_map || {};
 
-		// TODO: Working with background in containers.
-		// TODO: Add loading to the images.
-
 		const elements = this.getAiElements( [ args.model ] );
 
 		console.log( elements );
 
 		elements.forEach( async ( element ) => {
+			this.toggleLoader( element, true );
+
 			const prompt = element.__ai.prompt;
+			window.prompt_image_map[ element.id ] = window.prompt_image_map[ element.id ] || {};
 
 			const isBg = 'container' === element.elType;
-			const key = prompt + isBg ? '__bg' : 'normal';
+			const key = `${ prompt }${ isBg ? '__bg' : '__normal' }`;
 
-			console.log( `loading image for ${ element.id }` );
+			let imageUrl;
 
-			let imageUrl = null;
-
-			if ( window.prompt_image_map[ key ] ) {
-				imageUrl = window.prompt_image_map[ key ];
+			if ( window.prompt_image_map[ element.id ][ key ] ) {
+				imageUrl = window.prompt_image_map[ element.id ][ key ];
 			} else {
 				const { images: [ { image_url } ] } = await request(
 					'ai_get_text_to_image',
@@ -40,7 +38,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 						prompt,
 						promptSettings: {
 							image_type: ! isBg ? 'photographic' : 'background',
-							style_preset: ! isBg ? 'portrait' : '',
+							style_preset: '',
 							image_strength: 0,
 							ratio: ! isBg ? '3:4' : '16:9',
 						},
@@ -49,7 +47,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				);
 
 				imageUrl = image_url;
-				window.prompt_image_map[ key ] = image_url;
+				window.prompt_image_map[ element.id ][ key ] = image_url;
 			}
 
 			if ( isBg ) {
@@ -91,6 +89,8 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 					},
 				} );
 			}
+
+			this.toggleLoader( element, false );
 		} );
 
 		return true;
@@ -102,7 +102,31 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				element,
 				...( element.elements?.length > 0 ? this.getAiElements( element.elements ) : [] ),
 			] )
-			.filter( ( element ) => element.__ai && ( 'image' === element.widgetType || 'container' === element.elType ) );
+			.filter( ( element ) => element.__ai && element.__ai.prompt && ( 'image' === element.widgetType || 'container' === element.elType ) );
+	}
+
+	toggleLoader( elementData, loading ) {
+		const container = elementor.getContainer( elementData.id );
+		const element = container?.view?.$el;
+
+		if ( ! element.get( 0 ) ) {
+			return;
+		}
+
+		if ( 'container' === elementData.elType ) {
+			if ( loading ) {
+				element.get( 0 ).classList.add( 'ai-loading' );
+			} else {
+				element.get( 0 ).classList.remove( 'ai-loading' );
+			}
+		} else if ( loading ) {
+			console.log( element );
+			element.append(
+				`<div class="ai-loading ai-loading-elements" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>`,
+			);
+		} else {
+			element.querySelectorAll( '.ai-loading-elements' )?.remove?.();
+		}
 	}
 }
 

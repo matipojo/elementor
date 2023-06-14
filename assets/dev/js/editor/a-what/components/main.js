@@ -1,14 +1,21 @@
 import NewPromptButton from './new-prompt-button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PromptModal from './prompt-modal';
 import { useSelector } from '@elementor/store';
 import { selectElementsIds } from '../store';
 import ExistingPromptButton from './existing-prompt-button';
-import { openRoute } from '@elementor/editor-v1-adapters';
+import { listenTo, openRoute, windowEvent } from '@elementor/editor-v1-adapters';
 
 export default function Main() {
 	const [ elementId, setElementId ] = useState( null );
 	const elementsIds = useSelector( selectElementsIds );
+
+	useEffect( () => {
+		return listenTo( windowEvent( 'elementor/prompt/open' ), ( e ) => {
+			openRoute( 'panel/no-panel' );
+			setElementId( e.originalEvent.detail.id );
+		} );
+	}, [] );
 
 	return <>
 		<PromptModal elementId={ elementId } setElementId={ setElementId } />
@@ -23,7 +30,6 @@ export default function Main() {
 		{ elementsIds.map( ( eId ) => <ExistingPromptButton
 			key={ eId }
 			elementId={ eId }
-			setElementId={ setElementId }
 		/> ) }
 	</>;
 }

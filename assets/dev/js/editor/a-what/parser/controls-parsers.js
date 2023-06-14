@@ -72,6 +72,27 @@ export function normalize4Sizes( value ) {
 	};
 }
 
+export function globalizeColor( controlId, color ) {
+	let matchedColor = 'text';
+
+	const regex = /--(\w+)-color/;
+	const match = color.match( regex );
+	if ( match ) {
+		matchedColor = match[ 1 ];
+	} else {
+		return [ controlId, color ];
+	}
+
+	return [
+		{
+			[ controlId ]: '',
+			__globals__: {
+				[ controlId ]: 'globals/colors?id=' + matchedColor,
+			},
+		},
+	];
+}
+
 export function parseGradient( bgGradient ) {
 	// Define the regular expression patterns to match different types of gradients
 	const linearPattern = /linear-gradient\((.+)\)/;

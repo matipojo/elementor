@@ -42,3 +42,15 @@
 @import "flex-icons";
 
 @import "ai";
+
+.elementor-element {
+  .ai-element-button {
+    display: none;
+  }
+
+  &:hover {
+    .ai-element-button {
+      display: block;
+    }
+  }
+}

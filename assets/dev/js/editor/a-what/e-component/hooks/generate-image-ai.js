@@ -16,14 +16,16 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 
 		const elements = this.getAiElements( [ args.model ] );
 
+		console.log( elements );
+
 		elements.forEach( async ( element ) => {
-			this.toggleLoader( element.id, true );
+			this.toggleLoader( element, true );
 
 			const prompt = element.__ai.prompt;
 			window.prompt_image_map[ element.id ] = window.prompt_image_map[ element.id ] || {};
 
 			const isBg = 'container' === element.elType;
-			const key = prompt + isBg ? '__bg' : '__normal';
+			const key = `${ prompt }${ isBg ? '__bg' : '__normal' }`;
 
 			let imageUrl;
 
@@ -88,7 +90,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				} );
 			}
 
-			this.toggleLoader( element.id, false );
+			this.toggleLoader( element, false );
 		} );
 
 		return true;
@@ -100,20 +102,30 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				element,
 				...( element.elements?.length > 0 ? this.getAiElements( element.elements ) : [] ),
 			] )
-			.filter( ( element ) => element.__ai && ( 'image' === element.widgetType || 'container' === element.elType ) );
+			.filter( ( element ) => element.__ai && element.__ai.prompt && ( 'image' === element.widgetType || 'container' === element.elType ) );
 	}
 
-	toggleLoader( id, loading ) {
-		const element = elementor.getContainer( id )?.view?.$el?.[ 0 ];
+	toggleLoader( elementData, loading ) {
+		const container = elementor.getContainer( elementData.id );
+		const element = container?.view?.$el;
 
-		if ( ! element ) {
+		if ( ! element.get( 0 ) ) {
 			return;
 		}
 
-		if ( loading ) {
-			element.classList.add( 'ai-loading' );
+		if ( 'container' === elementData.elType ) {
+			if ( loading ) {
+				element.get( 0 ).classList.add( 'ai-loading' );
+			} else {
+				element.get( 0 ).classList.remove( 'ai-loading' );
+			}
+		} else if ( loading ) {
+			console.log( element );
+			element.append(
+				`<div class="ai-loading ai-loading-elements" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>`,
+			);
 		} else {
-			element.classList.remove( 'ai-loading' );
+			element.querySelectorAll( '.ai-loading-elements' )?.remove?.();
 		}
 	}
 }

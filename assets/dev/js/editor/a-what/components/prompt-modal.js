@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, IconButton, Stack, Divider, Tooltip, ToggleButton, CircularProgress } from '@elementor/ui';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, IconButton, Stack, Divider, Tooltip, ToggleButton, CircularProgress, styled } from '@elementor/ui';
 import { useDispatch, useSelector } from '@elementor/store';
 import { XIcon, AIIcon } from '@elementor/icons';
 import { selectElementResults, selectStatus, slice } from '../store';
@@ -11,6 +11,19 @@ import BrushIcon from '../icons/brush-icon';
 import RedoIcon from '../icons/redo-icon';
 import UndoIcon from '../icons/undo-icon';
 import WandIcon from '../icons/wand-icon';
+
+const StyledDialogTitle = styled( DialogTitle )( ( { theme } ) => ( {
+	'&.MuiDialogTitle-root': {
+		backgroundColor: 'dark' === theme.palette.mode ? theme.palette.background.paper : theme.palette.grey[ 100 ],
+		padding: theme.spacing( 0, 6 ),
+	},
+} ) );
+
+const StyledDialogContent = styled( DialogContent )( ( { theme } ) => ( {
+	'&.MuiDialogContent-root': {
+		padding: theme.spacing( 6 ),
+	},
+} ) );
 
 export default function PromptModal( { setElementId, elementId } ) {
 	const dispatch = useDispatch();
@@ -68,7 +81,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 					},
 				} }
 			>
-				<DialogTitle sx={ { bgcolor: 'background.paper' } }>
+				<StyledDialogTitle sx={ { bgcolor: 'background.paper' } }>
 					<Stack direction="row" spacing={ 3 } alignItems="center">
 						<Tooltip title="Generate with text">
 							<Box component="span" sx={ { cursor: 'pointer' } }>
@@ -135,14 +148,14 @@ export default function PromptModal( { setElementId, elementId } ) {
 							size="small"
 							aria-label="close"
 							onClick={ () => setElementId( null ) }
-							sx={ { '&.MuiButtonBase-root': { mr: -4 } } }
+							sx={ { '&.MuiButtonBase-root': { mr: -3 } } }
 						>
 							<XIcon />
 						</IconButton>
 					</Stack>
-				</DialogTitle>
+				</StyledDialogTitle>
 
-				<DialogContent>
+				<StyledDialogContent>
 					<Box component="form"
 						onSubmit={ async ( e ) => {
 							e.preventDefault();
@@ -177,7 +190,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 							} }
 						/>
 
-						<Stack direction="row" alignItems="center" spacing={ 4 } sx={ { ml: 5 } }>
+						<Stack direction="row" alignItems="center" spacing={ 4 } sx={ { ml: 4 } }>
 							{
 								false
 									? <CircularProgress color="secondary" size={ 20 } sx={ { mr: 2 } } />
@@ -211,7 +224,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 							</Button>
 						</Stack>
 					</Box>
-				</DialogContent>
+				</StyledDialogContent>
 			</Dialog>
 		</Draggable>
 	);

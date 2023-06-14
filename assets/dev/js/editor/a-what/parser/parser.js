@@ -45,6 +45,7 @@ export class Parser {
 
 		switch ( node.tagName.toLocaleLowerCase() ) {
 			case 'row':
+			case 'div':
 			case 'column':
 				result = this.parseContainer( node );
 				break;
@@ -104,7 +105,7 @@ export class Parser {
 		const result = {
 			elType: 'container',
 			settings: {
-				flex_direction: node.tagName.toLocaleLowerCase(),
+				flex_direction: 'column' === node.tagName.toLocaleLowerCase() ? 'column' : 'row',
 				content_width: isRootNode ? 'boxed' : 'full',
 			},
 			__ai: {

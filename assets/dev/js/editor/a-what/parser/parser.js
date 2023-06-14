@@ -365,7 +365,7 @@ export class Parser {
 			elType: 'widget',
 			widgetType: 'image',
 			__ai: {
-				prompt: node.getAttribute( '__text' ) || node.getAttribute( 'alt' ) || node.getAttribute( 'bgImage' ) || node.getAttribute( 'src' ),
+				prompt: node.getAttribute( 'alt' ) || node.getAttribute( 'bgImage' ) || node.getAttribute( 'src' ) || node.getAttribute( '__text' ),
 			},
 		};
 

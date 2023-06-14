@@ -3,34 +3,48 @@ const defaultMessages = [
 		role: 'user',
 		content: `
 			you are a generative AI of XMLs based on prompts.
-			the allowed tags are row, column, image, title, text, button, divider.
+			the allowed tags are row, column, img, title, text, button, divider.
 			the allowed attributes are color, bgColor, bgImage, bgGradient, height, width, padding, margin, gap, alignItems, justifyContent, border, borderRadius, font, fontSize, fontWeight, align, fullWidth, boxed.
 			image tags and bgImage attributes don't have URLs of images but descriptions of them.
-			based on this XML guidelines, create a section about fitness and training.
-			create a modern layout of 2 columns. the left one should have subtitle, title, text and button. the right one should only have a background image.
-			use red, yellow, white and black color scheme`,
+			based on this XML guidelines, Create a full-height row with a background image of an office. Inside, create a
+			column with a dark semi-transparent background, titles, and a row with multiple columns. Each column contains
+			an image, a title, and a text description related to a specific service: Search Engine Optimization, Social
+			Media Marketing, and Web Design and Development.`,
 	},
 	{
 		role: 'assistant',
 		content: `
-			<row height="100vh" gap="0" padding="0" alignItems="stretch" fullWidth="true" bgGradient="linear-gradient(45deg, #467FF7, #FFFFFF)">
-				<column justifyContent="center" fullWidth="true" gap="20px" bgColor="#FE114B" padding="0" margin="0">
-					<title align="center" color="#F8F812" font="Montserrat" fontSize="22px" fontWeight="600">Believe in Yourself</title>
-					<title align="center" color="#FBFBFB" font="Archivo" fontSize="115px" fontWeight="900">BE THE BEST YOU CAN BE</title>
-					<text align="center" color="#FFFFFF" font="Montserrat" fontSize="26px" fontWeight="300" padding="0 8%">
-						Initial one-to-one consultation, Health &amp; Fitness Assesments Bespoke training program planing, Custom Nutrition plan &amp; recipes. Weekly Progress Reviews
-					</text>
-					<button href="/pricing" align="center" color="#1B252F" hover_color="#F8F812" bgColor="#F8F812" hover_bgColor="#1B252F" font="Archivo" fontSize="18px" fontWeight="800" padding="20px 55px">
-						SEE PRICING &gt;
-					</button>
-				</column>
-				<column fullWidth="true" bgImage="a female fitness trainer looking at the camera with boxing equipment"></column>
-			</row>
-		`,
+			<column boxed="true" width="100%" gap="50px" bgColor="#F6F7FB" padding="4% 8%" alignItems="center">
+				<title align="center" color="#5E5E5E" font="Montserrat" fontWeight="600" fontSize="18px">OUR SERVICES</title>
+				<row boxed="true" width="100%" justifyContent="center" gap="50px" padding="0">
+					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="#FFFFFF" borderRadius="20px" alignItems="center" justifyContent="space-between">
+						<img align="center" width="70px" alt="icon for SEO optimization" />
+						<title align="center" color="#252525" font="Poppins" fontWeight="700" fontSize="22px">Search Engine Optimization</title>
+						<text color="#5C5B5B" font="Poppins" fontWeight="400" fontSize="16px" align="center">Our SEO experts work on strategies that help your website rank higher on Google and other search engines, increasing organic traffic to your website. </text>
+						<button href="/seo" color="#FFFFFF" bgColor="#F17F20" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
+					</column>
+					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="#FFFFFF" borderRadius="20px" alignItems="center" justifyContent="space-between">
+						<img align="center" width="70px" alt="icon for social media marketing" />
+						<title align="center" color="#252525" font="Poppins" fontWeight="700" fontSize="22px">Social Media Marketing</title>
+						<text color="#5C5B5B" font="Poppins" fontWeight="400" fontSize="16px" align="center">We run targeted ad campaigns on social media platforms that help you reach your target audience, increase brand awareness, and drive more traffic to your website or store.</text>
+						<button href="/social-media" color="#FFFFFF" bgColor="#F17F20" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
+					</column>
+					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="#FFFFFF" borderRadius="20px" alignItems="center" justifyContent="space-between">
+						<img align="center" width="70px" alt="icon for web design" />
+						<title align="center" color="#252525" font="Poppins" fontWeight="700" fontSize="22px">Web Design and Development</title>
+						<text color="#5C5B5B" font="Poppins" fontWeight="400" fontSize="16px" align="center">Our web design and development team creates visually stunning and user-friendly websites that help you convert more visitors into customers and grow your business online.</text>
+						<button href="/web-design" color="#FFFFFF" bgColor="#F17F20" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
+					</column>
+				</row>
+			</column>`
+		,
 	},
 	{
 		role: 'user',
-		content: `create a gallery based layout for digital agency company with subtle pink gradient background, with some text and 4 images of people`,
+		content: `Create a boxed row with a width of 1400px and a height of 80% of the viewport.
+			The row has a background gradient, fading from pink to white. Inside the row, place a centered column with
+			a divider, a title, and a text paragraph. Next, create another row that spans the full width and has images
+			aligned to the right with some spacing. The images depict studio portraits of different individuals.`,
 	},
 	{
 		role: 'assistant',
@@ -42,16 +56,21 @@ const defaultMessages = [
 					<text color="#212121" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
 				</column>
 				<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">
-					<image width="40%">studio portrait of black woman drinking coffee</image>
-					<image width="40%">studio portrait of serious blonde white woman profile</image>
-					<image width="40%">studio portrait of a person with a funny haircut, glasses, office, medium shot</image>
-					<image width="40%">studio portrait of asian with pink background, happy</image>
+					<img width="40%" alt="studio portrait of black woman drinking coffee" />
+					<img width="40%" alt="studio portrait of serious blonde white woman profile" />
+					<img width="40%" alt="studio portrait of a person with a funny haircut, glasses, office, medium shot" />
+					<img width="40%" alt="studio portrait of asian with pink background, happy" />
 				</row>
 			</row>`,
 	},
 	{
 		role: 'user',
-		content: `create a complex layout with overlapping images using negative margins of "meet our team" block with high-end layout design, with alternating images positions`,
+		content: `Create a boxed column that spans the full width and has a light gray background.
+		Inside this column, add another boxed column with a width of 1140px and some spacing.
+		Include two titles aligned to the center, one in purple and the other in a responsive font size. Below the titles,
+		create a boxed row with a width of 1584px and a height of 450px. Within this row, place multiple images of individuals
+		with different backgrounds and styles, including a black woman drinking coffee, a serious blonde white woman, a
+		fashionable black man, a generic black woman, and an Asian person with a light pink background.`,
 	},
 	{
 		role: 'assistant',
@@ -62,17 +81,19 @@ const defaultMessages = [
 					<title align="center" color="#5E0EE6" font="DM Sans" fontWeight="500" fontSize="2.5vw">Powered by our people</title>
 				</column>
 				<row boxed="true" width="1584px" height="450px" gap="0" padding="0">
-					<image width="25%" margin="0 -10% 0 0">studio portrait of black woman drinking coffee, light orange background</image>
-					<image width="25%" margin="120px -40px 0 0">studio portrait of serious blonde white woman</image>
-					<image width="32%" margin="28px 0 23px 0" zIndex="5">studio portrait of a fashion black man with black hat grayish blueish background</image>
-					<image width="25%" margin="120px 0 0 -40px">studio portrait of generic black woman with greenish background</image>
-					<image width="25%" margin="0 0 0 -40px">studio portrait of asian with light pink background, happy, glam</image>
+					<img width="25%" margin="0 -10% 0 0" alt="studio portrait of black woman drinking coffee, light orange background" />
+					<img width="25%" margin="120px -40px 0 0" alt="studio portrait of serious blonde white woman" />
+					<img width="32%" margin="28px 0 23px 0" zIndex="5" alt="studio portrait of a fashion black man with black hat grayish blueish background" />
+					<img width="25%" margin="120px 0 0 -40px" alt="studio portrait of generic black woman with greenish background" />
+					<img width="25%" margin="0 0 0 -40px" alt="studio portrait of asian with light pink background, happy, glam" />
 				</row>
 			</column>`,
 	},
 	{
 		role: 'user',
-		content: `create a detailed "about" section for graphic design agency, with cool layout and modern design. use interesting layout.`,
+		content: `Create a boxed column with a light gray background, padding, and a gap between elements. Inside, add a
+		divider, titles, and a text paragraph. Below, create a boxed row with two columns. The first column contains an
+		image, while the second column has a divider, a title, a text paragraph, and a button.`,
 	},
 	{
 		role: 'assistant',
@@ -86,7 +107,7 @@ const defaultMessages = [
 				</column>
 				<row boxed="true" width="1050px" justifyContent="space-between" gap="5%">
 					<column width="45%">
-							<image width="100%">Creative graphic designer brainstorming ideas at office desk</image>
+							<img width="100%" alt="Creative graphic designer brainstorming ideas at office desk" />
 					</column>
 					<column width="45%">
 						<column boxed="true" width="100%" gap="30px" padding="0">

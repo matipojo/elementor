@@ -1,8 +1,10 @@
 import { Dialog, Grid } from '@elementor/ui';
 import Steps from './steps';
-import Placeholder from './placeholder';
+import Preview from './preview';
 
 export default function WizardDialog() {
+	const [ state, setState ] = useState( {} );
+
 	return (
 		<Dialog
 			open={ true }
@@ -16,11 +18,11 @@ export default function WizardDialog() {
 			sx={ { zIndex: 9999 } }
 		>
 			<Grid container spacing={ 0 }>
-				<Grid item xs={ 8 }>
-					<Steps />
-				</Grid>
 				<Grid item xs={ 4 }>
-					<Placeholder />
+					<Steps setState={ setState } />
+				</Grid>
+				<Grid item xs={ 8 }>
+					<Preview state={ state } />
 				</Grid>
 			</Grid>
 		</Dialog>

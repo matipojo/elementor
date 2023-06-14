@@ -52,12 +52,14 @@ export default function PromptModal( { setElementId, elementId } ) {
 			results: [ ...results.past, results.current ].filter( Boolean ),
 		} );
 
+		// Const result = `<row bgImage="coffee" height="500px"><col><text>${ prompt }</text></col></row>>`;
+
+		console.log( result );
+
 		const isValid = result.includes( '<' );
 
 		if ( isValid ) {
 			window.last_result = result;
-
-			// Const result = `<row><text>${ prompt }</text></row>`;
 
 			dispatch( slice.actions.end( { elementId: eId, result } ) );
 		} else {

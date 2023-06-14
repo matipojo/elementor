@@ -97,6 +97,9 @@ export class Parser {
 				flex_direction: node.tagName.toLocaleLowerCase(),
 				content_width: isRootNode ? 'boxed' : 'full',
 			},
+			__ai: {
+				prompt: node.getAttribute( 'bg-image' ) || node.getAttribute( 'bgImage' ),
+			},
 		};
 
 		// Color,

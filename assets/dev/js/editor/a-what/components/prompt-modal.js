@@ -41,6 +41,10 @@ export default function PromptModal( { setElementId, elementId } ) {
 	const inputPromptPlaceholder = 'I want a hero section with background image and two columns.';
 
 	const submit = async ( { prompt, eId } ) => {
+		if ( ! promptInputRef.current.value.trim() ) {
+			return;
+		}
+
 		dispatch( slice.actions.start( { elementId: eId, prompt } ) );
 
 		const result = await request( {

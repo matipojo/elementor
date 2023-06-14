@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Stack, Typography, Button, Box, styled } from '@elementor/ui';
 
+const squareWidth = 140;
+
 const ColorCircle = styled( Box, { name: 'color-circle' } )( ( { theme, color } ) => ( {
 	width: theme.sizing[ 300 ],
 	height: theme.sizing[ 300 ],
@@ -22,14 +24,17 @@ export default function StyleStep( { data, setData } ) {
 		{
 			label: 'Creative',
 			value: 'creative',
+			family: 'Space Mono',
 		},
 		{
 			label: 'Elegant',
 			value: 'elegant',
+			family: 'Lobster',
 		},
 		{
 			label: 'Minimal',
 			value: 'minimal',
+			family: 'Open Sans',
 		},
 	];
 
@@ -70,7 +75,7 @@ export default function StyleStep( { data, setData } ) {
 										onClick={ () => handleColors( index ) }
 										variant="outlined"
 										color="secondary"
-										sx={ { maxWidth: 150, py: 10, opacity: selectedColors && selectedColors !== index ? '0.25' : '1' } }
+										sx={ { width: squareWidth, py: 10, opacity: selectedColors && selectedColors !== index ? '0.25' : '1' } }
 										disabled={ selectedColors && selectedColors !== index }
 									>
 										<Stack direction="row" spacing={ -3 }>
@@ -94,20 +99,20 @@ export default function StyleStep( { data, setData } ) {
 
 					<Box direction="row" display="flex" justifyContent={ { xs: 'space-between', sm: 'flex-start' } } flexWrap="wrap" gap={ 4 }>
 						{
-							fonts.map( ( { value }, index ) => (
+							fonts.map( ( { value, family }, index ) => (
 								<Box key={ value }>
 									<Button
 										variant="outlined"
 										color="secondary"
-										sx={ { maxWidth: 150, py: 12, px: 3, opacity: selectedFont && selectedFont !== index ? '0.25' : '1' } }
+										sx={ { width: squareWidth, py: 12, px: 3, opacity: selectedFont && selectedFont !== index ? '0.25' : '1' } }
 										onClick={ () => handleFont( index ) }
 										disabled={ selectedFont && selectedFont !== index }
 									>
 										<Stack>
-											<Typography variant="h6" sx={ { fontWeight: 'bold', mb: 3 } }>Titles</Typography>
-											<Typography variant="body2" sx={ { mb: 3 } }>body text</Typography>
+											<Typography variant="h6" sx={ { fontWeight: 'bold', mb: 3, fontFamily: family } }>Titles</Typography>
+											<Typography variant="body2" sx={ { mb: 3, fontFamily: family } }>body text</Typography>
 
-											<Button sx={ { mt: 2 } } color="secondary" variant="contained" size="small">Button text</Button>
+											<Button sx={ { mt: 2, fontFamily: family } } color="secondary" variant="contained" size="small">Button text</Button>
 										</Stack>
 									</Button>
 								</Box>

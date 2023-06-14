@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, Grid } from '@elementor/ui';
 import Steps from './steps';
 import Preview from './preview';
@@ -8,6 +8,12 @@ export default function WizardDialog() {
 	const [ activeStep, setActiveStep ] = useState( 0 );
 
 	console.log( '@@@ data', data );
+
+	useEffect( () => {
+		elementor.helpers.enqueueFont( 'Space Mono', 'editor' );
+		elementor.helpers.enqueueFont( 'Lobster', 'editor' );
+		elementor.helpers.enqueueFont( 'Open Sans', 'editor' );
+	}, [] );
 
 	return (
 		<Dialog

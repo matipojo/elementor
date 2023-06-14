@@ -7,17 +7,16 @@ const ColorCircle = styled( Box, { name: 'color-circle' } )( ( { theme, color } 
 	borderRadius: theme.border.radius.circle,
 	backgroundColor: color,
 	border: `1px solid ${ theme.palette.common.white }`,
+	boxShadow: `0px 0px 3px 3px rgba(0, 0, 0, 0.25)`,
 } ) );
 
 export default function StyleStep( { data, setData } ) {
 	const [ selectedColors, setSelectedColors ] = useState( null );
 	const [ selectedFont, setSelectedFont ] = useState( null );
 
-	const colors = [
-		[ '#F5F5F5', '#F5f', '#F5aa', '#aaff' ],
-		[ '#F5F5F5', '#F5f', '#F5aa', '#aaff' ],
-		[ '#F5F5F5', '#F5f', '#F5aa', '#aaff' ],
-	];
+	const colors = data.palette;
+
+	console.log( '@@@ colors', colors );
 
 	const fonts = [
 		{
@@ -76,14 +75,12 @@ export default function StyleStep( { data, setData } ) {
 									>
 										<Stack direction="row" spacing={ -3 }>
 											{
-												colorRow.map( ( color ) => (
+												Object.values( colorRow ).map( ( color ) => (
 													<ColorCircle key={ color } color={ color } />
 												) )
 											}
 										</Stack>
 									</Button>
-
-									<Typography variant="body2" align="center" sx={ { mt: 3 } }>Vibrant</Typography>
 								</Box>
 							) )
 						}
@@ -92,12 +89,12 @@ export default function StyleStep( { data, setData } ) {
 
 				<Stack spacing={ 4 }>
 					<Typography variant="h6" sx={ { fontWeight: 'bold', mt: 4 } }>
-						Choose a font
+						Choose a font pairing
 					</Typography>
 
 					<Stack direction="row" justifyContent="center" spacing={ 4 }>
 						{
-							fonts.map( ( { label, value }, index ) => (
+							fonts.map( ( { value }, index ) => (
 								<Box key={ value }>
 									<Button
 										variant="outlined"
@@ -113,8 +110,6 @@ export default function StyleStep( { data, setData } ) {
 											<Button sx={ { mt: 2 } } color="secondary" variant="contained" size="small">Button text</Button>
 										</Stack>
 									</Button>
-
-									<Typography variant="body2" align="center" sx={ { mt: 3 } }>{ label }</Typography>
 								</Box>
 							) )
 						}

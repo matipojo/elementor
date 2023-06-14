@@ -4,7 +4,7 @@ import Steps from './steps';
 import Preview from './preview';
 
 export default function WizardDialog() {
-	const [ data, setData ] = useState( { sections: [ { label: 'Introduction', value: 'introduction' }, { label: '', value: '' } ] } );
+	const [ data, setData ] = useState( { pending: false, sections: [ { label: 'Introduction', value: 'introduction' }, { label: '', value: '' } ] } );
 	const [ activeStep, setActiveStep ] = useState( 0 );
 
 	console.log( '@@@ data', data );

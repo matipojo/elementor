@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, IconButton, Stack, Divider, Tooltip, ToggleButton, CircularProgress } from '@elementor/ui';
 import { useDispatch, useSelector } from '@elementor/store';
 import { XIcon, AIIcon } from '@elementor/icons';
@@ -12,38 +12,38 @@ import RedoIcon from '../icons/redo-icon';
 import UndoIcon from '../icons/undo-icon';
 import WandIcon from '../icons/wand-icon';
 
-export default function PromptModal( { open, onClose } ) {
-	const [ debugElementId, setDebugElementId ] = useState( '' );
-
+export default function PromptModal( { setElementId, elementId } ) {
 	const dispatch = useDispatch();
-	const results = useSelector( ( state ) => selectElementResults( state, debugElementId ) );
+	const results = useSelector( ( state ) => selectElementResults( state, elementId ) );
 	const status = useSelector( selectStatus );
 	const promptInputRef = useRef();
 
 	const inputPromptPlaceholder = 'I want a hero section with background image and two columns.';
 
-	const submit = async ( { prompt, elementId } ) => {
-		elementId = elementId || elementorCommon.helpers.getUniqueId();
-
-		dispatch( slice.actions.start( { elementId, prompt } ) );
+	const submit = async ( { prompt, eId } ) => {
+		dispatch( slice.actions.start( { elementId: eId, prompt } ) );
 
 		const result = await request( {
 			prompt,
 			results: [ ...results.past, results.current ].filter( Boolean ),
 		} );
 
-		dispatch( slice.actions.end( { elementId, result } ) );
+		window.last_result = result;
 
-		setDebugElementId( elementId );
+		// Const result = `<row><text>${ prompt }</text></row>`;
+
+		dispatch( slice.actions.end( { elementId: eId, result } ) );
+
+		setElementId( eId );
 	};
 
-	const undo = ( { elementId } ) => dispatch( slice.actions.undo( { elementId } ) );
-	const redo = ( { elementId } ) => dispatch( slice.actions.redo( { elementId } ) );
+	const undo = ( { eId } ) => dispatch( slice.actions.undo( { elementId: eId } ) );
+	const redo = ( { eId } ) => dispatch( slice.actions.redo( { elementId: eId } ) );
 
 	return (
 		<Draggable handle=".MuiDialogTitle-root" cancel={ '[class*="MuiDialogContent-root"]' }>
 			<Dialog
-				open={ open }
+				open={ !! elementId }
 				fullWidth={ true }
 				hideBackdrop={ true }
 				scroll="paper"
@@ -67,7 +67,7 @@ export default function PromptModal( { open, onClose } ) {
 							<ToggleButton
 								size="small"
 								aria-label="close"
-								onClick={ onClose }
+								onClick={ () => setElementId( null ) }
 								selected
 								value
 								disabled={ 'pending' === status }
@@ -80,7 +80,7 @@ export default function PromptModal( { open, onClose } ) {
 							<IconButton
 								size="small"
 								aria-label="close"
-								onClick={ onClose }
+								onClick={ () => setElementId( null ) }
 								disabled
 							>
 								<BrushIcon />
@@ -96,7 +96,7 @@ export default function PromptModal( { open, onClose } ) {
 							<IconButton
 								size="small"
 								aria-label="close"
-								onClick={ undo }
+								onClick={ () => undo( { eId: elementId } ) }
 								disabled={ 'pending' === status }
 							>
 								<UndoIcon />
@@ -107,7 +107,7 @@ export default function PromptModal( { open, onClose } ) {
 							<IconButton
 								size="small"
 								aria-label="close"
-								onClick={ redo }
+								onClick={ () => redo( { eId: elementId } ) }
 								disabled={ 'pending' === status }
 							>
 								<RedoIcon />
@@ -119,7 +119,7 @@ export default function PromptModal( { open, onClose } ) {
 						<IconButton
 							size="small"
 							aria-label="close"
-							onClick={ onClose }
+							onClick={ () => setElementId( null ) }
 							sx={ { '&.MuiButtonBase-root': { mr: -4 } } }
 						>
 							<XIcon />
@@ -132,7 +132,7 @@ export default function PromptModal( { open, onClose } ) {
 						onSubmit={ async ( e ) => {
 							e.preventDefault();
 
-							await submit( { elementId: debugElementId, prompt: e.target.prompt.value } );
+							await submit( { eId: elementId, prompt: e.target.prompt.value } );
 
 							e.target.reset();
 						} }

@@ -1,12 +1,15 @@
 import { useSelector } from '@elementor/store';
 import { selectElementResults } from '../store';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { AIIcon } from '@elementor/icons';
+import { Box, Portal } from '@elementor/ui';
 
-export default function ExistingPromptButton( { elementId } ) {
+export default function ExistingPromptButton( { elementId, setElementId } ) {
 	const results = useSelector( ( state ) => selectElementResults( state, elementId ) );
+	const [ element, setElement ] = useState( null );
 
 	useEffect( () => {
-		const container = window.elementor.getContainer( elementId );
+		let container = window.elementor.getContainer( elementId );
 		const previewContainer = elementor.getPreviewContainer();
 
 		const { content: [ model ] } = window.elementor.html4Parser.parse(
@@ -22,15 +25,33 @@ export default function ExistingPromptButton( { elementId } ) {
 			$e.run( 'document/elements/delete', { container } );
 		}
 
-		$e.run( 'document/elements/create', {
+		container = $e.run( 'document/elements/create', {
 			container: previewContainer,
 			model,
-			options: { at },
+			options: { at, edit: false },
 		} );
 
-		console.log( ! container ? `${ elementId } created` : `${ elementId } updated` );
+		setElement( container.view.$el.get( 0 ) );
 	}, [ results.current?.id ] );
 
-	// TODO: Here should be a portal to the element with button to open the prompt modal.
-	return null;
+	return (
+		<>
+			{
+				element
+					? <Portal container={ element } key={ elementId }>
+						<Box style={ { position: 'absolute' } }>
+							<button
+								className="elementor-add-section-area-button e-block-ai-button"
+								title="Generate with AI"
+								onClick={ () => setElementId( elementId ) }
+								style={ { width: '32px', height: '32px', padding: '10px' } }
+							>
+								<AIIcon fill="white" />
+							</button>
+						</Box>
+					</Portal>
+					: null
+			}
+		</>
+	);
 }

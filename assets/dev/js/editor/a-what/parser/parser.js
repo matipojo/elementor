@@ -75,6 +75,10 @@ export class Parser {
 				result = this.parseDivider( node );
 				break;
 
+			case 'icon':
+				result = this.parseIcon( node );
+				break;
+
 			case 'image':
 			case 'img':
 				result = this.parseImage( node );
@@ -415,6 +419,28 @@ export class Parser {
 			...bgColor( 'hover_bgColor', 'button_background_hover' ),
 			padding: ( value ) => {
 				return [ 'text_padding', normalize4Sizes( value ) ];
+			},
+		};
+
+		result.settings = this.parseAttributes( node, attrsMap );
+
+		return result;
+	}
+
+	//TODO: alignment & icon pattern (user and etc)
+	parseIcon( node ) {
+		const result = {
+			elType: 'widget',
+			widgetType: 'icon',
+		};
+
+		const attrsMap = {
+			...common(),
+			color: ( value ) => {
+				return [ 'primary_color', value ];
+			},
+			fontSize: ( value ) => {
+				return [ 'size', parseSize( value, true ) ];
 			},
 		};
 

@@ -88,7 +88,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				} );
 			}
 
-			this.toggleLoader( element.id, true );
+			this.toggleLoader( element.id, false );
 		} );
 
 		return true;

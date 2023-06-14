@@ -22,6 +22,10 @@
 @import "../flex-icons.scss";
 
 
+.ai-loading {
+	background-color: #e6db74 !important;
+}
+
 // mixins
 @mixin e-grid-outline-base {
 	padding-top: var(--padding-top);

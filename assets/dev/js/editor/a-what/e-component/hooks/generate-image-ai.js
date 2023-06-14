@@ -14,23 +14,18 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 	apply( args ) {
 		window.prompt_image_map = window.prompt_image_map || {};
 
-		// TODO: Working with background in containers.
-		// TODO: Add loading to the images.
-
 		const elements = this.getAiElements( [ args.model ] );
 
-		console.log( elements );
-
 		elements.forEach( async ( element ) => {
+			this.toggleLoader( element.id, true );
+
 			const prompt = element.__ai.prompt;
 			window.prompt_image_map[ element.id ] = window.prompt_image_map[ element.id ] || {};
 
 			const isBg = 'container' === element.elType;
-			const key = prompt + isBg ? '__bg' : 'normal';
+			const key = prompt + isBg ? '__bg' : '__normal';
 
-			console.log( `loading image for ${ element.id }` );
-
-			let imageUrl = null;
+			let imageUrl;
 
 			if ( window.prompt_image_map[ element.id ][ key ] ) {
 				imageUrl = window.prompt_image_map[ element.id ][ key ];
@@ -41,7 +36,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 						prompt,
 						promptSettings: {
 							image_type: ! isBg ? 'photographic' : 'background',
-							style_preset: ! isBg ? 'portrait' : '',
+							style_preset: '',
 							image_strength: 0,
 							ratio: ! isBg ? '3:4' : '16:9',
 						},
@@ -92,6 +87,8 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 					},
 				} );
 			}
+
+			this.toggleLoader( element.id, true );
 		} );
 
 		return true;
@@ -104,6 +101,20 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				...( element.elements?.length > 0 ? this.getAiElements( element.elements ) : [] ),
 			] )
 			.filter( ( element ) => element.__ai && ( 'image' === element.widgetType || 'container' === element.elType ) );
+	}
+
+	toggleLoader( id, loading ) {
+		const element = elementor.getContainer( id )?.view?.$el?.[ 0 ];
+
+		if ( ! element ) {
+			return;
+		}
+
+		if ( loading ) {
+			element.classList.add( 'ai-loading' );
+		} else {
+			element.classList.remove( 'ai-loading' );
+		}
 	}
 }
 

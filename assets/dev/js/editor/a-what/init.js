@@ -6,6 +6,7 @@ import { slice } from './store';
 import Main from './components/main';
 import { Parser } from './parser/parser';
 import { validateEnv } from './env';
+import WizardDialog from './components/onboarding/wizard-dialog';
 
 export default function init() {
 	validateEnv();
@@ -63,4 +64,14 @@ export default function init() {
 		id: 'a-what-buttons',
 		filler: Main,
 	} );
+
+	const params = new URLSearchParams( document.location.search );
+	const onboardingFlag = parseInt( params.get( 'onboarding' ) );
+
+	if ( 1 === onboardingFlag ) {
+		injectIntoTop( {
+			id: 'a-what-wizard',
+			filler: WizardDialog,
+		} );
+	}
 }

@@ -38,6 +38,7 @@ class Module extends BaseModule {
 			$ajax->register_ajax_action( 'ai_get_image_to_image_outpainting', [ $this, 'ajax_ai_get_image_to_image_outpainting' ] );
 			$ajax->register_ajax_action( 'ai_get_image_to_image_upscale', [ $this, 'ajax_ai_get_image_to_image_upscale' ] );
 			$ajax->register_ajax_action( 'ai_upload_image', [ $this, 'ajax_ai_upload_image' ] );
+			$ajax->register_ajax_action( 'onboarding_update_globals', [ $this, 'ajax_onboarding_update_globals' ] );
 		} );
 
 		add_action( 'elementor/editor/before_enqueue_scripts', function() {
@@ -480,6 +481,367 @@ class Module extends BaseModule {
 		return [
 			'image' => array_merge( $image_data, $data ),
 		];
+	}
+
+	public function ajax_onboarding_update_globals( $data ) {
+		$kit = Plugin::$instance->kits_manager->get_active_kit();
+
+		$d = [
+			'elements' =>
+				[
+				],
+			'settings' =>
+				[
+					'system_colors' =>
+						[
+							0 =>
+								[
+									'_id' => 'primary',
+									'title' => 'Primary',
+									'color' => '#000000',
+								],
+							1 =>
+								[
+									'_id' => 'secondary',
+									'title' => 'Secondary',
+									'color' => '#F03737',
+								],
+							2 =>
+								[
+									'_id' => 'text',
+									'title' => 'Body Text',
+									'color' => '#F0F0F0',
+								],
+							3 =>
+								[
+									'_id' => 'accent',
+									'title' => 'Accent',
+									'color' => '#F0F0F0',
+								],
+						],
+					'system_typography' =>
+						[
+							0 =>
+								[
+									'_id' => 'primary',
+									'title' => 'Primary',
+									'typography_typography' => 'custom',
+									'typography_font_family' => 'Montserrat',
+									'typography_font_weight' => 800,
+									'typography_font_size' =>
+										[
+											'unit' => 'px',
+											'size' => 95,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_text_transform' => 'uppercase',
+									'typography_font_style' => 'normal',
+									'typography_text_decoration' => 'none',
+									'typography_line_height' =>
+										[
+											'unit' => 'px',
+											'size' => 105,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_font_size_tablet' =>
+										[
+											'unit' => 'px',
+											'size' => 59,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_font_size_mobile' =>
+										[
+											'unit' => 'px',
+											'size' => 36,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_letter_spacing' =>
+										[
+											'unit' => 'px',
+											'size' => -0.28,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_word_spacing' =>
+										[
+											'unit' => 'px',
+											'size' => 0,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_letter_spacing_tablet' =>
+										[
+											'unit' => 'px',
+											'size' => -0.28,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_letter_spacing_mobile' =>
+										[
+											'unit' => 'px',
+											'size' => -0.28,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_line_height_tablet' =>
+										[
+											'unit' => 'px',
+											'size' => 60,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_line_height_mobile' =>
+										[
+											'unit' => 'px',
+											'size' => 40,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_word_spacing_tablet' =>
+										[
+											'unit' => 'em',
+											'size' => 0,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_word_spacing_mobile' =>
+										[
+											'unit' => 'px',
+											'size' => 0,
+											'sizes' =>
+												[
+												],
+										],
+								],
+							1 =>
+								[
+									'_id' => 'secondary',
+									'title' => 'Secondary',
+									'typography_typography' => 'custom',
+									'typography_font_family' => 'Montserrat',
+									'typography_font_weight' => 800,
+									'typography_font_size' =>
+										[
+											'unit' => 'px',
+											'size' => 50,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_text_transform' => 'uppercase',
+									'typography_font_style' => 'normal',
+									'typography_text_decoration' => 'none',
+									'typography_line_height' =>
+										[
+											'unit' => 'px',
+											'size' => 60,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_font_size_mobile' =>
+										[
+											'unit' => 'px',
+											'size' => 36,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_letter_spacing' =>
+										[
+											'unit' => 'px',
+											'size' => -0.28,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_word_spacing' =>
+										[
+											'unit' => 'px',
+											'size' => 0,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_font_size_tablet' =>
+										[
+											'unit' => 'px',
+											'size' => 50,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_line_height_mobile' =>
+										[
+											'unit' => 'px',
+											'size' => 50,
+											'sizes' =>
+												[
+												],
+										],
+								],
+							2 =>
+								[
+									'_id' => 'text',
+									'title' => 'Body Text',
+									'typography_typography' => 'custom',
+									'typography_font_family' => 'Montserrat',
+									'typography_font_weight' => 400,
+									'typography_font_size' =>
+										[
+											'unit' => 'px',
+											'size' => 18,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_text_transform' => 'none',
+									'typography_font_style' => 'normal',
+									'typography_text_decoration' => 'none',
+									'typography_line_height' =>
+										[
+											'unit' => 'px',
+											'size' => 25,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_letter_spacing' =>
+										[
+											'unit' => 'px',
+											'size' => 1,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_font_size_tablet' =>
+										[
+											'unit' => 'px',
+											'size' => 15,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_word_spacing' =>
+										[
+											'unit' => 'px',
+											'size' => 0,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_font_size_mobile' =>
+										[
+											'unit' => 'px',
+											'size' => 16,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_line_height_mobile' =>
+										[
+											'unit' => 'px',
+											'size' => 20,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_line_height_tablet' =>
+										[
+											'unit' => 'px',
+											'size' => 17,
+											'sizes' =>
+												[
+												],
+										],
+								],
+							3 =>
+								[
+									'_id' => 'accent',
+									'title' => 'Accent Text',
+									'typography_typography' => 'custom',
+									'typography_font_family' => 'Montserrat',
+									'typography_font_weight' => 600,
+									'typography_font_size' =>
+										[
+											'unit' => 'px',
+											'size' => 60,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_text_transform' => 'capitalize',
+									'typography_font_style' => 'normal',
+									'typography_text_decoration' => 'underline',
+									'typography_line_height' =>
+										[
+											'unit' => 'px',
+											'size' => 74,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_font_size_tablet' =>
+										[
+											'unit' => 'px',
+											'size' => 14,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_letter_spacing' =>
+										[
+											'unit' => 'px',
+											'size' => 0,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_word_spacing' =>
+										[
+											'unit' => 'px',
+											'size' => 0,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_letter_spacing_mobile' =>
+										[
+											'unit' => 'px',
+											'size' => 2,
+											'sizes' =>
+												[
+												],
+										],
+									'typography_line_height_tablet' =>
+										[
+											'unit' => 'px',
+											'size' => 30,
+											'sizes' =>
+												[
+												],
+										],
+								],
+						],
+				],
+			];
+
+		$kit->save( $d );
 	}
 
 	private function upload_image( $image_url, $image_title, $parent_post_id = 0 ) {

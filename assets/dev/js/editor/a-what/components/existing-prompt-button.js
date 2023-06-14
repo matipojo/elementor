@@ -17,6 +17,8 @@ export default function ExistingPromptButton( { elementId, setElementId } ) {
 			elementId || null,
 		);
 
+		console.log( 'parsed data: ', model );
+
 		let at = null;
 
 		if ( container ) {
@@ -39,7 +41,7 @@ export default function ExistingPromptButton( { elementId, setElementId } ) {
 			{
 				element
 					? <Portal container={ element } key={ elementId }>
-						<Box style={ { position: 'absolute' } }>
+						<Box style={ { position: 'absolute', top: '10px', left: '10px' } } className="ai-element-button">
 							<button
 								className="elementor-add-section-area-button e-block-ai-button"
 								title="Generate with AI"

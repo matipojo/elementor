@@ -55,7 +55,7 @@ export default function Steps() {
 				) ) }
 			</Stepper>
 
-			<Box display="flex" justifyContent="center" sx={ { margin: 'auto', height: '50vh', width: '80%', backgroundColor: '#eee' } } >
+			<Box display="flex" justifyContent="center" sx={ { margin: 'auto', height: '50vh', width: '90%' } } >
 				{ steps[ activeStep ].filler }
 			</Box>
 

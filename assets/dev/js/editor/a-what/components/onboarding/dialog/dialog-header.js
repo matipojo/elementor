@@ -18,7 +18,7 @@ const StyledElementorLogo = styled( ElementorLogo )( ( { theme } ) => ( {
 
 export default function DialogHeader() {
 	return (
-		<DialogTitle sx={ { display: 'flex', alignItems: 'center' } }>
+		<DialogTitle sx={ { display: 'flex', alignItems: 'center', marginTop: 4 } }>
 			<StyledElementorLogo sx={ { mr: 3 } } />
 			Elementor
 		</DialogTitle>

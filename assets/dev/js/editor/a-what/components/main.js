@@ -12,6 +12,7 @@ export default function Main() {
 
 	useEffect( () => {
 		return listenTo( windowEvent( 'elementor/prompt/open' ), ( e ) => {
+			openRoute( 'panel/no-panel' );
 			setElementId( e.originalEvent.detail.id );
 		} );
 	}, [] );

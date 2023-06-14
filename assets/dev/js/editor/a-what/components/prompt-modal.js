@@ -25,6 +25,11 @@ const StyledDialogContent = styled( DialogContent )( ( { theme } ) => ( {
 	},
 } ) );
 
+const GenerateButton = styled( Button )( ( { theme } ) => ( {
+	width: 130,
+	borderRadius: theme.border.radius.sm,
+} ) );
+
 export default function PromptModal( { setElementId, elementId } ) {
 	const dispatch = useDispatch();
 	const results = useSelector( ( state ) => selectElementResults( state, elementId ) );
@@ -182,6 +187,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 							color="secondary"
 							variant="standard"
 							disabled={ 'pending' === status }
+							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={ true }
 							onKeyDown={ ( event ) => {
 								if ( 'Tab' === event.key ) {
@@ -199,7 +205,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 						<Stack direction="row" alignItems="center" spacing={ 4 } sx={ { ml: 4 } }>
 							{
 								false
-									? <CircularProgress color="secondary" size={ 20 } sx={ { mr: 2 } } />
+									? <CircularProgress color="secondary" size={ 16 } />
 									: <Tooltip title="Enhance prompt">
 										<Box component="span" sx={ { cursor: 'pointer' } }>
 											<IconButton
@@ -214,20 +220,19 @@ export default function PromptModal( { setElementId, elementId } ) {
 									</Tooltip>
 							}
 
-							<Button
+							<GenerateButton
 								variant="contained"
 								type="submit"
 								disabled={ 'pending' === status }
 								startIcon={ 'pending' !== status && <AIIcon /> }
 								size="small"
-								sx={ { width: 130 } }
 							>
 								{
 									'pending' === status
 										? <CircularProgress color="secondary" size={ 20 } />
 										: generateButtonText
 								}
-							</Button>
+							</GenerateButton>
 						</Stack>
 					</Box>
 				</StyledDialogContent>

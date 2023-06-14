@@ -53,13 +53,15 @@ export default function BlocksStep( { data, setData } ) {
 			body: JSON.stringify( body ),
 		} )
 			.then( ( response ) => response.json() )
-			.then( ( data ) => data.choices[ 0 ].message.content )
+			.then( ( data ) => JSON.parse( data.choices[ 0 ].message.content ) )
 			.catch( ( error ) => console.log( error ) );
 	};
 
 	useEffect( () => {
-		request( 'marketing' ).then( ( response ) => {
-			console.log( response );
+		setData( ( prev ) => ( { ...prev, pending: true } ) );
+
+		request( data.type.label ).then( ( response ) => {
+			setData( ( prev ) => ( { ...prev, palette: response, pending: false } ) );
 		} );
 	}, [] );
 

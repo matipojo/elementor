@@ -1,4 +1,4 @@
-import { Box, Stepper, Step, StepLabel, Stack, Button } from '@elementor/ui';
+import { Box, Stepper, Step, StepLabel, Stack, Button, CircularProgress } from '@elementor/ui';
 import { useState } from 'react';
 import BusinessStep from './steps/business-step';
 import BlocksStep from './steps/blocks-step';
@@ -87,7 +87,7 @@ export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 							? <Button variant="contained" onClick={ handleFinish }>
 								Finish
 							</Button>
-							: <Button variant="contained" onClick={ handleNext }>
+							: <Button variant="contained" onClick={ handleNext } disabled={ ! data.type?.label || data.pending } startIcon={ data.pending && <CircularProgress color="secondary" size={ 20 } /> }>
 								Next
 							</Button>
 					}

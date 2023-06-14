@@ -1,36 +1,40 @@
 import { useState } from 'react';
 import { Stack, Typography, Button, Box, styled } from '@elementor/ui';
 
+const squareWidth = 140;
+
 const ColorCircle = styled( Box, { name: 'color-circle' } )( ( { theme, color } ) => ( {
 	width: theme.sizing[ 300 ],
 	height: theme.sizing[ 300 ],
 	borderRadius: theme.border.radius.circle,
 	backgroundColor: color,
 	border: `1px solid ${ theme.palette.common.white }`,
+	boxShadow: `0px 0px 3px 3px rgba(0, 0, 0, 0.25)`,
 } ) );
 
 export default function StyleStep( { data, setData } ) {
 	const [ selectedColors, setSelectedColors ] = useState( null );
 	const [ selectedFont, setSelectedFont ] = useState( null );
 
-	const colors = [
-		[ '#F5F5F5', '#F5f', '#F5aa', '#aaff' ],
-		[ '#F5F5F5', '#F5f', '#F5aa', '#aaff' ],
-		[ '#F5F5F5', '#F5f', '#F5aa', '#aaff' ],
-	];
+	const colors = data.palette;
+
+	console.log( '@@@ colors', colors );
 
 	const fonts = [
 		{
 			label: 'Creative',
 			value: 'creative',
+			family: 'Space Mono',
 		},
 		{
 			label: 'Elegant',
 			value: 'elegant',
+			family: 'Lobster',
 		},
 		{
 			label: 'Minimal',
 			value: 'minimal',
+			family: 'Open Sans',
 		},
 	];
 
@@ -63,7 +67,7 @@ export default function StyleStep( { data, setData } ) {
 						Choose a color palette
 					</Typography>
 
-					<Stack direction="row" justifyContent="center" spacing={ 4 }>
+					<Box direction="row" display="flex" justifyContent={ { xs: 'space-between', sm: 'flex-start' } } flexWrap="wrap" gap={ 4 }>
 						{
 							colors.map( ( colorRow, index ) => (
 								<Box key={ index }>
@@ -71,54 +75,50 @@ export default function StyleStep( { data, setData } ) {
 										onClick={ () => handleColors( index ) }
 										variant="outlined"
 										color="secondary"
-										sx={ { maxWidth: 150, py: 10, opacity: selectedColors && selectedColors !== index ? '0.25' : '1' } }
+										sx={ { width: squareWidth, py: 10, opacity: selectedColors && selectedColors !== index ? '0.25' : '1' } }
 										disabled={ selectedColors && selectedColors !== index }
 									>
 										<Stack direction="row" spacing={ -3 }>
 											{
-												colorRow.map( ( color ) => (
+												Object.values( colorRow ).map( ( color ) => (
 													<ColorCircle key={ color } color={ color } />
 												) )
 											}
 										</Stack>
 									</Button>
-
-									<Typography variant="body2" align="center" sx={ { mt: 3 } }>Vibrant</Typography>
 								</Box>
 							) )
 						}
-					</Stack>
+					</Box>
 				</Stack>
 
 				<Stack spacing={ 4 }>
 					<Typography variant="h6" sx={ { fontWeight: 'bold', mt: 4 } }>
-						Choose a font
+						Choose a font pairing
 					</Typography>
 
-					<Stack direction="row" justifyContent="center" spacing={ 4 }>
+					<Box direction="row" display="flex" justifyContent={ { xs: 'space-between', sm: 'flex-start' } } flexWrap="wrap" gap={ 4 }>
 						{
-							fonts.map( ( { label, value }, index ) => (
+							fonts.map( ( { value, family }, index ) => (
 								<Box key={ value }>
 									<Button
 										variant="outlined"
 										color="secondary"
-										sx={ { maxWidth: 150, py: 12, px: 3, opacity: selectedFont && selectedFont !== index ? '0.25' : '1' } }
+										sx={ { width: squareWidth, py: 12, px: 3, opacity: selectedFont && selectedFont !== index ? '0.25' : '1' } }
 										onClick={ () => handleFont( index ) }
 										disabled={ selectedFont && selectedFont !== index }
 									>
 										<Stack>
-											<Typography variant="h6" sx={ { fontWeight: 'bold', mb: 3 } }>Titles</Typography>
-											<Typography variant="body2" sx={ { mb: 3 } }>body text</Typography>
+											<Typography variant="h6" sx={ { fontWeight: 'bold', mb: 3, fontFamily: family } }>Titles</Typography>
+											<Typography variant="body2" sx={ { mb: 3, fontFamily: family } }>body text</Typography>
 
-											<Button sx={ { mt: 2 } } color="secondary" variant="contained" size="small">Button text</Button>
+											<Button sx={ { mt: 2, fontFamily: family } } color="secondary" variant="contained" size="small">Button text</Button>
 										</Stack>
 									</Button>
-
-									<Typography variant="body2" align="center" sx={ { mt: 3 } }>{ label }</Typography>
 								</Box>
 							) )
 						}
-					</Stack>
+					</Box>
 				</Stack>
 			</Stack>
 		</Stack>

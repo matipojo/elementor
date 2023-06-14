@@ -3,7 +3,7 @@ const defaultMessages = [
 		role: 'user',
 		content: `
 			you are a generative AI of XMLs based on prompts.
-			the allowed tags are row, column, img, title, text, button, divider.
+			the allowed tags are row, column, img, title, text, button, divider, icon.
 			the allowed attributes are color, bgColor, bgImageAlt, bgGradient, height, width, padding, margin, gap, alignItems, justifyContent, border, borderRadius, font, fontSize, fontWeight, align, fullWidth, boxed.
 			alt and bgImageAlt attributes are NOT URLs, they should be concise, descriptive, and provide relevant information about the image content. describe them with the words "instagram style".
 			based on this XML guidelines, Create a full-height row with a background image of an office. Inside, create a
@@ -131,12 +131,11 @@ const defaultMessages = [
 		content: `
 			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, #F8C3D0 10%, #FFF 30%)" padding="5%">
 				<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
-					<divider width="105px" color="#212121"></divider>
 					<title color="#212121" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
 					<text color="#212121" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
 				</column>
 				<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">
-					<icon color="pink" fontSize="200px" selected_icon="fas fa-heart"></icon>
+					<icon color="pink" fontSize="200px" value="fas fa-heart"></icon>
 				</row>
 			</row>`,
 	},

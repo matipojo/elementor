@@ -125,7 +125,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				`<div class="ai-loading ai-loading-elements" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>`,
 			);
 		} else {
-			element.querySelectorAll( '.ai-loading-elements' )?.remove?.();
+			element.get( 0 ).querySelectorAll( '.ai-loading-elements' )?.remove?.();
 		}
 	}
 }

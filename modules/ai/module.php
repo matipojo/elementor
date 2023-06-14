@@ -526,13 +526,6 @@ class Module extends BaseModule {
 	}
 
 	public function ajax_onboarding_update_globals( $data ) {
-		$data = [
-			'primary_color' => '#000000',
-			'secondary_color' => '#F03737',
-			'text_color' => '#F0F0F0',
-			'accent_color' => '#F03737',
-		];
-
 		$kit = Plugin::$instance->kits_manager->get_active_kit();
 
 		$d = [
@@ -924,6 +917,10 @@ class Module extends BaseModule {
 		];
 
 		$kit->save( $d );
+
+		return [
+			'status' => 'success',
+		];
 	}
 
 	private function upload_image( $image_url, $image_title, $parent_post_id = 0 ) {

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import BusinessStep from './steps/business-step';
 import BlocksStep from './steps/blocks-step';
 import StyleStep from './steps/style-step';
+import { updateGlobals } from '../../api/calls';
 
 export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 	const [ skipped, setSkipped ] = useState( new Set() );
@@ -43,6 +44,13 @@ export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 
 	const handleFinish = () => {
 		console.log( 'data', data );
+
+		updateGlobals( {
+			primary_color: '#000000',
+			secondary_color: '#F03737',
+			text_color: '#F0F0F0',
+			accent_color: '#F03737',
+		} );
 	};
 
 	return (

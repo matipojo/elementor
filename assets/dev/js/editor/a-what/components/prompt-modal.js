@@ -18,6 +18,8 @@ export default function PromptModal( { setElementId, elementId } ) {
 	const status = useSelector( selectStatus );
 	const promptInputRef = useRef();
 
+	const generateButtonText = results.current?.nextPrompt ? 'Regenerate' : 'Generate';
+
 	const inputPromptPlaceholder = 'I want a hero section with background image and two columns.';
 
 	const submit = async ( { prompt, eId } ) => {
@@ -49,42 +51,51 @@ export default function PromptModal( { setElementId, elementId } ) {
 				scroll="paper"
 				maxWidth="md"
 				sx={ {
+					position: 'absolute',
+					bottom: 56,
+					left: 0,
+					right: 'initial',
+					top: 'initial',
+					width: '100%',
+					height: 'auto',
 					'& .MuiDialog-container': {
 						alignItems: 'flex-end',
-						// Mb: '18vh',
 					},
 				} }
 				PaperProps={ {
 					sx: {
 						m: 0,
-						mb: 11,
 					},
 				} }
 			>
 				<DialogTitle sx={ { bgcolor: 'background.paper' } }>
 					<Stack direction="row" spacing={ 3 } alignItems="center">
 						<Tooltip title="Generate with text">
-							<ToggleButton
-								size="small"
-								aria-label="close"
-								onClick={ () => setElementId( null ) }
-								selected
-								value
-								disabled={ 'pending' === status }
-							>
-								<TextIcon />
-							</ToggleButton>
+							<Box component="span" sx={ { cursor: 'pointer' } }>
+								<ToggleButton
+									size="small"
+									aria-label="close"
+									onClick={ () => setElementId( null ) }
+									selected
+									value
+									disabled={ 'pending' === status }
+								>
+									<TextIcon />
+								</ToggleButton>
+							</Box>
 						</Tooltip>
 
 						<Tooltip title="Soon.. (Generate with image)">
-							<IconButton
-								size="small"
-								aria-label="close"
-								onClick={ () => setElementId( null ) }
-								disabled
-							>
-								<BrushIcon />
-							</IconButton>
+							<Box component="span" sx={ { cursor: 'pointer' } }>
+								<IconButton
+									size="small"
+									aria-label="close"
+									onClick={ () => setElementId( null ) }
+									disabled
+								>
+									<BrushIcon />
+								</IconButton>
+							</Box>
 						</Tooltip>
 
 					</Stack>
@@ -93,25 +104,29 @@ export default function PromptModal( { setElementId, elementId } ) {
 
 					<Stack direction="row" spacing={ 3 } alignItems="center">
 						<Tooltip title="Undo">
-							<IconButton
-								size="small"
-								aria-label="close"
-								onClick={ () => undo( { eId: elementId } ) }
-								disabled={ 'pending' === status }
-							>
-								<UndoIcon />
-							</IconButton>
+							<Box component="span" sx={ { cursor: 'pointer' } }>
+								<IconButton
+									size="small"
+									aria-label="close"
+									onClick={ () => undo( { eId: elementId } ) }
+									disabled={ 'pending' === status || 0 === results.past.length }
+								>
+									<UndoIcon />
+								</IconButton>
+							</Box>
 						</Tooltip>
 
 						<Tooltip title="Redo">
-							<IconButton
-								size="small"
-								aria-label="close"
-								onClick={ () => redo( { eId: elementId } ) }
-								disabled={ 'pending' === status }
-							>
-								<RedoIcon />
-							</IconButton>
+							<Box component="span" sx={ { cursor: 'pointer' } }>
+								<IconButton
+									size="small"
+									aria-label="close"
+									onClick={ () => redo( { eId: elementId } ) }
+									disabled={ 'pending' === status || 0 === results.future.length }
+								>
+									<RedoIcon />
+								</IconButton>
+							</Box>
 						</Tooltip>
 					</Stack>
 
@@ -155,9 +170,14 @@ export default function PromptModal( { setElementId, elementId } ) {
 									promptInputRef.current.value = inputPromptPlaceholder;
 								}
 							} }
+							sx={ {
+								'& .Mui-disabled': {
+									bgcolor: 'background.default',
+								},
+							} }
 						/>
 
-						<Stack direction="row" alignItems="center" spacing={ 3 } sx={ { ml: 5 } }>
+						<Stack direction="row" alignItems="center" spacing={ 4 } sx={ { ml: 5 } }>
 							{
 								false
 									? <CircularProgress color="secondary" size={ 20 } sx={ { mr: 2 } } />
@@ -179,10 +199,15 @@ export default function PromptModal( { setElementId, elementId } ) {
 								variant="contained"
 								type="submit"
 								disabled={ 'pending' === status }
-								startIcon={ <AIIcon /> }
+								startIcon={ 'pending' !== status && <AIIcon /> }
 								size="small"
+								sx={ { width: 130 } }
 							>
-								{ results.current?.nextPrompt ? 'Regenerate' : 'Generate' }
+								{
+									'pending' === status
+										? <CircularProgress color="secondary" size={ 20 } />
+										: generateButtonText
+								}
 							</Button>
 						</Stack>
 					</Box>

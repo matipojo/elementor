@@ -51,10 +51,13 @@ export default function PromptModal( { setElementId, elementId } ) {
 
 		const resultsData = [ ...results.past, results.current ].filter( Boolean );
 
+		const countToRemove = Math.min( ( resultsData.length - 1 ) * 2, 8 );
+		const messagesToConcat = defaultMessages.slice( 0, defaultMessages.length - countToRemove );
+
 		const result = await request( {
 			body: {
 				messages: [
-					...defaultMessages,
+					...messagesToConcat,
 					...resultsData.reduce( ( acc, res ) => {
 						if ( res.result ) {
 							acc.push( {

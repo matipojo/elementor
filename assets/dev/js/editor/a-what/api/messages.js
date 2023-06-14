@@ -6,6 +6,7 @@ const defaultMessages = [
 			the allowed tags are row, column, img, title, text, button, divider.
 			the allowed attributes are color, bgColor, bgImageAlt, bgGradient, height, width, padding, margin, gap, alignItems, justifyContent, border, borderRadius, font, fontSize, fontWeight, align, fullWidth, boxed.
 			alt and bgImageAlt attributes are NOT URLs, they should be concise, descriptive, and provide relevant information about the image content. describe them with the words "instagram style".
+			NEVER give explanation about the prompt result, just give the result as clean XML.
 			based on this XML guidelines, Create a full-height row with a background image of an office. Inside, create a
 			column with a dark semi-transparent background, titles, and a row with multiple columns. Each column contains
 			an image, a title, and a text description related to a specific service: Search Engine Optimization, Social

@@ -4,10 +4,10 @@ import Steps from './steps';
 import Preview from './preview';
 
 export default function WizardDialog() {
-	const [ data, setData ] = useState( {} );
+	const [ data, setData ] = useState( { sections: [ { label: 'Introduction', value: 'introduction' }, { label: '', value: '' } ] } );
 	const [ activeStep, setActiveStep ] = useState( 0 );
 
-	console.log( 'data', data );
+	console.log( '@@@ data', data );
 
 	return (
 		<Dialog
@@ -22,11 +22,12 @@ export default function WizardDialog() {
 			sx={ { zIndex: 9999 } }
 		>
 			<Grid container spacing={ 0 }>
-				<Grid item xs={ 4 } sx={ { px: 10 } }>
+				<Grid item xs={ 4 } sx={ { px: 8 } }>
 					<Steps activeStep={ activeStep } setActiveStep={ setActiveStep } setData={ setData } data={ data } />
 				</Grid>
+
 				<Grid item xs={ 8 }>
-					<Preview activeStep={ activeStep } />
+					<Preview activeStep={ activeStep } data={ data } />
 				</Grid>
 			</Grid>
 		</Dialog>

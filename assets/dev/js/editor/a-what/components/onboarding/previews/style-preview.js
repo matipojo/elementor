@@ -1,0 +1,10 @@
+
+import { Box } from '@elementor/ui';
+
+export default function StylePreview() {
+	return (
+		<Box width="100%" maxWidth="680px" margin="0 auto">
+			<img src={ `${ elementorCommonConfig.urls.assets }images/ai/ai-style.png` } alt="Business Preview" width="100%" />
+		</Box>
+	);
+}

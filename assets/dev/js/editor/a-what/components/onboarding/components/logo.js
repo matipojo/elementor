@@ -1,4 +1,4 @@
-import { DialogTitle, SvgIcon, styled, Stack } from '@elementor/ui';
+import { SvgIcon, styled, Stack, Typography } from '@elementor/ui';
 
 const ElementorLogo = ( props ) => {
 	return (
@@ -16,11 +16,11 @@ const StyledElementorLogo = styled( ElementorLogo )( ( { theme } ) => ( {
 	},
 } ) );
 
-export default function DialogHeader() {
+export default function Logo() {
 	return (
 		<Stack direction="row" spacing={ 3 }>
-			<StyledElementorLogo sx={ { mr: 3 } } />
-			Elementor
+			<StyledElementorLogo />
+			<Typography variant="h4">elementor</Typography>
 		</Stack>
 	);
 }

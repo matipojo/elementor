@@ -54,6 +54,12 @@ export class Parser {
 				break;
 
 			case 'title':
+			case 'h1':
+			case 'h2':
+			case 'h3':
+			case 'h4':
+			case 'h5':
+			case 'h6':
 				result = this.parseHeading( node );
 				break;
 
@@ -421,7 +427,6 @@ export class Parser {
 		return result;
 	}
 
-	//TODO: alignment & icon pattern (user and etc)
 	parseIcon( node ) {
 		const result = {
 			elType: 'widget',
@@ -436,10 +441,12 @@ export class Parser {
 			fontSize: ( value ) => {
 				return [ 'size', parseSize( value, true ) ];
 			},
+			selected_icon: ( value ) => {
+				return  [ 'selected_icon',  { value, library: 'fa-solid' } ];
+			}
 		};
 
 		result.settings = this.parseAttributes( node, attrsMap );
-
 		return result;
 	}
 

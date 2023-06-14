@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { Dialog, Grid } from '@elementor/ui';
 import Steps from './steps';
 import Preview from './preview';
 
 export default function WizardDialog() {
-	const [ state, setState ] = useState( {} );
+	const [ data, setData ] = useState( {} );
+	const [ activeStep, setActiveStep ] = useState( 0 );
+
+	console.log( 'data', data );
 
 	return (
 		<Dialog
@@ -18,11 +22,11 @@ export default function WizardDialog() {
 			sx={ { zIndex: 9999 } }
 		>
 			<Grid container spacing={ 0 }>
-				<Grid item xs={ 4 }>
-					<Steps setState={ setState } />
+				<Grid item xs={ 4 } sx={ { px: 10 } }>
+					<Steps activeStep={ activeStep } setActiveStep={ setActiveStep } setData={ setData } data={ data } />
 				</Grid>
 				<Grid item xs={ 8 }>
-					<Preview state={ state } />
+					<Preview activeStep={ activeStep } />
 				</Grid>
 			</Grid>
 		</Dialog>

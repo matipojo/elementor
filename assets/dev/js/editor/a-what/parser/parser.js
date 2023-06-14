@@ -468,9 +468,15 @@ export class Parser {
 				return;
 			}
 
-			const [ control, settingValue ] = resolver( attrValue, settings );
+			const result = resolver( attrValue, settings );
 
-			settings[ control ] = settingValue;
+			if ( Array.isArray( result ) ) {
+				const [ control, settingValue ] = result;
+
+				settings[ control ] = settingValue;
+			} else {
+				Object.assign( settings, result );
+			}
 		} );
 
 		return settings;

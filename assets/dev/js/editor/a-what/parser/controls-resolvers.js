@@ -53,7 +53,15 @@ export function bgColor( attrName, prefix ) {
 		[ attrName ]: ( value, settings ) => {
 			settings[ `${ prefix }_background` ] = 'classic';
 
-			return globalizeColor( `${ prefix }_color`, value );
+			const color = globalizeColor( `${ prefix }_color`, value );
+
+			if ( Array.isArray( color ) ) {
+				return color;
+			}
+
+			Object.assign( settings, color );
+
+			return [ '__', 'asd' ];
 		},
 	};
 }
@@ -65,8 +73,21 @@ export function bgGradient( attrName, prefix ) {
 
 			const { type, angle, colors } = parseGradient( value );
 
-			settings.push( globalizeColor( `${ prefix }_color`, colors[ 0 ] ) );
-			settings.push( globalizeColor( `${ prefix }_color_b`, colors[ 1 ] ) );
+			const color1 = globalizeColor( `${ prefix }_color`, colors[ 0 ] );
+			const color2 = globalizeColor( `${ prefix }_color_b`, colors[ 1 ] );
+
+			if ( Array.isArray( color1 ) ) {
+				settings[ color1[ 0 ] ] = color1[ 1 ];
+			} else {
+				Object.assign( settings, color1 );
+			}
+
+			if ( Array.isArray( color2 ) ) {
+				settings[ color2[ 0 ] ] = color2[ 1 ];
+			} else {
+				Object.assign( settings, color2 );
+			}
+
 			settings[ `${ prefix }_gradient_angle` ] = angle;
 
 			return [ `${ prefix }_gradient_type`, type ];

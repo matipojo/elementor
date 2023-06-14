@@ -1,27 +1,25 @@
-import { Box, Stepper, Step, StepLabel, Typography, Button } from '@elementor/ui';
-import DialogHeader from './dialog/dialog-header';
+import { Box, Stepper, Step, StepLabel, Stack, Button } from '@elementor/ui';
 import { useState } from 'react';
 import BusinessStep from './steps/business-step';
 import StyleStep from './steps/style-step';
 import BlocksStep from './steps/blocks-step';
 
-export default function Steps() {
+export default function Steps( { activeStep, setActiveStep, setData, data } ) {
 	const steps = [
 		{
 			label: 'Business Info',
-			filler: <BusinessStep />,
+			filler: <BusinessStep setData={ setData } />,
 		},
 		{
 			label: 'Look and Feel',
-			filler: <StyleStep />,
+			filler: <StyleStep setData={ setData } />,
 		},
 		{
 			label: 'Building Blocks',
-			filler: <BlocksStep />,
+			filler: <BlocksStep setData={ setData } />,
 		},
 	];
 
-	const [ activeStep, setActiveStep ] = useState( 0 );
 	const [ skipped, setSkipped ] = useState( new Set() );
 
 	const isStepSkipped = ( step ) => {
@@ -43,11 +41,15 @@ export default function Steps() {
 		setActiveStep( ( prevActiveStep ) => prevActiveStep - 1 );
 	};
 
+	const handleFinish = () => {
+
+	};
+
 	return (
 		<Box sx={ { height: '100vh' } } >
-			<DialogHeader />
+			{ /* <DialogHeader /> */ }
 
-			<Stepper activeStep={ activeStep } alternativeLabel sx={ { marginTop: 10, marginBottom: 10 } }>
+			<Stepper activeStep={ 1 } alternativeLabel sx={ { py: 10 } }>
 				{ steps.map( ( step ) => (
 					<Step key={ step.label }>
 						<StepLabel>{ step.label }</StepLabel>
@@ -55,23 +57,35 @@ export default function Steps() {
 				) ) }
 			</Stepper>
 
-			<Box display="flex" justifyContent="center" sx={ { margin: 'auto', height: '50vh', width: '90%' } } >
+			<Box display="flex" justifyContent="center" >
 				{ steps[ activeStep ].filler }
 			</Box>
 
-			<Box sx={ { display: 'flex', flexDirection: 'row', pt: 2 } }>
-				<Button
-					color="inherit"
-					disabled={ 0 === activeStep }
-					onClick={ handleBack }
-					sx={ { mr: 1 } }
-				>
-					Back
-				</Button>
-				<Box sx={ { flex: '1 1 auto' } } />
-				<Button onClick={ handleNext }>
-					{ activeStep === steps.length - 1 ? 'Finish' : 'Next' }
-				</Button>
+			<Box display="flex" position="sticky" top="calc(100% - 72px)" sx={ { mt: 8 } }>
+				{
+					activeStep > 0 && (
+						<Button
+							color="secondary"
+							disabled={ 0 === activeStep }
+							onClick={ handleBack }
+							sx={ { mr: 1 } }
+						>
+							Back
+						</Button>
+					)
+				}
+
+				<Stack direction="row" justifyContent="flex-end" flexGrow={ 1 }>
+					{
+						activeStep === steps.length - 1
+							? <Button variant="contained" onClick={ handleFinish }>
+								Finish
+							</Button>
+							: <Button variant="contained" onClick={ handleNext }>
+								Next
+							</Button>
+					}
+				</Stack>
 			</Box>
 		</Box>
 	);

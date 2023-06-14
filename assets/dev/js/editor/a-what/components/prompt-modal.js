@@ -77,7 +77,10 @@ export default function PromptModal( { setElementId, elementId } ) {
 					}, [] ),
 					{
 						role: 'user',
-						content: prompt,
+						content: `
+							My website name: Varda's Flowers Shop
+							My website description: A flower shop that sells flowers and bouquets for all occasions.
+							My prompt: ${ prompt }`,
 					},
 				],
 			},
@@ -106,8 +109,8 @@ export default function PromptModal( { setElementId, elementId } ) {
 		setEnhancing( true );
 
 		const enhancedPrompt = `Prompt: "${ prompt }".
-		Assuming that i'm going to send the prompt to AI generator for blocks of a websites, can you enhance it?
-		Limit it to 3 lines.`
+		Assuming that i'm going to send the prompt to AI generator for styled blocks of a websites, can you enhance it?
+		Limit it to 3 sentences.`;
 
 		const result = await request( {
 			body: {

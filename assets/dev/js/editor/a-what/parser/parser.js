@@ -112,23 +112,6 @@ export class Parser {
 			},
 		};
 
-		// Color,
-		// bgColor,
-		// bgImage,
-		// bgGradient,
-		// height,
-		// width,
-		// padding,
-		// margin,
-		// gap,
-		// alignItems,
-		// border,
-		// borderRadius,
-		// font,
-		// fontSize,
-		// fontWeight
-		// align
-
 		const attrsMap = {
 			width: ( value ) => {
 				return [ 'boxed_width', parseSize( value, true ) ];
@@ -187,6 +170,10 @@ export class Parser {
 			...bgColor( 'bgColor', 'background' ),
 			...bgColor( 'hover_bgColor', 'background_hover' ),
 		};
+
+		if ( result.settings.background_color && result.__ai.prompt ) {
+			delete result.settings.background_color;
+		}
 
 		result.settings = {
 			...result.settings,

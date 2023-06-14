@@ -30,11 +30,17 @@ export default function PromptModal( { setElementId, elementId } ) {
 			results: [ ...results.past, results.current ].filter( Boolean ),
 		} );
 
-		window.last_result = result;
+		const isValid = result.includes( '<' );
 
-		// Const result = `<row><text>${ prompt }</text></row>`;
+		if ( isValid ) {
+			window.last_result = result;
 
-		dispatch( slice.actions.end( { elementId: eId, result } ) );
+			// Const result = `<row><text>${ prompt }</text></row>`;
+
+			dispatch( slice.actions.end( { elementId: eId, result } ) );
+		} else {
+			dispatch( slice.actions.error( { elementId: eId, error: result } ) );
+		}
 
 		setElementId( eId );
 	};

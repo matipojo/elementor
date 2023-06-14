@@ -83,14 +83,12 @@ export function globalizeColor( controlId, color ) {
 		return [ controlId, color ];
 	}
 
-	return [
-		{
-			[ controlId ]: '',
-			__globals__: {
-				[ controlId ]: 'globals/colors?id=' + matchedColor,
-			},
+	return {
+		[ controlId ]: '',
+		__globals__: {
+			[ controlId ]: 'globals/colors?id=' + matchedColor,
 		},
-	];
+	};
 }
 
 export function parseGradient( bgGradient ) {

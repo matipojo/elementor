@@ -1,12 +1,9 @@
 import { useSelector } from '@elementor/store';
 import { selectElementResults } from '../store';
-import React, { useEffect, useState } from 'react';
-import { AIIcon } from '@elementor/icons';
-import { Box, Portal } from '@elementor/ui';
+import React, { useEffect } from 'react';
 
-export default function ExistingPromptButton( { elementId, setElementId } ) {
+export default function ExistingPromptButton( { elementId } ) {
 	const results = useSelector( ( state ) => selectElementResults( state, elementId ) );
-	const [ element, setElement ] = useState( null );
 
 	useEffect( () => {
 		let container = window.elementor.getContainer( elementId );
@@ -16,8 +13,6 @@ export default function ExistingPromptButton( { elementId, setElementId } ) {
 			results.current?.result || '<row></row>',
 			elementId || null,
 		);
-
-		console.log( 'parsed data: ', model );
 
 		let at = null;
 
@@ -32,28 +27,7 @@ export default function ExistingPromptButton( { elementId, setElementId } ) {
 			model,
 			options: { at, edit: false },
 		} );
-
-		setElement( container.view.$el.get( 0 ) );
 	}, [ results.current?.id ] );
 
-	return (
-		<>
-			{
-				element
-					? <Portal container={ element } key={ elementId }>
-						<Box style={ { position: 'absolute', top: '10px', left: '10px' } } className="ai-element-button">
-							<button
-								className="elementor-add-section-area-button e-block-ai-button"
-								title="Generate with AI"
-								onClick={ () => setElementId( elementId ) }
-								style={ { width: '32px', height: '32px', padding: '10px' } }
-							>
-								<AIIcon fill="white" />
-							</button>
-						</Box>
-					</Portal>
-					: null
-			}
-		</>
-	);
+	return null;
 }

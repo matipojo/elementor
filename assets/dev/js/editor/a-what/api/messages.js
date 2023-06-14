@@ -124,7 +124,7 @@ const defaultMessages = [
 		role: 'user',
 		content: `Create a boxed row with a width of 1400px and a height of 80% of the viewport.
 			The row has a background gradient, fading from pink to white. Inside the row, place a centered column with
-			a divider, a title, and a star icon.`,
+			a divider, a title, and a star pink icon.`,
 	},
 	{
 		role: 'assistant',
@@ -137,6 +137,7 @@ const defaultMessages = [
 				</column>
 				<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">
 					<icon color="#183A4B" fontSize="200px" content="\\e89e"></icon>
+					<icon color="pink" fontSize="200px"><i class="fas fa-star"></i></icon>
 				</row>
 			</row>`,
 	},

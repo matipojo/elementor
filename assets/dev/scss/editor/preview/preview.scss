@@ -338,6 +338,27 @@ html.elementor-html {
 	transition: var(--e-a-transition-hover);
 }
 
+
+[data-nesting-level="0"] > .elementor-element-overlay > .elementor-editor-container-settings {
+	top: 4px !important;
+	right: 4px !important;
+	transform: none !important;
+	left: initial !important;
+	border-radius: 2px !important;
+	background-color: var(--e-p-border-con-in) !important;
+	overflow: hidden !important;
+
+	& > li::before,
+	& > li::after {
+		display: none !important;
+	}
+
+	& > li:hover {
+		border-radius: 0 !important;
+		background-color: var(--e-p-border-con-in-hover) !important;
+	}
+}
+
 .elementor-editor-element-edit {
 
 	@media(min-width: $editor-screen-lg-min) {

@@ -446,7 +446,7 @@ export class Parser {
 			fontSize: ( value ) => {
 				return [ 'size', parseSize( value, true ) ];
 			},
-			selected_icon: ( value ) => {
+			value: ( value ) => {
 				return [ 'selected_icon', { value, library: 'fa-solid' } ];
 			},
 		};

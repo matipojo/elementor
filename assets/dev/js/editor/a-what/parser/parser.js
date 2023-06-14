@@ -54,6 +54,12 @@ export class Parser {
 				break;
 
 			case 'title':
+			case 'h1':
+			case 'h2':
+			case 'h3':
+			case 'h4':
+			case 'h5':
+			case 'h6':
 				result = this.parseHeading( node );
 				break;
 

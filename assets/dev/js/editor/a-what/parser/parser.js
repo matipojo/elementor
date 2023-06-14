@@ -384,6 +384,11 @@ export class Parser {
 
 		const attrsMap = {
 			...common(),
+			// Override things from common.
+			...border( 'border', 'image_border' ),
+			borderRadius: ( value ) => {
+				return [ 'image_border_radius', normalize4Sizes( value ) ];
+			},
 		};
 
 		result.settings = this.parseAttributes( node, attrsMap );
@@ -442,8 +447,8 @@ export class Parser {
 				return [ 'size', parseSize( value, true ) ];
 			},
 			selected_icon: ( value ) => {
-				return  [ 'selected_icon',  { value, library: 'fa-solid' } ];
-			}
+				return [ 'selected_icon', { value, library: 'fa-solid' } ];
+			},
 		};
 
 		result.settings = this.parseAttributes( node, attrsMap );

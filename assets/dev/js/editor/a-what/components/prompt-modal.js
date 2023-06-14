@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, IconButton, Stack, Divider, Tooltip, ToggleButton, CircularProgress, styled } from '@elementor/ui';
 import { useDispatch, useSelector } from '@elementor/store';
 import { XIcon, AIIcon } from '@elementor/icons';
@@ -36,6 +36,8 @@ export default function PromptModal( { setElementId, elementId } ) {
 	const status = useSelector( selectStatus );
 	const promptInputRef = useRef();
 
+	const [ enhancing, setEnhancing ] = useState( false );
+
 	const generateButtonText = results.current?.nextPrompt ? 'Regenerate' : 'Generate';
 
 	const inputPromptPlaceholder = 'I want a hero section with background image and two columns.';
@@ -47,14 +49,38 @@ export default function PromptModal( { setElementId, elementId } ) {
 
 		dispatch( slice.actions.start( { elementId: eId, prompt } ) );
 
+		const resultsData = [ ...results.past, results.current ].filter( Boolean );
+
 		const result = await request( {
-			prompt,
-			results: [ ...results.past, results.current ].filter( Boolean ),
+			body: {
+				messages: [
+					...defaultMessages,
+					...resultsData.reduce( ( acc, res ) => {
+						if ( res.result ) {
+							acc.push( {
+								role: 'assistant',
+								content: res.result,
+							} );
+						}
+
+						if ( res.nextPrompt ) {
+							acc.push( {
+								role: 'user',
+								content: res.nextPrompt,
+							} );
+						}
+
+						return acc;
+					}, [] ),
+					{
+						role: 'user',
+						content: prompt,
+					},
+				],
+			},
 		} );
 
 		// Const result = `<row bgImage="coffee" height="500px"><col><text>${ prompt }</text></col></row>>`;
-
-		console.log( result );
 
 		const isValid = result.includes( '<' );
 
@@ -69,8 +95,43 @@ export default function PromptModal( { setElementId, elementId } ) {
 		setElementId( eId );
 	};
 
+	const enhancePrompt = async ( prompt ) => {
+		if ( ! promptInputRef.current.value.trim() ) {
+			return;
+		}
+
+		setEnhancing( true );
+
+		const enhancedPrompt = `you are a generative AI of XMLs based on prompts.
+		the allowed tags are row, column, img, title, text, button, divider.
+		the allowed attributes are color, bgColor, bgImage, bgGradient, height, width, padding, margin, gap, alignItems, justifyContent, border, borderRadius, font, fontSize, fontWeight, align, fullWidth, boxed.
+		image tags and bgImage attributes don't have URLs of images but descriptions of them.
+		based on this XML guidelines, Create a full-height row with a background image of an office. Inside, create a
+		column with a dark semi-transparent background, titles, and a row with multiple columns. Each column contains
+		an image, a title, and a text description related to a specific service: Search Engine Optimization, Social
+		Media Marketing, and Web Design and Development.
+		take the following prompt and enhance it by creating a more descriptive instruction that will make you generate the most suitable layout according the required instruction: "${ prompt }"`;
+
+		const result = await request( {
+			body: {
+				messages: [
+					{
+						role: 'user',
+						content: enhancedPrompt,
+					},
+				],
+			},
+		} );
+
+		promptInputRef.current.value = result;
+
+		setEnhancing( false );
+	};
+
 	const undo = ( { eId } ) => dispatch( slice.actions.undo( { elementId: eId } ) );
 	const redo = ( { eId } ) => dispatch( slice.actions.redo( { elementId: eId } ) );
+
+	const isLoading = 'pending' === status || enhancing;
 
 	return (
 		<Draggable handle=".MuiDialogTitle-root" cancel={ '[class*="MuiDialogContent-root"]' }>
@@ -139,7 +200,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 									size="small"
 									aria-label="close"
 									onClick={ () => undo( { eId: elementId } ) }
-									disabled={ 'pending' === status || 0 === results.past.length }
+									disabled={ isLoading || 0 === results.past.length }
 								>
 									<UndoIcon />
 								</IconButton>
@@ -152,7 +213,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 									size="small"
 									aria-label="close"
 									onClick={ () => redo( { eId: elementId } ) }
-									disabled={ 'pending' === status || 0 === results.future.length }
+									disabled={ isLoading || 0 === results.future.length }
 								>
 									<RedoIcon />
 								</IconButton>
@@ -184,6 +245,9 @@ export default function PromptModal( { setElementId, elementId } ) {
 						display="flex"
 					>
 						<TextField
+							multiline
+							minRows={ 1 }
+							maxRows={ 3 }
 							ref={ promptInputRef }
 							fullWidth
 							name="prompt"
@@ -192,11 +256,11 @@ export default function PromptModal( { setElementId, elementId } ) {
 							placeholder={ inputPromptPlaceholder }
 							color="secondary"
 							variant="standard"
-							disabled={ 'pending' === status }
+							disabled={ isLoading }
 							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={ true }
 							onKeyDown={ ( event ) => {
-								if ( 'Tab' === event.key ) {
+								if ( 'Tab' === event.key && '' === promptInputRef.current.value.trim() ) {
 									event.preventDefault();
 									promptInputRef.current.value = inputPromptPlaceholder;
 								}
@@ -208,37 +272,39 @@ export default function PromptModal( { setElementId, elementId } ) {
 							} }
 						/>
 
-						<Stack direction="row" alignItems="center" spacing={ 4 } sx={ { ml: 4 } }>
-							{
-								false
-									? <CircularProgress color="secondary" size={ 16 } />
-									: <Tooltip title="Enhance prompt">
-										<Box component="span" sx={ { cursor: 'pointer' } }>
-											<IconButton
-												size="small"
-												color="secondary"
-												onClick={ () => {} }
-												disabled={ 'pending' === status }
-											>
-												<WandIcon />
-											</IconButton>
-										</Box>
-									</Tooltip>
-							}
-
-							<GenerateButton
-								variant="contained"
-								type="submit"
-								disabled={ 'pending' === status }
-								startIcon={ 'pending' !== status && <AIIcon /> }
-								size="small"
-							>
+						<Stack direction="row" alignItems="flex-end" sx={ { ml: 4 } }>
+							<Stack direction="row" alignItems="center" spacing={ 4 }>
 								{
-									'pending' === status
-										? <CircularProgress color="secondary" size={ 20 } />
-										: generateButtonText
+									enhancing
+										? <CircularProgress color="secondary" size={ 16 } />
+										: <Tooltip title="Enhance prompt">
+											<Box component="span" sx={ { cursor: 'pointer' } }>
+												<IconButton
+													size="small"
+													color="secondary"
+													onClick={ () => enhancePrompt( promptInputRef.current.value ) }
+													disabled={ isLoading }
+												>
+													<WandIcon />
+												</IconButton>
+											</Box>
+										</Tooltip>
 								}
-							</GenerateButton>
+
+								<GenerateButton
+									variant="contained"
+									type="submit"
+									disabled={ isLoading }
+									startIcon={ 'pending' !== status && <AIIcon /> }
+									size="small"
+								>
+									{
+										'pending' === status
+											? <CircularProgress color="secondary" size={ 20 } />
+											: generateButtonText
+									}
+								</GenerateButton>
+							</Stack>
 						</Stack>
 					</Box>
 				</StyledDialogContent>
@@ -247,32 +313,9 @@ export default function PromptModal( { setElementId, elementId } ) {
 	);
 }
 
-function request( { prompt, results } ) {
+function request( { body: bodyData } ) {
 	const body = {
-		messages: [
-			...defaultMessages,
-			...results.reduce( ( acc, result ) => {
-				if ( result.result ) {
-					acc.push( {
-						role: 'assistant',
-						content: result.result,
-					} );
-				}
-
-				if ( result.nextPrompt ) {
-					acc.push( {
-						role: 'user',
-						content: result.nextPrompt,
-					} );
-				}
-
-				return acc;
-			}, [] ),
-			{
-				role: 'user',
-				content: prompt,
-			},
-		],
+		...bodyData,
 		model: 'gpt-3.5-turbo',
 	};
 

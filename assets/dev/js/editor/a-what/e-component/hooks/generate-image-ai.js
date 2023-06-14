@@ -24,13 +24,12 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 		elements.forEach( async ( element ) => {
 			const prompt = element.__ai.prompt;
 
+			const isBg = 'container' === element.elType;
 			const key = prompt + isBg ? '__bg' : 'normal';
 
 			console.log( `loading image for ${ element.id }` );
 
 			let imageUrl = null;
-
-			const isBg = 'container' === element.elType;
 
 			if ( window.prompt_image_map[ key ] ) {
 				imageUrl = window.prompt_image_map[ key ];

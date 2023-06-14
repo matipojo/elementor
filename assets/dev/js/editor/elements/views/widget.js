@@ -125,6 +125,10 @@ const WidgetView = BaseWidget.extend( {
 
 		this.normalizeAttributes();
 
+		if ( 'image' === this.model.get( 'widgetType' ) ) {
+			this.$el.append( `<div class="ai-loading-element"></div>` );
+		}
+
 		// TODO: Find a better way to detect if all the images have been loaded
 		self.$el.imagesLoaded().always( function() {
 			setTimeout( function() {

@@ -16,8 +16,6 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 
 		const elements = this.getAiElements( [ args.model ] );
 
-		console.log( elements );
-
 		elements.forEach( async ( element ) => {
 			this.toggleLoader( element, true );
 
@@ -113,19 +111,10 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 			return;
 		}
 
-		if ( 'container' === elementData.elType ) {
-			if ( loading ) {
-				element.get( 0 ).classList.add( 'ai-loading' );
-			} else {
-				element.get( 0 ).classList.remove( 'ai-loading' );
-			}
-		} else if ( loading ) {
-			console.log( element );
-			element.append(
-				`<div class="ai-loading ai-loading-elements" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>`,
-			);
+		if ( loading ) {
+			element.get( 0 ).classList.add( 'ai-loading' );
 		} else {
-			element.querySelectorAll( '.ai-loading-elements' )?.remove?.();
+			element.get( 0 ).classList.remove( 'ai-loading' );
 		}
 	}
 }

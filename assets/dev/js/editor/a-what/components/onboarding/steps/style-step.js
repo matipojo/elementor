@@ -62,7 +62,7 @@ export default function StyleStep( { data, setData } ) {
 						Choose a color palette
 					</Typography>
 
-					<Stack direction="row" justifyContent="space-between" spacing={ 4 }>
+					<Box direction="row" display="flex" justifyContent={ { xs: 'space-between', sm: 'flex-start' } } flexWrap="wrap" gap={ 4 }>
 						{
 							colors.map( ( colorRow, index ) => (
 								<Box key={ index }>
@@ -84,7 +84,7 @@ export default function StyleStep( { data, setData } ) {
 								</Box>
 							) )
 						}
-					</Stack>
+					</Box>
 				</Stack>
 
 				<Stack spacing={ 4 }>
@@ -92,7 +92,7 @@ export default function StyleStep( { data, setData } ) {
 						Choose a font pairing
 					</Typography>
 
-					<Stack direction="row" justifyContent="space-between" spacing={ 4 }>
+					<Box direction="row" display="flex" justifyContent={ { xs: 'space-between', sm: 'flex-start' } } flexWrap="wrap" gap={ 4 }>
 						{
 							fonts.map( ( { value }, index ) => (
 								<Box key={ value }>
@@ -113,7 +113,7 @@ export default function StyleStep( { data, setData } ) {
 								</Box>
 							) )
 						}
-					</Stack>
+					</Box>
 				</Stack>
 			</Stack>
 		</Stack>

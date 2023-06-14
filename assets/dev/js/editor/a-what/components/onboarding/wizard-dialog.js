@@ -22,11 +22,11 @@ export default function WizardDialog() {
 			sx={ { zIndex: 9999 } }
 		>
 			<Grid container spacing={ 0 }>
-				<Grid item xs={ 4 } sx={ { px: 10 } }>
+				<Grid item xs={ 6 } md={ 4 } sx={ { px: 10 } }>
 					<Steps activeStep={ activeStep } setActiveStep={ setActiveStep } setData={ setData } data={ data } />
 				</Grid>
 
-				<Grid item xs={ 8 }>
+				<Grid item xs={ 6 } md={ 8 }>
 					<Preview activeStep={ activeStep } data={ data } />
 				</Grid>
 			</Grid>

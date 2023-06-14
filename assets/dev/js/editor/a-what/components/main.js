@@ -10,7 +10,6 @@ export default function Main() {
 	const [ elementId, setElementId ] = useState( null );
 	const elementsIds = useSelector( selectElementsIds );
 
-	console.log( elementId );
 
 	return <>
 		<PromptModal elementId={ elementId } setElementId={ setElementId } />

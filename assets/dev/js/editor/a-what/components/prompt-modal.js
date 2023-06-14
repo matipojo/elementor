@@ -1,13 +1,24 @@
-import { Button, Drawer, TextField } from '@elementor/ui';
+import { useRef } from 'react';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, IconButton, Stack, Divider, Tooltip, ToggleButton, CircularProgress } from '@elementor/ui';
 import { useDispatch, useSelector } from '@elementor/store';
+import { XIcon, AIIcon } from '@elementor/icons';
 import { selectElementResults, selectStatus, slice } from '../store';
 import defaultMessages from '../api/messages';
 import { env } from '../env';
+import Draggable from 'react-draggable';
+import TextIcon from '../icons/text-icon';
+import BrushIcon from '../icons/brush-icon';
+import RedoIcon from '../icons/redo-icon';
+import UndoIcon from '../icons/undo-icon';
+import WandIcon from '../icons/wand-icon';
 
 export default function PromptModal( { setElementId, elementId } ) {
 	const dispatch = useDispatch();
 	const results = useSelector( ( state ) => selectElementResults( state, elementId ) );
 	const status = useSelector( selectStatus );
+	const promptInputRef = useRef();
+
+	const inputPromptPlaceholder = 'I want a hero section with background image and two columns.';
 
 	const submit = async ( { prompt, eId } ) => {
 		dispatch( slice.actions.start( { elementId: eId, prompt } ) );
@@ -28,44 +39,154 @@ export default function PromptModal( { setElementId, elementId } ) {
 	const redo = ( { eId } ) => dispatch( slice.actions.redo( { elementId: eId } ) );
 
 	return (
-		<Drawer
-			anchor="bottom"
-			open={ !! elementId }
-			onClose={ () => setElementId( null ) }
-		>
-			<form
-				onSubmit={ async ( e ) => {
-					e.preventDefault();
-
-					await submit( { eId: elementId, prompt: e.target.prompt.value } );
-
-					e.target.reset();
+		<Draggable handle=".MuiDialogTitle-root" cancel={ '[class*="MuiDialogContent-root"]' }>
+			<Dialog
+				open={ !! elementId }
+				fullWidth={ true }
+				hideBackdrop={ true }
+				scroll="paper"
+				maxWidth="md"
+				sx={ {
+					'& .MuiDialog-container': {
+						alignItems: 'flex-end',
+						// Mb: '18vh',
+					},
 				} }
-				style={ { padding: '20px', display: 'flex' } }
+				PaperProps={ {
+					sx: {
+						m: 0,
+						mb: 11,
+					},
+				} }
 			>
-				<Button
-					disabled={ 0 === results.past.length }
-					onClick={ () => undo( { eId: elementId } ) }
-				>
-					Undo
-				</Button>
-				<Button
-					disabled={ 0 === results.future.length }
-					onClick={ () => redo( { eId: elementId } ) }
-				>
-					Redo
-				</Button>
-				<TextField
-					sx={ { width: '100%' } }
-					name="prompt"
-					defaultValue={ results.current?.nextPrompt || '' }
-					key={ results.current?.nextPrompt || '__EMPTY__' }
-				/>
-				<Button variant="contained" type="submit" disabled={ 'pending' === status }>
-					{ results.current?.nextPrompt ? 'Regenerate' : 'Generate' }
-				</Button>
-			</form>
-		</Drawer>
+				<DialogTitle sx={ { bgcolor: 'background.paper' } }>
+					<Stack direction="row" spacing={ 3 } alignItems="center">
+						<Tooltip title="Generate with text">
+							<ToggleButton
+								size="small"
+								aria-label="close"
+								onClick={ setElementId( null ) }
+								selected
+								value
+								disabled={ 'pending' === status }
+							>
+								<TextIcon />
+							</ToggleButton>
+						</Tooltip>
+
+						<Tooltip title="Soon.. (Generate with image)">
+							<IconButton
+								size="small"
+								aria-label="close"
+								onClick={ setElementId( null ) }
+								disabled
+							>
+								<BrushIcon />
+							</IconButton>
+						</Tooltip>
+
+					</Stack>
+
+					<Divider orientation="vertical" variant="middle" flexItem sx={ { mx: 4, my: 3 } } />
+
+					<Stack direction="row" spacing={ 3 } alignItems="center">
+						<Tooltip title="Undo">
+							<IconButton
+								size="small"
+								aria-label="close"
+								onClick={ () => undo( { eId: elementId } ) }
+								disabled={ 'pending' === status }
+							>
+								<UndoIcon />
+							</IconButton>
+						</Tooltip>
+
+						<Tooltip title="Redo">
+							<IconButton
+								size="small"
+								aria-label="close"
+								onClick={ () => redo( { eId: elementId } ) }
+								disabled={ 'pending' === status }
+							>
+								<RedoIcon />
+							</IconButton>
+						</Tooltip>
+					</Stack>
+
+					<Stack direction="row" spacing={ 3 } alignItems="center" sx={ { ml: 'auto' } }>
+						<IconButton
+							size="small"
+							aria-label="close"
+							onClick={ setElementId( null ) }
+							sx={ { '&.MuiButtonBase-root': { mr: -4 } } }
+						>
+							<XIcon />
+						</IconButton>
+					</Stack>
+				</DialogTitle>
+
+				<DialogContent>
+					<Box component="form"
+						onSubmit={ async ( e ) => {
+							e.preventDefault();
+
+							await submit( { eId: elementId, prompt: e.target.prompt.value } );
+
+							e.target.reset();
+						} }
+						display="flex"
+					>
+						<TextField
+							ref={ promptInputRef }
+							fullWidth
+							name="prompt"
+							defaultValue={ results.current?.nextPrompt || '' }
+							key={ results.current?.nextPrompt || '__EMPTY__' }
+							placeholder={ inputPromptPlaceholder }
+							color="secondary"
+							variant="standard"
+							disabled={ 'pending' === status }
+							autoFocus={ true }
+							onKeyDown={ ( event ) => {
+								if ( 'Tab' === event.key ) {
+									event.preventDefault();
+									promptInputRef.current.value = inputPromptPlaceholder;
+								}
+							} }
+						/>
+
+						<Stack direction="row" alignItems="center" spacing={ 3 } sx={ { ml: 5 } }>
+							{
+								false
+									? <CircularProgress color="secondary" size={ 20 } sx={ { mr: 2 } } />
+									: <Tooltip title="Enhance prompt">
+										<Box component="span" sx={ { cursor: 'pointer' } }>
+											<IconButton
+												size="small"
+												color="secondary"
+												onClick={ () => {} }
+												disabled={ 'pending' === status }
+											>
+												<WandIcon />
+											</IconButton>
+										</Box>
+									</Tooltip>
+							}
+
+							<Button
+								variant="contained"
+								type="submit"
+								disabled={ 'pending' === status }
+								startIcon={ <AIIcon /> }
+								size="small"
+							>
+								{ results.current?.nextPrompt ? 'Regenerate' : 'Generate' }
+							</Button>
+						</Stack>
+					</Box>
+				</DialogContent>
+			</Dialog>
+		</Draggable>
 	);
 }
 

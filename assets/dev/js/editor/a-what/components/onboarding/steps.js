@@ -46,10 +46,10 @@ export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 		console.log( 'data', data );
 
 		updateGlobals( {
-			primary_color: '#000000',
-			secondary_color: '#F03737',
-			text_color: '#F0F0F0',
-			accent_color: '#F03737',
+			primary_color: '#75976A',
+			secondary_color: '#CCCFD8',
+			text_color: '#586264',
+			accent_color: '#CC5B76',
 		} );
 	};
 

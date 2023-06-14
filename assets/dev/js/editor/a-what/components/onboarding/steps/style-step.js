@@ -111,8 +111,6 @@ export default function StyleStep( { data, setData } ) {
 										<Stack>
 											<Typography variant="h6" sx={ { fontWeight: 'bold', mb: 3, fontFamily: family } }>Titles</Typography>
 											<Typography variant="body2" sx={ { mb: 3, fontFamily: family } }>body text</Typography>
-
-											<Button sx={ { mt: 2, fontFamily: family } } color="secondary" variant="contained" size="small">Button text</Button>
 										</Stack>
 									</Button>
 								</Box>

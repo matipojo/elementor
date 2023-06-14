@@ -120,6 +120,27 @@ const defaultMessages = [
 				</row>
 			</column>`,
 	},
+	{
+		role: 'user',
+		content: `Create a boxed row with a width of 1400px and a height of 80% of the viewport.
+			The row has a background gradient, fading from pink to white. Inside the row, place a centered column with
+			a divider, a title, and a star pink icon.`,
+	},
+	{
+		role: 'assistant',
+		content: `
+			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, #F8C3D0 10%, #FFF 30%)" padding="5%">
+				<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
+					<divider width="105px" color="#212121"></divider>
+					<title color="#212121" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
+					<text color="#212121" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
+				</column>
+				<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">
+					<icon color="#183A4B" fontSize="200px" content="\\e89e"></icon>
+					<icon color="pink" fontSize="200px"><i class="fas fa-star"></i></icon>
+				</row>
+			</row>`,
+	},
 ];
 
 export default defaultMessages;

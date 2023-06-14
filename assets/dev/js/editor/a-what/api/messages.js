@@ -3,9 +3,11 @@ const defaultMessages = [
 		role: 'user',
 		content: `
 			you are a generative AI of XMLs based on prompts.
-			the allowed tags are row, column, img, title, text, button, divider.
-			the allowed attributes are color, bgColor, bgImage, bgGradient, height, width, padding, margin, gap, alignItems, justifyContent, border, borderRadius, font, fontSize, fontWeight, align, fullWidth, boxed.
-			image tags and bgImage attributes don't have URLs of images but descriptions of them.
+			the allowed tags are row, column, img, title, text, button, divider, icon.
+			the allowed attributes are color, bgColor, bgImageAlt, bgGradient, height, width, padding, margin, gap, alignItems, justifyContent, border, borderRadius, font, fontSize, fontWeight, align, fullWidth, boxed.
+			alt and bgImageAlt attributes are NOT URLs, they should be concise, descriptive, and provide relevant information about the image content. describe them with the words "instagram style".
+			colors will be #000 #fff and variables only, the variables will be: var( --background-color ), var( --primary-color ), var( --secondary-color ), var( --text-color ), var( --accent-color ).
+			NEVER give explanation about the prompt result, just give the result as clean XML.
 			based on this XML guidelines, Create a full-height row with a background image of an office. Inside, create a
 			column with a dark semi-transparent background, titles, and a row with multiple columns. Each column contains
 			an image, a title, and a text description related to a specific service: Search Engine Optimization, Social
@@ -14,26 +16,26 @@ const defaultMessages = [
 	{
 		role: 'assistant',
 		content: `
-			<column boxed="true" width="100%" gap="50px" bgColor="#F6F7FB" padding="4% 8%" alignItems="center">
-				<title align="center" color="#5E5E5E" font="Montserrat" fontWeight="600" fontSize="18px">OUR SERVICES</title>
+			<column boxed="true" width="100%" gap="50px" bgColor="var( --background-color )" padding="4% 8%" alignItems="center">
+				<title align="center" color="var( --primary-color )" font="Montserrat" fontWeight="600" fontSize="18px">OUR SERVICES</title>
 				<row boxed="true" width="100%" justifyContent="center" gap="50px" padding="0">
 					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="#FFFFFF" borderRadius="20px" alignItems="center" justifyContent="space-between">
-						<img align="center" width="70px" alt="icon for SEO optimization" />
-						<title align="center" color="#252525" font="Poppins" fontWeight="700" fontSize="22px">Search Engine Optimization</title>
-						<text color="#5C5B5B" font="Poppins" fontWeight="400" fontSize="16px" align="center">Our SEO experts work on strategies that help your website rank higher on Google and other search engines, increasing organic traffic to your website. </text>
-						<button href="/seo" color="#FFFFFF" bgColor="#F17F20" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
+						<icon align="center" width="70px" alt="icon for SEO optimization" />
+						<title align="center" color="var( --primary-color )" font="Poppins" fontWeight="700" fontSize="22px">Search Engine Optimization</title>
+						<text color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="16px" align="center">Our SEO experts work on strategies that help your website rank higher on Google and other search engines, increasing organic traffic to your website. </text>
+						<button href="/seo" color="#FFFFFF" bgColor="var( --secondary-color )" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
+					</column>
+					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="var( --accent-color )" borderRadius="20px" alignItems="center" justifyContent="space-between">
+						<icon align="center" width="70px" alt="icon for social media marketing" />
+						<title align="center" color="var( --primary-color )" font="Poppins" fontWeight="700" fontSize="22px">Social Media Marketing</title>
+						<text color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="16px" align="center">We run targeted ad campaigns on social media platforms that help you reach your target audience, increase brand awareness, and drive more traffic to your website or store.</text>
+						<button href="/social-media" color="#FFFFFF" bgColor="var( --secondary-color )" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
 					</column>
 					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="#FFFFFF" borderRadius="20px" alignItems="center" justifyContent="space-between">
-						<img align="center" width="70px" alt="icon for social media marketing" />
-						<title align="center" color="#252525" font="Poppins" fontWeight="700" fontSize="22px">Social Media Marketing</title>
-						<text color="#5C5B5B" font="Poppins" fontWeight="400" fontSize="16px" align="center">We run targeted ad campaigns on social media platforms that help you reach your target audience, increase brand awareness, and drive more traffic to your website or store.</text>
-						<button href="/social-media" color="#FFFFFF" bgColor="#F17F20" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
-					</column>
-					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="#FFFFFF" borderRadius="20px" alignItems="center" justifyContent="space-between">
-						<img align="center" width="70px" alt="icon for web design" />
-						<title align="center" color="#252525" font="Poppins" fontWeight="700" fontSize="22px">Web Design and Development</title>
-						<text color="#5C5B5B" font="Poppins" fontWeight="400" fontSize="16px" align="center">Our web design and development team creates visually stunning and user-friendly websites that help you convert more visitors into customers and grow your business online.</text>
-						<button href="/web-design" color="#FFFFFF" bgColor="#F17F20" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
+						<icon align="center" width="70px" alt="icon for web design" />
+						<title align="center" color="var( --primary-color )" font="Poppins" fontWeight="700" fontSize="22px">Web Design and Development</title>
+						<text color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="16px" align="center">Our web design and development team creates visually stunning and user-friendly websites that help you convert more visitors into customers and grow your business online.</text>
+						<button href="/web-design" color="#FFFFFF" bgColor="var( --secondary-color )" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
 					</column>
 				</row>
 			</column>`
@@ -49,11 +51,11 @@ const defaultMessages = [
 	{
 		role: 'assistant',
 		content: `
-			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, #F8C3D0 10%, #FFF 30%)" padding="5%">
+			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, var( --primary-color ), 10%, #FFF 30%)" padding="5%">
 				<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
-					<divider width="105px" color="#212121"></divider>
-					<title color="#212121" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
-					<text color="#212121" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
+					<divider width="105px" color="var( --divider-color )"></divider>
+					<title color="var( --primary-color )" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
+					<text color="var( --text-color )" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
 				</column>
 				<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">
 					<img width="40%" alt="studio portrait of black woman drinking coffee" />
@@ -65,7 +67,7 @@ const defaultMessages = [
 	},
 	{
 		role: 'user',
-		content: `Create a boxed column that spans the full width and has a light gray background.
+		content: `Create a boxed column that spans the full width and has a color background.
 		Inside this column, add another boxed column with a width of 1140px and some spacing.
 		Include two titles aligned to the center, one in purple and the other in a responsive font size. Below the titles,
 		create a boxed row with a width of 1584px and a height of 450px. Within this row, place multiple images of individuals
@@ -75,10 +77,10 @@ const defaultMessages = [
 	{
 		role: 'assistant',
 		content: `
-			<column boxed="true" width="100%" gap="65px" bgColor="#F7F7F7" padding="4% 8%">
+			<column boxed="true" width="100%" gap="65px" bgColor="var( --background-color )" padding="4% 8%">
 				<column boxed="true" width="1140px" gap="10px" padding="0">
-					<title align="center" color="#5E0EE6" font="DM Sans" fontWeight="400" fontSize="16px">MEET THE TEAM</title>
-					<title align="center" color="#5E0EE6" font="DM Sans" fontWeight="500" fontSize="2.5vw">Powered by our people</title>
+					<title align="center" color="var( --secondary-color )" font="DM Sans" fontWeight="400" fontSize="16px">MEET THE TEAM</title>
+					<title align="center" color="var( --secondary-color )" font="DM Sans" fontWeight="500" fontSize="2.5vw">Powered by our people</title>
 				</column>
 				<row boxed="true" width="1584px" height="450px" gap="0" padding="0">
 					<img width="25%" margin="0 -10% 0 0" alt="studio portrait of black woman drinking coffee, light orange background" />
@@ -91,19 +93,19 @@ const defaultMessages = [
 	},
 	{
 		role: 'user',
-		content: `Create a boxed column with a light gray background, padding, and a gap between elements. Inside, add a
+		content: `Create a boxed column with a accent background, padding, and a gap between elements. Inside, add a
 		divider, titles, and a text paragraph. Below, create a boxed row with two columns. The first column contains an
 		image, while the second column has a divider, a title, a text paragraph, and a button.`,
 	},
 	{
 		role: 'assistant',
 		content: `
-			<column boxed="true" width="100%" gap="50px" bgColor="#F6F7FB" padding="4% 8%">
+			<column boxed="true" width="100%" gap="50px" bgColor="var( --accent-color )" padding="4% 8%">
 				<column boxed="true" width="100%" gap="30px" padding="0">
-					<divider width="60px" color="#5E5E5E"></divider>
-					<title align="center" color="#5E5E5E" font="Montserrat" fontWeight="600" fontSize="18px">ABOUT US</title>
-					<title align="center" color="#252525" font="Poppins" fontWeight="900" fontSize="3.5vw">CREATIVE IS OUR CORE</title>
-					<text align="center" color="#8D8D8D" font="Poppins" fontWeight="400" fontSize="18px" padding="0 10%">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
+					<divider width="60px" color="var( --divider-color )"></divider>
+					<title align="center" color="var( --primary-color )" font="Montserrat" fontWeight="600" fontSize="18px">ABOUT US</title>
+					<title align="center" color="var( --secondary-color )" font="Poppins" fontWeight="900" fontSize="3.5vw">CREATIVE IS OUR CORE</title>
+					<text align="center" color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="18px" padding="0 10%">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
 				</column>
 				<row boxed="true" width="1050px" justifyContent="space-between" gap="5%">
 					<column width="45%">
@@ -111,10 +113,10 @@ const defaultMessages = [
 					</column>
 					<column width="45%">
 						<column boxed="true" width="100%" gap="30px" padding="0">
-							<divider width="90px" color="#5E5E5E"></divider>
-							<title color="#5C5B5B" font="Poppins" fontWeight="700" fontSize="22px">The best of your ideas combined with our creativity</title>
-							<text color="#8D8D8D" font="Poppins" fontWeight="400" fontSize="18px" padding="20px 0">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
-							<button href="/services" color="#fff" bgColor="#5E5E5E" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">See our services</button>
+							<divider width="90px" color="#000"></divider>
+							<title color="var( --primary-color )" font="Poppins" fontWeight="700" fontSize="22px">The best of your ideas combined with our creativity</title>
+							<text color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="18px" padding="20px 0">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
+							<button href="/services" color="#fff" bgColor="var( --accent-color )" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">See our services</button>
 						</column>
 					</column>
 				</row>
@@ -123,21 +125,19 @@ const defaultMessages = [
 	{
 		role: 'user',
 		content: `Create a boxed row with a width of 1400px and a height of 80% of the viewport.
-			The row has a background gradient, fading from pink to white. Inside the row, place a centered column with
-			a divider, a title, and a star pink icon.`,
+			The row has a background gradient, fading from pink to white. Inside the row, place a centered column with a title,
+			and a heart pink icon of size 200px.`,
 	},
 	{
 		role: 'assistant',
 		content: `
-			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, #F8C3D0 10%, #FFF 30%)" padding="5%">
+			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, var( --primary-color ) 10%, var( --primary_darker-color ) 30%)" padding="5%">
 				<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
-					<divider width="105px" color="#212121"></divider>
-					<title color="#212121" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
-					<text color="#212121" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
+					<title color="#fff" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
+					<text color="var( --text-color )" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
 				</column>
 				<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">
-					<icon color="#183A4B" fontSize="200px" content="\\e89e"></icon>
-					<icon color="pink" fontSize="200px"><i class="fas fa-star"></i></icon>
+					<icon color="var( --primary-color )" fontSize="200px" value="fas fa-heart"></icon>
 				</row>
 			</row>`,
 	},

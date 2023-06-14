@@ -483,7 +483,56 @@ class Module extends BaseModule {
 		];
 	}
 
+	private function darkenColor($color)
+	{
+		// Remove the '#' symbol if present
+		$color = str_replace('#', '', $color);
+
+		// Convert the color to RGB values
+		$red = hexdec(substr($color, 0, 2));
+		$green = hexdec(substr($color, 2, 2));
+		$blue = hexdec(substr($color, 4, 2));
+
+		// Calculate the darker RGB values
+		$red = round($red * 0.88);
+		$green = round($green * 0.88);
+		$blue = round($blue * 0.88);
+
+		// Convert the darker RGB values back to hexadecimal format
+		$darkerColor = sprintf("#%02x%02x%02x", $red, $green, $blue);
+
+		return $darkerColor;
+	}
+
+	private function reverseColor($color)
+	{
+		// Remove '#' from the beginning of the color if present
+		$color = ltrim($color, '#');
+
+		// Convert the color to RGB
+		$red = hexdec(substr($color, 0, 2));
+		$green = hexdec(substr($color, 2, 2));
+		$blue = hexdec(substr($color, 4, 2));
+
+		// Calculate the inverse RGB values
+		$inverseRed = 255 - $red;
+		$inverseGreen = 255 - $green;
+		$inverseBlue = 255 - $blue;
+
+		// Convert the inverse RGB values back to hexadecimal
+		$inverseColor = sprintf("#%02X%02X%02X", $inverseRed, $inverseGreen, $inverseBlue);
+
+		return $inverseColor;
+	}
+
 	public function ajax_onboarding_update_globals( $data ) {
+		$data = [
+			'primary_color' => '#000000',
+			'secondary_color' => '#F03737',
+			'text_color' => '#F0F0F0',
+			'accent_color' => '#F03737',
+		];
+
 		$kit = Plugin::$instance->kits_manager->get_active_kit();
 
 		$d = [
@@ -498,25 +547,58 @@ class Module extends BaseModule {
 								[
 									'_id' => 'primary',
 									'title' => 'Primary',
-									'color' => '#000000',
+									'color' => $data[ 'primary_color' ],
 								],
 							1 =>
 								[
 									'_id' => 'secondary',
 									'title' => 'Secondary',
-									'color' => '#F03737',
+									'color' => $data[ 'secondary_color' ],
 								],
 							2 =>
 								[
 									'_id' => 'text',
 									'title' => 'Body Text',
-									'color' => '#F0F0F0',
+									'color' => $data[ 'text_color' ],
 								],
 							3 =>
 								[
 									'_id' => 'accent',
 									'title' => 'Accent',
-									'color' => '#F0F0F0',
+									'color' => $data[ 'accent_color' ],
+								],
+						],
+					'custom_colors' =>
+						[
+							0 =>
+								[
+									'_id' => 'primary_darker',
+									'title' => 'Primary Darker',
+									'color' => $this->darkenColor( $data['primary_color'] ),
+								],
+							1 =>
+								[
+									'_id' => 'secondary_darker',
+									'title' => 'Secondary Darker',
+									'color' => $this->darkenColor( $data['secondary_color'] ),
+								],
+							2 =>
+								[
+									'_id' => 'text_darker',
+									'title' => 'Body Darker',
+									'color' => $this->darkenColor( $data['text_color'] ),
+								],
+							3 =>
+								[
+									'_id' => 'accent_darker',
+									'title' => 'Accent Darker',
+									'color' => $this->darkenColor( $data['accent_color'] ),
+								],
+							4 =>
+								[
+									'_id' => 'background',
+									'title' => 'Background',
+									'color' => $this->reverseColor( $data['primary_color'] ),
 								],
 						],
 					'system_typography' =>
@@ -839,7 +921,7 @@ class Module extends BaseModule {
 								],
 						],
 				],
-			];
+		];
 
 		$kit->save( $d );
 	}

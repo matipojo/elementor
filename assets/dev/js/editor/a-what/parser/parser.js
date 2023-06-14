@@ -1,5 +1,5 @@
 import { bgColor, bgGradient, border, common, typography } from './controls-resolvers';
-import { normalize4Sizes, parseSize } from './controls-parsers';
+import { globalizeColor, normalize4Sizes, parseSize } from './controls-parsers';
 
 export class Parser {
 	parse( xml, elementId = null ) {
@@ -54,6 +54,12 @@ export class Parser {
 				break;
 
 			case 'title':
+			case 'h1':
+			case 'h2':
+			case 'h3':
+			case 'h4':
+			case 'h5':
+			case 'h6':
 				result = this.parseHeading( node );
 				break;
 
@@ -106,23 +112,6 @@ export class Parser {
 			},
 		};
 
-		// Color,
-		// bgColor,
-		// bgImage,
-		// bgGradient,
-		// height,
-		// width,
-		// padding,
-		// margin,
-		// gap,
-		// alignItems,
-		// border,
-		// borderRadius,
-		// font,
-		// fontSize,
-		// fontWeight
-		// align
-
 		const attrsMap = {
 			width: ( value ) => {
 				return [ 'boxed_width', parseSize( value, true ) ];
@@ -165,7 +154,7 @@ export class Parser {
 				settings.border_border = style;
 				settings.border_width = normalize4Sizes( size );
 
-				return [ 'border_color', color ];
+				return globalizeColor( 'border_color', color );
 			},
 			borderRadius: ( value ) => {
 				return [ 'border_radius', normalize4Sizes( value ) ];
@@ -181,6 +170,10 @@ export class Parser {
 			...bgColor( 'bgColor', 'background' ),
 			...bgColor( 'hover_bgColor', 'background_hover' ),
 		};
+
+		if ( result.settings.background_color && result.__ai.prompt ) {
+			delete result.settings.background_color;
+		}
 
 		result.settings = {
 			...result.settings,
@@ -269,10 +262,10 @@ export class Parser {
 			...typography( 'button_typography' ),
 			...border( 'border', 'button_border' ),
 			bgColor: ( value ) => {
-				return [ 'button_background_color', value ];
+				return globalizeColor( 'button_background_color', value );
 			},
 			color: ( value ) => {
-				return [ 'button_text_color', value ];
+				return globalizeColor( 'button_text_color', value );
 			},
 			borderRadius: ( value ) => {
 				return [ 'button_border_radius', normalize4Sizes( value ) ];
@@ -303,10 +296,10 @@ export class Parser {
 			...typography( 'field_typography' ),
 			...border( 'border', 'field_border' ),
 			bgColor: ( value ) => {
-				return [ 'field_background_color', value ];
+				return globalizeColor( 'field_background_color', value );
 			},
 			color: ( value ) => {
-				return [ 'field_text_color', value ];
+				return globalizeColor( 'field_text_color', value );
 			},
 			borderRadius: ( value ) => {
 				return [ 'field_border_radius', normalize4Sizes( value ) ];
@@ -336,7 +329,7 @@ export class Parser {
 				return [ 'title', value ];
 			},
 			color: ( value ) => {
-				return [ 'title_color', value ];
+				return globalizeColor( 'title_color', value );
 			},
 		};
 
@@ -358,7 +351,7 @@ export class Parser {
 				return [ 'editor', value ];
 			},
 			color: ( value ) => {
-				return [ 'text_color', value ];
+				return globalizeColor( 'text_color', value );
 			},
 		};
 
@@ -398,7 +391,7 @@ export class Parser {
 				return [ 'text', value ];
 			},
 			color: ( value ) => {
-				return [ 'button_text_color', value ];
+				return globalizeColor( 'button_text_color', value );
 			},
 			href: ( value ) => {
 				return [ 'link', { url: value } ];
@@ -421,7 +414,7 @@ export class Parser {
 		return result;
 	}
 
-	//TODO: alignment & icon pattern (user and etc)
+	// TODO: icon pattern (user and etc)
 	parseIcon( node ) {
 		const result = {
 			elType: 'widget',
@@ -431,7 +424,7 @@ export class Parser {
 		const attrsMap = {
 			...common(),
 			color: ( value ) => {
-				return [ 'primary_color', value ];
+				return globalizeColor( 'primary_color', value );
 			},
 			fontSize: ( value ) => {
 				return [ 'size', parseSize( value, true ) ];
@@ -452,7 +445,7 @@ export class Parser {
 		const attrsMap = {
 			...common(),
 			color: ( value ) => {
-				return [ 'color', value ];
+				return globalizeColor( 'color', value );
 			},
 			// Override things from common.
 			width: ( value ) => {

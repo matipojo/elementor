@@ -51,10 +51,13 @@ export default function PromptModal( { setElementId, elementId } ) {
 
 		const resultsData = [ ...results.past, results.current ].filter( Boolean );
 
+		const countToRemove = Math.min( ( resultsData.length - 1 ) * 2, 8 );
+		const messagesToConcat = defaultMessages.slice( 0, defaultMessages.length - countToRemove );
+
 		const result = await request( {
 			body: {
 				messages: [
-					...defaultMessages,
+					...messagesToConcat,
 					...resultsData.reduce( ( acc, res ) => {
 						if ( res.result ) {
 							acc.push( {
@@ -74,7 +77,10 @@ export default function PromptModal( { setElementId, elementId } ) {
 					}, [] ),
 					{
 						role: 'user',
-						content: prompt,
+						content: `
+							My website name: Varda's Flowers Shop
+							My website description: A flower shop that sells flowers and bouquets for all occasions.
+							My prompt: ${ prompt }`,
 					},
 				],
 			},
@@ -102,15 +108,9 @@ export default function PromptModal( { setElementId, elementId } ) {
 
 		setEnhancing( true );
 
-		const enhancedPrompt = `you are a generative AI of XMLs based on prompts.
-		the allowed tags are row, column, img, title, text, button, divider.
-		the allowed attributes are color, bgColor, bgImage, bgGradient, height, width, padding, margin, gap, alignItems, justifyContent, border, borderRadius, font, fontSize, fontWeight, align, fullWidth, boxed.
-		image tags and bgImage attributes don't have URLs of images but descriptions of them.
-		based on this XML guidelines, Create a full-height row with a background image of an office. Inside, create a
-		column with a dark semi-transparent background, titles, and a row with multiple columns. Each column contains
-		an image, a title, and a text description related to a specific service: Search Engine Optimization, Social
-		Media Marketing, and Web Design and Development.
-		take the following prompt and enhance it by creating a more descriptive instruction that will make you generate the most suitable layout according the required instruction: "${ prompt }"`;
+		const enhancedPrompt = `Prompt: "${ prompt }".
+		Assuming that i'm going to send the prompt to AI generator for styled blocks of a websites, can you enhance it?
+		Limit it to 3 sentences.`;
 
 		const result = await request( {
 			body: {

@@ -13,24 +13,22 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 
 	apply( args ) {
 		window.prompt_image_map = window.prompt_image_map || {};
+		window.prompt_image_map[ args.model.id ] = window.prompt_image_map[ args.model.id ] || {};
 
 		const elements = this.getAiElements( [ args.model ] );
-
-		console.log( elements );
 
 		elements.forEach( async ( element ) => {
 			this.toggleLoader( element, true );
 
 			const prompt = element.__ai.prompt;
-			window.prompt_image_map[ element.id ] = window.prompt_image_map[ element.id ] || {};
 
 			const isBg = 'container' === element.elType;
 			const key = `${ prompt }${ isBg ? '__bg' : '__normal' }`;
 
 			let imageUrl;
 
-			if ( window.prompt_image_map[ element.id ][ key ] ) {
-				imageUrl = window.prompt_image_map[ element.id ][ key ];
+			if ( window.prompt_image_map[ args.model.id ][ key ] ) {
+				imageUrl = window.prompt_image_map[ args.model.id ][ key ];
 			} else {
 				const { images: [ { image_url } ] } = await request(
 					'ai_get_text_to_image',
@@ -47,7 +45,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				);
 
 				imageUrl = image_url;
-				window.prompt_image_map[ element.id ][ key ] = image_url;
+				window.prompt_image_map[ args.model.id ][ key ] = image_url;
 			}
 
 			if ( isBg ) {
@@ -113,19 +111,10 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 			return;
 		}
 
-		if ( 'container' === elementData.elType ) {
-			if ( loading ) {
-				element.get( 0 ).classList.add( 'ai-loading' );
-			} else {
-				element.get( 0 ).classList.remove( 'ai-loading' );
-			}
-		} else if ( loading ) {
-			console.log( element );
-			element.append(
-				`<div class="ai-loading ai-loading-elements" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>`,
-			);
+		if ( loading ) {
+			element.get( 0 ).classList.add( 'ai-loading' );
 		} else {
-			element.querySelectorAll( '.ai-loading-elements' )?.remove?.();
+			element.get( 0 ).classList.remove( 'ai-loading' );
 		}
 	}
 }

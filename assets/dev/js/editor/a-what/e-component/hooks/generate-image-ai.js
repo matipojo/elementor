@@ -13,6 +13,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 
 	apply( args ) {
 		window.prompt_image_map = window.prompt_image_map || {};
+		window.prompt_image_map[ args.model.id ] = window.prompt_image_map[ args.model.id ] || {};
 
 		const elements = this.getAiElements( [ args.model ] );
 
@@ -20,15 +21,14 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 			this.toggleLoader( element, true );
 
 			const prompt = element.__ai.prompt;
-			window.prompt_image_map[ element.id ] = window.prompt_image_map[ element.id ] || {};
 
 			const isBg = 'container' === element.elType;
 			const key = `${ prompt }${ isBg ? '__bg' : '__normal' }`;
 
 			let imageUrl;
 
-			if ( window.prompt_image_map[ element.id ][ key ] ) {
-				imageUrl = window.prompt_image_map[ element.id ][ key ];
+			if ( window.prompt_image_map[ args.model.id ][ key ] ) {
+				imageUrl = window.prompt_image_map[ args.model.id ][ key ];
 			} else {
 				const { images: [ { image_url } ] } = await request(
 					'ai_get_text_to_image',
@@ -45,7 +45,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				);
 
 				imageUrl = image_url;
-				window.prompt_image_map[ element.id ][ key ] = image_url;
+				window.prompt_image_map[ args.model.id ][ key ] = image_url;
 			}
 
 			if ( isBg ) {

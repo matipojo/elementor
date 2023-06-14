@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { Stack, Typography, Autocomplete, TextField, Button } from '@elementor/ui';
 import PlusIcon from '../../../icons/plus-icon';
+import { env } from '../../../env';
 
 const sectionTypes = [
 	{
@@ -26,6 +27,42 @@ const sectionTypes = [
 ];
 
 export default function BlocksStep( { data, setData } ) {
+	const request = ( businessType ) => {
+		const body = {
+			messages: [
+				{
+					role: 'user',
+					content: `
+							Create three unique modern color palettes, that will match my business of ${ businessType } each containing four colors.
+							The first palette should evoke a sense of tranquility and relaxation, the second palette should convey energy and vibrancy, and the third palette should capture a feeling of elegance and sophistication.
+							Be creative and use any combination of colors that you think best represents each theme.
+							return only a json in the following structure: [ { primary: '', secondary: '', text: '', accent: ''} ]`,
+				},
+			],
+			model: 'gpt-3.5-turbo',
+		};
+
+		const headers = {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${ env.apiKey }`,
+		};
+
+		return fetch( env.apiURL, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify( body ),
+		} )
+			.then( ( response ) => response.json() )
+			.then( ( data ) => data.choices[ 0 ].message.content )
+			.catch( ( error ) => console.log( error ) );
+	};
+
+	useEffect( () => {
+		request( 'marketing' ).then( ( response ) => {
+			console.log( response );
+		} );
+	}, [] );
+
 	const handleSection = ( index, label, value ) => {
 		setData( ( prevState ) => {
 			const newState = { ...prevState, sections: [ ...prevState.sections ] };

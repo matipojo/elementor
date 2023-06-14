@@ -24,45 +24,74 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 		elements.forEach( async ( element ) => {
 			const prompt = element.__ai.prompt;
 
+			const key = prompt + isBg ? '__bg' : 'normal';
+
 			console.log( `loading image for ${ element.id }` );
 
 			let imageUrl = null;
 
-			if ( window.prompt_image_map[ prompt ] ) {
-				imageUrl = window.prompt_image_map[ prompt ];
+			const isBg = 'container' === element.elType;
+
+			if ( window.prompt_image_map[ key ] ) {
+				imageUrl = window.prompt_image_map[ key ];
 			} else {
 				const { images: [ { image_url } ] } = await request(
 					'ai_get_text_to_image',
 					{
 						prompt,
 						promptSettings: {
-							image_type: 'photographic',
-							style_preset: '',
+							image_type: ! isBg ? 'photographic' : 'background',
+							style_preset: ! isBg ? 'portrait' : '',
 							image_strength: 0,
-							ratio: '1:1',
+							ratio: ! isBg ? '3:4' : '16:9',
 						},
 					},
 					element.id,
 				);
 
 				imageUrl = image_url;
-				window.prompt_image_map[ prompt ] = image_url;
+				window.prompt_image_map[ key ] = image_url;
 			}
 
-			console.log( `image for ${ element.id }: ${ imageUrl }` );
-
-			$e.run( 'document/elements/settings', {
-				container: elementor.getContainer( element.id ),
-				settings: {
-					image: {
-						url: imageUrl,
-						id: '',
+			if ( isBg ) {
+				$e.run( 'document/elements/settings', {
+					container: elementor.getContainer( element.id ),
+					settings: {
+						background_background: 'classic',
+						background_image: {
+							id: '',
+							url: imageUrl,
+						},
+						background_position: 'center center',
+						background_repeat: 'no-repeat',
+						background_size: 'cover',
+						background_overlay_background: 'classic',
+						background_overlay_color: '#000000',
+						background_attachment: 'fixed',
+						background_overlay_opacity: {
+							unit: 'px',
+							size: 0.3,
+							sizes: [],
+						},
 					},
-				},
-				options: {
-					external: true,
-				},
-			} );
+					options: {
+						external: true,
+					},
+				} );
+			} else {
+				$e.run( 'document/elements/settings', {
+					container: elementor.getContainer( element.id ),
+					settings: {
+						image: {
+							url: imageUrl,
+							id: '',
+						},
+					},
+					options: {
+						external: true,
+					},
+				} );
+			}
 		} );
 
 		return true;
@@ -74,7 +103,7 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 				element,
 				...( element.elements?.length > 0 ? this.getAiElements( element.elements ) : [] ),
 			] )
-			.filter( ( element ) => element.__ai && 'image' === element.widgetType );
+			.filter( ( element ) => element.__ai && ( 'image' === element.widgetType || 'container' === element.elType ) );
 	}
 }
 

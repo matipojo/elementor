@@ -17,6 +17,8 @@ export default function ExistingPromptButton( { elementId, setElementId } ) {
 			elementId || null,
 		);
 
+		console.log( 'parsed data: ', model );
+
 		let at = null;
 
 		if ( container ) {

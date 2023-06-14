@@ -46,6 +46,7 @@ export default function init() {
 		routeOpenEvent( 'panel/no-panel' ),
 		() => {
 			document.getElementById( 'elementor-preview' ).style.width = '100%';
+			document.getElementById( 'elementor-preview' ).style.transition = 'none';
 			document.getElementById( 'elementor-panel' ).style.display = 'none';
 		},
 	);

@@ -1,56 +1,43 @@
-import { Box, Button, Divider, Drawer, TextField, Typography } from '@elementor/ui';
+import { Button, Drawer, TextField } from '@elementor/ui';
 import { useDispatch, useSelector } from '@elementor/store';
-import { useState } from 'react';
 import { selectElementResults, selectStatus, slice } from '../store';
 import defaultMessages from '../api/messages';
 import { env } from '../env';
 
-export default function PromptModal( { open, onClose } ) {
-	const [ debugElementId, setDebugElementId ] = useState( '' );
-
+export default function PromptModal( { setElementId, elementId } ) {
 	const dispatch = useDispatch();
-	const results = useSelector( ( state ) => selectElementResults( state, debugElementId ) );
+	const results = useSelector( ( state ) => selectElementResults( state, elementId ) );
 	const status = useSelector( selectStatus );
 
-	const submit = async ( { prompt, elementId } ) => {
-		elementId = elementId || elementorCommon.helpers.getUniqueId();
-
-		dispatch( slice.actions.start( { elementId, prompt } ) );
+	const submit = async ( { prompt, eId } ) => {
+		dispatch( slice.actions.start( { elementId: eId, prompt } ) );
 
 		const result = await request( {
 			prompt,
 			results: [ ...results.past, results.current ].filter( Boolean ),
 		} );
 
-		dispatch( slice.actions.end( { elementId, result } ) );
+		// Const result = `<row><text>${ prompt }</text></row>`;
 
-		setDebugElementId( elementId );
+		dispatch( slice.actions.end( { elementId: eId, result } ) );
+
+		setElementId( eId );
 	};
 
-	const undo = ( { elementId } ) => dispatch( slice.actions.undo( { elementId } ) );
-	const redo = ( { elementId } ) => dispatch( slice.actions.redo( { elementId } ) );
+	const undo = ( { eId } ) => dispatch( slice.actions.undo( { elementId: eId } ) );
+	const redo = ( { eId } ) => dispatch( slice.actions.redo( { elementId: eId } ) );
 
 	return (
 		<Drawer
 			anchor="bottom"
-			open={ open }
-			onClose={ onClose }
+			open={ !! elementId }
+			onClose={ () => setElementId( null ) }
 		>
-			<Box sx={ { padding: '20px' } }>
-				<Typography variant="body2"> Debug: </Typography>
-				<TextField
-					label="Element ID"
-					value={ debugElementId }
-					onChange={ ( e ) => setDebugElementId( e.target.value ) }
-					sx={ { marginTop: '10px' } }
-				/>
-				<Divider sx={ { marginTop: '20px' } } />
-			</Box>
 			<form
 				onSubmit={ async ( e ) => {
 					e.preventDefault();
 
-					await submit( { elementId: debugElementId, prompt: e.target.prompt.value } );
+					await submit( { eId: elementId, prompt: e.target.prompt.value } );
 
 					e.target.reset();
 				} }
@@ -58,13 +45,13 @@ export default function PromptModal( { open, onClose } ) {
 			>
 				<Button
 					disabled={ 0 === results.past.length }
-					onClick={ () => undo( { elementId: debugElementId } ) }
+					onClick={ () => undo( { eId: elementId } ) }
 				>
 					Undo
 				</Button>
 				<Button
 					disabled={ 0 === results.future.length }
-					onClick={ () => redo( { elementId: debugElementId } ) }
+					onClick={ () => redo( { eId: elementId } ) }
 				>
 					Redo
 				</Button>

@@ -75,8 +75,7 @@ export default function StyleStep( { data, setData } ) {
 										onClick={ () => handleColors( index ) }
 										variant="outlined"
 										color="secondary"
-										sx={ { width: squareWidth, py: 10, opacity: selectedColors && selectedColors !== index ? '0.25' : '1' } }
-										disabled={ selectedColors && selectedColors !== index }
+										sx={ { width: squareWidth, py: 10, opacity: Number.isInteger( selectedColors ) && selectedColors !== index ? '0.25' : '1' } }
 									>
 										<Stack direction="row" spacing={ -3 }>
 											{
@@ -104,9 +103,8 @@ export default function StyleStep( { data, setData } ) {
 									<Button
 										variant="outlined"
 										color="secondary"
-										sx={ { width: squareWidth, py: 12, px: 3, opacity: selectedFont && selectedFont !== index ? '0.25' : '1' } }
+										sx={ { width: squareWidth, py: 10, px: 3, opacity: Number.isInteger( selectedFont ) && selectedFont !== index ? '0.25' : '1' } }
 										onClick={ () => handleFont( index ) }
-										disabled={ selectedFont && selectedFont !== index }
 									>
 										<Stack>
 											<Typography variant="h6" sx={ { fontWeight: 'bold', mb: 3, fontFamily: family } }>Titles</Typography>

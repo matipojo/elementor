@@ -4,6 +4,7 @@ import BusinessStep from './steps/business-step';
 import BlocksStep from './steps/blocks-step';
 import StyleStep from './steps/style-step';
 import { updateGlobals } from '../../api/calls';
+import { AIIcon } from '@elementor/icons';
 
 export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 	const [ skipped, setSkipped ] = useState( new Set() );
@@ -84,8 +85,8 @@ export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 				<Stack direction="row" justifyContent="flex-end" flexGrow={ 1 }>
 					{
 						activeStep === steps.length - 1
-							? <Button variant="contained" onClick={ handleFinish }>
-								Finish
+							? <Button variant="contained" onClick={ handleFinish } startIcon={ <AIIcon /> }>
+								Generate
 							</Button>
 							: <Button variant="contained" onClick={ handleNext } disabled={ ! data.type?.label || data.pending } startIcon={ data.pending && <CircularProgress color="secondary" size={ 20 } /> }>
 								Next

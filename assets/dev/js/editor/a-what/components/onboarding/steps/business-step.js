@@ -2,8 +2,20 @@ import { useState } from 'react';
 import { Box, Typography, FormControl, TextField, Stack, Autocomplete } from '@elementor/ui';
 
 const siteTypes = [
-	{ label: 'Marketing' },
-	{ label: 'Websites Agency' },
+	{ label: 'Real Estate' },
+	{ label: 'Agriculture' },
+	{ label: 'Financial services' },
+	{ label: 'Retail' },
+	{ label: 'Airline' },
+	{ label: 'Finance' },
+	{ label: 'Advertising' },
+	{ label: 'Photography' },
+	{ label: 'Computers & Electronics' },
+	{ label: 'Education' },
+	{ label: 'Entertainment' },
+	{ label: 'Food & Dining' },
+	{ label: 'Health & Medicine' },
+	{ label: 'Home & Garden' },
 ];
 
 export default function BusinessStep( { setData } ) {

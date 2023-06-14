@@ -91,6 +91,10 @@ export const slice = createSlice( {
 			id++;
 		},
 
+		error: ( state, { payload: { elementId, error } } ) => {
+			state.status = 'idle';
+		},
+
 		undo( state, { payload: { elementId } } ) {
 			Object.values( state.results ).forEach( ( item ) => {
 				if ( item.elementId !== elementId ) {

@@ -12,6 +12,8 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 	}
 
 	apply( args ) {
+		window.prompt_image_map = window.prompt_image_map || {};
+
 		// TODO: Working with background in containers.
 		// TODO: Add loading to the images.
 
@@ -24,19 +26,28 @@ export class GenerateImageAI extends $e.modules.hookData.After {
 
 			console.log( `loading image for ${ element.id }` );
 
-			const { images: [ { image_url: imageUrl } ] } = await request(
-				'ai_get_text_to_image',
-				{
-					prompt,
-					promptSettings: {
-						image_type: 'photographic',
-						style_preset: '',
-						image_strength: 0,
-						ratio: '1:1',
+			let imageUrl = null;
+
+			if ( window.prompt_image_map[ prompt ] ) {
+				imageUrl = window.prompt_image_map[ prompt ];
+			} else {
+				const { images: [ { image_url } ] } = await request(
+					'ai_get_text_to_image',
+					{
+						prompt,
+						promptSettings: {
+							image_type: 'photographic',
+							style_preset: '',
+							image_strength: 0,
+							ratio: '1:1',
+						},
 					},
-				},
-				element.id,
-			);
+					element.id,
+				);
+
+				imageUrl = image_url;
+				window.prompt_image_map[ prompt ] = image_url;
+			}
 
 			console.log( `image for ${ element.id }: ${ imageUrl }` );
 

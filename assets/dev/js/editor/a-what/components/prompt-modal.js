@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, IconButton, Stack, Divider, Tooltip, ToggleButton, CircularProgress } from '@elementor/ui';
+import { useRef } from 'react';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, IconButton, Stack, Divider, Tooltip, ToggleButton, CircularProgress, styled } from '@elementor/ui';
 import { useDispatch, useSelector } from '@elementor/store';
 import { XIcon, AIIcon } from '@elementor/icons';
 import { selectElementResults, selectStatus, slice } from '../store';
@@ -12,79 +12,109 @@ import RedoIcon from '../icons/redo-icon';
 import UndoIcon from '../icons/undo-icon';
 import WandIcon from '../icons/wand-icon';
 
-export default function PromptModal( { open, onClose } ) {
-	const [ debugElementId, setDebugElementId ] = useState( '' );
+const StyledDialogTitle = styled( DialogTitle )( ( { theme } ) => ( {
+	'&.MuiDialogTitle-root': {
+		backgroundColor: 'dark' === theme.palette.mode ? theme.palette.background.paper : theme.palette.grey[ 100 ],
+		padding: theme.spacing( 0, 6 ),
+	},
+} ) );
 
+const StyledDialogContent = styled( DialogContent )( ( { theme } ) => ( {
+	'&.MuiDialogContent-root': {
+		padding: theme.spacing( 6 ),
+	},
+} ) );
+
+export default function PromptModal( { setElementId, elementId } ) {
 	const dispatch = useDispatch();
-	const results = useSelector( ( state ) => selectElementResults( state, debugElementId ) );
+	const results = useSelector( ( state ) => selectElementResults( state, elementId ) );
 	const status = useSelector( selectStatus );
 	const promptInputRef = useRef();
 
+	const generateButtonText = results.current?.nextPrompt ? 'Regenerate' : 'Generate';
+
 	const inputPromptPlaceholder = 'I want a hero section with background image and two columns.';
 
-	const submit = async ( { prompt, elementId } ) => {
-		elementId = elementId || elementorCommon.helpers.getUniqueId();
-
-		dispatch( slice.actions.start( { elementId, prompt } ) );
+	const submit = async ( { prompt, eId } ) => {
+		dispatch( slice.actions.start( { elementId: eId, prompt } ) );
 
 		const result = await request( {
 			prompt,
 			results: [ ...results.past, results.current ].filter( Boolean ),
 		} );
 
-		dispatch( slice.actions.end( { elementId, result } ) );
+		const isValid = result.includes( '<' );
 
-		setDebugElementId( elementId );
+		if ( isValid ) {
+			window.last_result = result;
+
+			// Const result = `<row><text>${ prompt }</text></row>`;
+
+			dispatch( slice.actions.end( { elementId: eId, result } ) );
+		} else {
+			dispatch( slice.actions.error( { elementId: eId, error: result } ) );
+		}
+
+		setElementId( eId );
 	};
 
-	const undo = ( { elementId } ) => dispatch( slice.actions.undo( { elementId } ) );
-	const redo = ( { elementId } ) => dispatch( slice.actions.redo( { elementId } ) );
+	const undo = ( { eId } ) => dispatch( slice.actions.undo( { elementId: eId } ) );
+	const redo = ( { eId } ) => dispatch( slice.actions.redo( { elementId: eId } ) );
 
 	return (
 		<Draggable handle=".MuiDialogTitle-root" cancel={ '[class*="MuiDialogContent-root"]' }>
 			<Dialog
-				open={ open }
+				open={ !! elementId }
 				fullWidth={ true }
 				hideBackdrop={ true }
 				scroll="paper"
 				maxWidth="md"
 				sx={ {
+					position: 'absolute',
+					bottom: 56,
+					left: 0,
+					right: 'initial',
+					top: 'initial',
+					width: '100%',
+					height: 'auto',
 					'& .MuiDialog-container': {
 						alignItems: 'flex-end',
-						// Mb: '18vh',
 					},
 				} }
 				PaperProps={ {
 					sx: {
 						m: 0,
-						mb: 11,
 					},
 				} }
 			>
-				<DialogTitle sx={ { bgcolor: 'background.paper' } }>
+				<StyledDialogTitle sx={ { bgcolor: 'background.paper' } }>
 					<Stack direction="row" spacing={ 3 } alignItems="center">
 						<Tooltip title="Generate with text">
-							<ToggleButton
-								size="small"
-								aria-label="close"
-								onClick={ onClose }
-								selected
-								value
-								disabled={ 'pending' === status }
-							>
-								<TextIcon />
-							</ToggleButton>
+							<Box component="span" sx={ { cursor: 'pointer' } }>
+								<ToggleButton
+									size="small"
+									aria-label="close"
+									onClick={ () => setElementId( null ) }
+									selected
+									value
+									disabled={ 'pending' === status }
+								>
+									<TextIcon />
+								</ToggleButton>
+							</Box>
 						</Tooltip>
 
 						<Tooltip title="Soon.. (Generate with image)">
-							<IconButton
-								size="small"
-								aria-label="close"
-								onClick={ onClose }
-								disabled
-							>
-								<BrushIcon />
-							</IconButton>
+							<Box component="span" sx={ { cursor: 'pointer' } }>
+								<IconButton
+									size="small"
+									aria-label="close"
+									onClick={ () => setElementId( null ) }
+									disabled
+								>
+									<BrushIcon />
+								</IconButton>
+							</Box>
 						</Tooltip>
 
 					</Stack>
@@ -93,25 +123,29 @@ export default function PromptModal( { open, onClose } ) {
 
 					<Stack direction="row" spacing={ 3 } alignItems="center">
 						<Tooltip title="Undo">
-							<IconButton
-								size="small"
-								aria-label="close"
-								onClick={ undo }
-								disabled={ 'pending' === status }
-							>
-								<UndoIcon />
-							</IconButton>
+							<Box component="span" sx={ { cursor: 'pointer' } }>
+								<IconButton
+									size="small"
+									aria-label="close"
+									onClick={ () => undo( { eId: elementId } ) }
+									disabled={ 'pending' === status || 0 === results.past.length }
+								>
+									<UndoIcon />
+								</IconButton>
+							</Box>
 						</Tooltip>
 
 						<Tooltip title="Redo">
-							<IconButton
-								size="small"
-								aria-label="close"
-								onClick={ redo }
-								disabled={ 'pending' === status }
-							>
-								<RedoIcon />
-							</IconButton>
+							<Box component="span" sx={ { cursor: 'pointer' } }>
+								<IconButton
+									size="small"
+									aria-label="close"
+									onClick={ () => redo( { eId: elementId } ) }
+									disabled={ 'pending' === status || 0 === results.future.length }
+								>
+									<RedoIcon />
+								</IconButton>
+							</Box>
 						</Tooltip>
 					</Stack>
 
@@ -119,20 +153,20 @@ export default function PromptModal( { open, onClose } ) {
 						<IconButton
 							size="small"
 							aria-label="close"
-							onClick={ onClose }
-							sx={ { '&.MuiButtonBase-root': { mr: -4 } } }
+							onClick={ () => setElementId( null ) }
+							sx={ { '&.MuiButtonBase-root': { mr: -3 } } }
 						>
 							<XIcon />
 						</IconButton>
 					</Stack>
-				</DialogTitle>
+				</StyledDialogTitle>
 
-				<DialogContent>
+				<StyledDialogContent>
 					<Box component="form"
 						onSubmit={ async ( e ) => {
 							e.preventDefault();
 
-							await submit( { elementId: debugElementId, prompt: e.target.prompt.value } );
+							await submit( { eId: elementId, prompt: e.target.prompt.value } );
 
 							e.target.reset();
 						} }
@@ -155,9 +189,14 @@ export default function PromptModal( { open, onClose } ) {
 									promptInputRef.current.value = inputPromptPlaceholder;
 								}
 							} }
+							sx={ {
+								'& .Mui-disabled': {
+									bgcolor: 'background.default',
+								},
+							} }
 						/>
 
-						<Stack direction="row" alignItems="center" spacing={ 3 } sx={ { ml: 5 } }>
+						<Stack direction="row" alignItems="center" spacing={ 4 } sx={ { ml: 4 } }>
 							{
 								false
 									? <CircularProgress color="secondary" size={ 20 } sx={ { mr: 2 } } />
@@ -179,14 +218,19 @@ export default function PromptModal( { open, onClose } ) {
 								variant="contained"
 								type="submit"
 								disabled={ 'pending' === status }
-								startIcon={ <AIIcon /> }
+								startIcon={ 'pending' !== status && <AIIcon /> }
 								size="small"
+								sx={ { width: 130 } }
 							>
-								{ results.current?.nextPrompt ? 'Regenerate' : 'Generate' }
+								{
+									'pending' === status
+										? <CircularProgress color="secondary" size={ 20 } />
+										: generateButtonText
+								}
 							</Button>
 						</Stack>
 					</Box>
-				</DialogContent>
+				</StyledDialogContent>
 			</Dialog>
 		</Draggable>
 	);

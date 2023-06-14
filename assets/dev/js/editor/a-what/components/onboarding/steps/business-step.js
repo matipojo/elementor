@@ -1,59 +1,78 @@
-import { Box, Typography, Select, MenuItem, InputLabel, FormControl, TextField } from '@elementor/ui';
 import { useState } from 'react';
+import { Box, Typography, FormControl, TextField, Stack, Autocomplete } from '@elementor/ui';
 
-export default function BusinessStep() {
-	const [ businessType, setBusinessType ] = useState( '' );
+const siteTypes = [
+	{ label: 'Marketing' },
+	{ label: 'Websites Agency' },
+];
 
-	const handleChange = () => setBusinessType( event.target.value );
+export default function BusinessStep( { setData } ) {
+	const setState = ( key, value ) => setData( ( prev ) => ( { ...prev, [ key ]: value } ) );
+
+	const handleType = ( e ) => setState( 'businessType', siteTypes[ e.target.value ] );
+	const handleName = ( e ) => setState( 'businessName', e.target.value );
+	const handleDescription = ( e ) => setState( 'businessDescription', e.target.value );
 
 	return (
-		<Box display="flex" flexDirection="column">
-			<Typography variant="h2">
+		<Stack spacing={ 7 } width="100%">
+			<Typography variant="h4">
 				Let's get down to business
 			</Typography>
 
-			<FormControl fullWidth sx={ { minWidth: 250 } }>
-				<Typography variant="body2" sx={ { marginTop: 4 } }>
-					What kind of business do you have?
-				</Typography>
-				<Box sx={ { minWidth: 120 } }>
-					<InputLabel id="demo-simple-select-label">Input Label</InputLabel>
-					<Select
-						onChange={ handleChange }
-						value={ businessType }
-						labelId="demo-simple-select-label"
-						id="demo-simple-select"
-						label="Input Label"
-						MenuProps={ {
-							MenuListProps: {
-								sx: {
-									minWidth: 150,
-								},
-							},
-							anchorOrigin: {
-								vertical: 'bottom',
-								horizontal: 'left',
-							},
-							transformOrigin: {
-								vertical: 'top',
-								horizontal: 'left',
-							},
-						} }
-					>
-						<MenuItem value={ 10 }>Ten</MenuItem>
-						<MenuItem value={ 20 }>Twenty</MenuItem>
-						<MenuItem value={ 30 }>Third</MenuItem>
-					</Select>
-				</Box>
-				<Typography variant="body2" sx={ { marginTop: 4 } }>
-					What kind of business do you have?
-				</Typography>
-				<TextField color="primary" type="text" size="small" id="outlined-basic" defaultValue="My incredible business" variant="outlined" />
-				<Typography variant="body2" sx={ { marginTop: 4 } }>
-					What kind of business do you have?
-				</Typography>
-				<TextField color="primary" type="text" size="small" id="outlined-basic" defaultValue="My incredible business" variant="outlined" />
+			<FormControl fullWidth>
+				<Stack spacing={ 7 }>
+					<Stack spacing={ 4 }>
+						<Typography variant="h6" sx={ { fontWeight: 'bold', mt: 4 } }>
+							What’s your site about?
+						</Typography>
+
+						<Box sx={ { minWidth: 120 } }>
+							<Autocomplete
+								fullWidth
+								disablePortal
+								id="combo-box-demo"
+								options={ siteTypes }
+								renderInput={ ( params ) => <TextField color="secondary" { ...params } label="Movie" /> }
+								onChange={ handleType }
+								color="secondary"
+							/>
+						</Box>
+					</Stack>
+
+					<Stack spacing={ 4 }>
+						<Typography variant="h6">
+							What’s your business name?
+						</Typography>
+
+						<TextField
+							color="secondary"
+							type="text"
+							id="outlined-basic"
+							placeholder="My incredible business"
+							variant="outlined"
+							onChange={ handleName }
+						/>
+					</Stack>
+
+					<Stack spacing={ 4 }>
+						<Typography variant="h6">
+							Describe your business (optional)
+						</Typography>
+
+						<TextField
+							multiline
+							minRows={ 8 }
+							maxRows={ 8 }
+							color="secondary"
+							type="text"
+							id="outlined-basic"
+							variant="outlined"
+							placeholder="A dynamic and collaborative creative agency that brings ideas to life through captivating visuals and digital experiences. We specialize in crafting unique brand identities, immersive websites, and engaging social media content. We deliver exceptional results that reflect our clients' brand personalities and resonate with their target audience."
+							onChange={ handleDescription }
+						/>
+					</Stack>
+				</Stack>
 			</FormControl>
-		</Box>
+		</Stack>
 	);
 }

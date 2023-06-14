@@ -28,6 +28,8 @@ export default function PromptModal( { setElementId, elementId } ) {
 			results: [ ...results.past, results.current ].filter( Boolean ),
 		} );
 
+		window.last_result = result;
+
 		// Const result = `<row><text>${ prompt }</text></row>`;
 
 		dispatch( slice.actions.end( { elementId: eId, result } ) );
@@ -65,7 +67,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 							<ToggleButton
 								size="small"
 								aria-label="close"
-								onClick={ setElementId( null ) }
+								onClick={ () => setElementId( null ) }
 								selected
 								value
 								disabled={ 'pending' === status }
@@ -78,7 +80,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 							<IconButton
 								size="small"
 								aria-label="close"
-								onClick={ setElementId( null ) }
+								onClick={ () => setElementId( null ) }
 								disabled
 							>
 								<BrushIcon />
@@ -117,7 +119,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 						<IconButton
 							size="small"
 							aria-label="close"
-							onClick={ setElementId( null ) }
+							onClick={ () => setElementId( null ) }
 							sx={ { '&.MuiButtonBase-root': { mr: -4 } } }
 						>
 							<XIcon />

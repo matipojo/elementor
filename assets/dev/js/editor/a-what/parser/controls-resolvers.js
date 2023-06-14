@@ -55,15 +55,34 @@ export function bgColor( attrName, prefix ) {
 
 			const color = globalizeColor( `${ prefix }_color`, value );
 
-			if ( Array.isArray( color ) ) {
-				return color;
-			}
-
-			Object.assign( settings, color );
+			assignColor( settings, color );
 
 			return [ '__', 'asd' ];
 		},
 	};
+}
+
+function assignColor( settings, color ) {
+	if ( Array.isArray( color ) ) {
+		settings[ color[ 0 ] ] = color[ 1 ];
+
+		return;
+	}
+
+	for ( const [ key, value ] of Object.entries( color ) ) {
+		if ( '__globals__' === key ) {
+			continue;
+		}
+
+		settings[ key ] = value;
+	}
+
+	if ( color.__globals__ ) {
+		settings.__globals__ = {
+			...settings.__globals__,
+			...color.__globals__,
+		};
+	}
 }
 
 export function bgGradient( attrName, prefix ) {
@@ -76,17 +95,8 @@ export function bgGradient( attrName, prefix ) {
 			const color1 = globalizeColor( `${ prefix }_color`, colors[ 0 ] );
 			const color2 = globalizeColor( `${ prefix }_color_b`, colors[ 1 ] );
 
-			if ( Array.isArray( color1 ) ) {
-				settings[ color1[ 0 ] ] = color1[ 1 ];
-			} else {
-				Object.assign( settings, color1 );
-			}
-
-			if ( Array.isArray( color2 ) ) {
-				settings[ color2[ 0 ] ] = color2[ 1 ];
-			} else {
-				Object.assign( settings, color2 );
-			}
+			assignColor( settings, color1 );
+			assignColor( settings, color2 );
 
 			settings[ `${ prefix }_gradient_angle` ] = angle;
 

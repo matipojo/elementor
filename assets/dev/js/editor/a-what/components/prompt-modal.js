@@ -46,54 +46,62 @@ export default function PromptModal( { setElementId, elementId } ) {
 
 	const submit = async ( { prompt, eId } ) => {
 		const pastPrompt = lastResult?.nextPrompt;
+		const hackResult = 0 === prompt.trim().length && 1 === results.past.length ? window?.onboarding_elements_hacks?.[ eId ] : null;
 		prompt = prompt.trim() || pastPrompt;
 
 		if ( ! prompt ) {
 			return;
 		}
 
-		console.log( prompt );
-
 		dispatch( slice.actions.start( { elementId: eId, prompt } ) );
 
-		const resultsData = [ ...results.past, results.current ].filter( Boolean );
+		let result;
 
-		const countToRemove = Math.min( ( resultsData.length - 1 ) * 2, 8 );
-		const messagesToConcat = defaultMessages.slice( 0, defaultMessages.length - countToRemove );
+		if ( hackResult ) {
+			await ( new Promise( ( resolve ) => setTimeout( resolve, 2000 ) ) );
 
-		const result = await request( {
-			body: {
-				messages: [
-					...messagesToConcat,
-					...resultsData.reduce( ( acc, res ) => {
-						if ( res.result ) {
-							acc.push( {
-								role: 'assistant',
-								content: res.result,
-							} );
-						}
+			result = hackResult;
+		} else {
+			const resultsData = [ ...results.past, results.current ].filter( Boolean );
 
-						if ( res.nextPrompt ) {
-							acc.push( {
-								role: 'user',
-								content: res.nextPrompt,
-							} );
-						}
+			const countToRemove = Math.min( ( resultsData.length - 1 ) * 2, 8 );
+			const messagesToConcat = defaultMessages.slice( 0, defaultMessages.length - countToRemove );
 
-						return acc;
-					}, [] ),
-					{
-						role: 'user',
-						content: `
+			//
+			// result = `<row><text>from API: ${ prompt }</text></row>`;
+
+			result = await request( {
+				body: {
+					messages: [
+						...messagesToConcat,
+						...resultsData.reduce( ( acc, res ) => {
+							if ( res.result ) {
+								acc.push( {
+									role: 'assistant',
+									content: res.result,
+								} );
+							}
+
+							if ( res.nextPrompt ) {
+								acc.push( {
+									role: 'user',
+									content: res.nextPrompt,
+								} );
+							}
+
+							return acc;
+						}, [] ),
+						{
+							role: 'user',
+							content: `
 							My website name: ${ window.elementor.config.onboarding_data.business_name }
 							My website description: ${ window.elementor.config.onboarding_data.business_description }
 							My prompt: ${ prompt }`,
-					},
-				],
-			},
-		} );
-
-		// Const result = `<row><col><text>${ prompt }</text></col></row>`;
+						},
+					],
+				},
+			} );
+		}
 
 		const isValid = result.includes( '<' );
 

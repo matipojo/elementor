@@ -40,6 +40,11 @@ listenTo(
 				options: { edit: false },
 			} );
 
+			window.onboarding_elements_hacks = {
+				[ heroContainer.id ]: '<row><text>Hack result for hero</text></row>',
+				[ aboutContainer.id ]: '<row><text>Hack result for about</text></row>',
+			};
+
 			dispatch( slice.actions.start( { elementId: heroContainer.id, prompt: cache.hero.prompt } ) );
 			dispatch( slice.actions.end( { elementId: heroContainer.id, result: cache.hero.xml } ) );
 

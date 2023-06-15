@@ -27,7 +27,7 @@ export default function BusinessStep( { setData, data } ) {
 
 	return (
 		<Stack spacing={ 7 } width="100%">
-			<Stack spacing={ 3 }>
+			<Stack spacing={ 4 }>
 				<img
 					src={ `${ elementorCommonConfig.urls.assets }images/ai/business.png` }
 					alt="Business"

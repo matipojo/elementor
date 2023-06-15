@@ -80,7 +80,7 @@ export default function BlocksStep( { data, setData } ) {
 
 	return (
 		<Stack spacing={ 8 } width="100%">
-			<Stack spacing={ 3 }>
+			<Stack spacing={ 4 }>
 				<img
 					src={ `${ elementorCommonConfig.urls.assets }images/ai/homepage.png` }
 					alt="Blocks"

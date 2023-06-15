@@ -1,10 +1,51 @@
 import NewPromptButton from './new-prompt-button';
 import { useEffect, useState } from 'react';
 import PromptModal from './prompt-modal';
-import { useSelector } from '@elementor/store';
-import { selectElementsIds } from '../store';
+import { dispatch, useSelector } from '@elementor/store';
+import { selectElementsIds, slice } from '../store';
 import ExistingPromptButton from './existing-prompt-button';
-import { listenTo, openRoute, windowEvent } from '@elementor/editor-v1-adapters';
+import { listenTo, openRoute, v1ReadyEvent, windowEvent } from '@elementor/editor-v1-adapters';
+
+listenTo(
+	v1ReadyEvent(),
+	() => {
+		setTimeout( () => {
+			const cache = JSON.parse( localStorage.getItem( 'cache' ) || '{}' );
+
+			if ( ! cache.hero || ! cache.about ) {
+				return;
+			}
+
+			const { content: [ heroModel ] } = window.elementor.html4Parser.parse(
+				cache.hero.xml,
+			);
+
+			const heroContainer = $e.run( 'document/elements/create', {
+				container: elementor.getPreviewContainer(),
+				model: heroModel,
+				options: { edit: false },
+			} );
+
+			const { content: [ aboutModel ] } = window.elementor.html4Parser.parse(
+				cache.about.xml,
+			);
+
+			const aboutContainer = $e.run( 'document/elements/create', {
+				container: elementor.getPreviewContainer(),
+				model: aboutModel,
+				options: { edit: false },
+			} );
+
+			dispatch( slice.actions.start( { elementId: heroContainer.id, prompt: cache.hero.prompt } ) );
+			dispatch( slice.actions.end( { elementId: heroContainer.id, result: cache.hero.xml } ) );
+
+			dispatch( slice.actions.start( { elementId: aboutContainer.id, prompt: cache.about.prompt } ) );
+			dispatch( slice.actions.end( { elementId: aboutContainer.id, result: cache.about.xml } ) );
+
+			localStorage.removeItem( 'cache' );
+		}, 4000 );
+	},
+);
 
 export default function Main() {
 	const [ elementId, setElementId ] = useState( null );

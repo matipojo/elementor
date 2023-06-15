@@ -78,8 +78,8 @@ export default function PromptModal( { setElementId, elementId } ) {
 					{
 						role: 'user',
 						content: `
-							My website name: Varda's Flowers Shop
-							My website description: A flower shop that sells flowers and bouquets for all occasions.
+							My website name: ${ window.elementor.config.onboarding_data.business_name }
+							My website description: ${ window.elementor.config.onboarding_data.business_description }
 							My prompt: ${ prompt }`,
 					},
 				],

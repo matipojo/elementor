@@ -9,3 +9,4 @@ const request = ( endpoint, data = {} ) => {
 };
 
 export const updateGlobals = ( data ) => request( 'onboarding_update_globals', { ...data } );
+export const updateData = ( data ) => request( 'onboarding_update_data', { ...data } );

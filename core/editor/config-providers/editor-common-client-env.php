@@ -100,6 +100,11 @@ class Editor_Common_Client_Env {
 			'promotion' => [
 				'elements' => Plugin::$instance->editor->promotion->get_elements_promotion(),
 			],
+			'onboarding_data' => [
+				'business_type' => get_option('__elementor_onboarding__business_type'),
+				'business_name' => get_option('__elementor_onboarding__business_name'),
+				'business_description' => get_option('__elementor_onboarding__business_description'),
+			]
 		];
 
 		if ( ! Utils::has_pro() && current_user_can( 'manage_options' ) ) {

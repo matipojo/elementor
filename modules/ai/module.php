@@ -39,6 +39,7 @@ class Module extends BaseModule {
 			$ajax->register_ajax_action( 'ai_get_image_to_image_upscale', [ $this, 'ajax_ai_get_image_to_image_upscale' ] );
 			$ajax->register_ajax_action( 'ai_upload_image', [ $this, 'ajax_ai_upload_image' ] );
 			$ajax->register_ajax_action( 'onboarding_update_globals', [ $this, 'ajax_onboarding_update_globals' ] );
+			$ajax->register_ajax_action( 'onboarding_update_data', [ $this, 'ajax_onboarding_update_data' ] );
 		} );
 
 		add_action( 'elementor/editor/before_enqueue_scripts', function() {
@@ -483,6 +484,15 @@ class Module extends BaseModule {
 		];
 	}
 
+	public function ajax_onboarding_update_data( $data ) {
+		update_option( '__elementor_onboarding__business_type', $data['business_type'] );
+		update_option( '__elementor_onboarding__business_name', $data['business_name'] );
+		update_option( '__elementor_onboarding__business_description', $data['business_description'] );
+
+		return [
+			'status' => 'success',
+		];
+	}
 
 	private function darkenColor($color, $darken = 0.88)
 	{

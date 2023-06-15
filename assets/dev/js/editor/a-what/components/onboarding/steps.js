@@ -3,7 +3,7 @@ import { useState } from 'react';
 import BusinessStep from './steps/business-step';
 import BlocksStep from './steps/blocks-step';
 import StyleStep from './steps/style-step';
-import { updateGlobals } from '../../api/calls';
+import { updateData, updateGlobals } from '../../api/calls';
 import { AIIcon } from '@elementor/icons';
 
 export default function Steps( { activeStep, setActiveStep, data, setData } ) {
@@ -45,6 +45,15 @@ export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 
 	const handleFinish = () => {
 		updateGlobals( data.colors );
+		updateData( {
+			business_type: data.type.label,
+			business_name: data.name ?? '',
+			business_description: data.description ?? '',
+		} );
+
+		elementor.config.onboarding_data.business_type = data.type.label;
+		elementor.config.onboarding_data.business_name = data.name ?? '';
+		elementor.config.onboarding_data.business_description = data.description ?? '';
 	};
 
 	return (

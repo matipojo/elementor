@@ -88,7 +88,7 @@ export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 							? <Button variant="contained" onClick={ handleFinish } startIcon={ <AIIcon /> }>
 								Generate
 							</Button>
-							: <Button variant="contained" onClick={ handleNext } disabled={ ! data.type?.label || data.pending } startIcon={ data.pending && <CircularProgress color="secondary" size={ 20 } /> }>
+							: <Button variant="contained" onClick={ handleNext } disabled={ ! data.type?.label || ! data.name || data.pending } startIcon={ data.pending && <CircularProgress color="secondary" size={ 20 } /> }>
 								Next
 							</Button>
 					}

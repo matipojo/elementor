@@ -18,7 +18,7 @@ const siteTypes = [
 	{ label: 'Home & Garden' },
 ];
 
-export default function BusinessStep( { setData } ) {
+export default function BusinessStep( { setData, data } ) {
 	const setState = ( key, value ) => setData( ( prev ) => ( { ...prev, [ key ]: value } ) );
 
 	const handleType = ( e ) => setState( 'type', siteTypes[ e.target.value ] );
@@ -51,38 +51,46 @@ export default function BusinessStep( { setData } ) {
 						</Box>
 					</Stack>
 
-					<Stack spacing={ 4 }>
-						<Typography variant="h6">
-							What’s your business name?
-						</Typography>
+					{
+						data.type && (
+							<Stack spacing={ 4 }>
+								<Typography variant="h6">
+									What’s your business name?
+								</Typography>
 
-						<TextField
-							color="secondary"
-							type="text"
-							id="outlined-basic"
-							placeholder="My incredible business"
-							variant="outlined"
-							onChange={ handleName }
-						/>
-					</Stack>
+								<TextField
+									color="secondary"
+									type="text"
+									id="outlined-basic"
+									placeholder="My incredible business"
+									variant="outlined"
+									onChange={ handleName }
+								/>
+							</Stack>
+						)
+					}
 
-					<Stack spacing={ 4 }>
-						<Typography variant="h6">
-							Describe your business (optional)
-						</Typography>
+					{
+						data.name && (
+							<Stack spacing={ 4 }>
+								<Typography variant="h6">
+									Describe your business (optional)
+								</Typography>
 
-						<TextField
-							multiline
-							minRows={ 8 }
-							maxRows={ 8 }
-							color="secondary"
-							type="text"
-							id="outlined-basic"
-							variant="outlined"
-							placeholder="A dynamic and collaborative creative agency that brings ideas to life through captivating visuals and digital experiences. We specialize in crafting unique brand identities, immersive websites, and engaging social media content. We deliver exceptional results that reflect our clients' brand personalities and resonate with their target audience."
-							onChange={ handleDescription }
-						/>
-					</Stack>
+								<TextField
+									multiline
+									minRows={ 8 }
+									maxRows={ 8 }
+									color="secondary"
+									type="text"
+									id="outlined-basic"
+									variant="outlined"
+									placeholder="A dynamic and collaborative creative agency that brings ideas to life through captivating visuals and digital experiences. We specialize in crafting unique brand identities, immersive websites, and engaging social media content. We deliver exceptional results that reflect our clients' brand personalities and resonate with their target audience."
+									onChange={ handleDescription }
+								/>
+							</Stack>
+						)
+					}
 				</Stack>
 			</FormControl>
 		</Stack>

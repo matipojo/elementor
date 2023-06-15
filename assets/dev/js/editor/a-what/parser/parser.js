@@ -109,7 +109,7 @@ export class Parser {
 				content_width: isRootNode ? 'boxed' : 'full',
 			},
 			__ai: {
-				prompt: node.getAttribute( 'bg-image' ) || node.getAttribute( 'bgImage' ),
+				prompt: node.getAttribute( 'bgImageAlt' ) || node.getAttribute( 'bg-image' ) || node.getAttribute( 'bgImage' ),
 			},
 		};
 

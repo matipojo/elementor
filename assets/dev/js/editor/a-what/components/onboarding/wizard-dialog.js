@@ -101,33 +101,35 @@ export default function WizardDialog() {
 						</DialogTitle>
 
 						<DialogContent dividers>
-							<Stack spacing={ 8 } sx={ { mt: '80px' } }>
-								<Typography variant="h6" align="center" sx={ { fontWeight: 'normal' } }>Thank you, Ariel. You're good to go!</Typography>
+							<Stack direction="row" justifyContent="center" alignItems="center" height="100%">
+								<Stack spacing={ 8 }>
+									<Typography variant="h6" align="center" sx={ { fontWeight: 'normal' } }>Thank you, Ariel. You're good to go!</Typography>
 
-								<Typography variant="h4" align="center">How do you want to create your site?</Typography>
+									<Typography variant="h4" align="center">How do you want to create your site?</Typography>
 
-								<Stack direction="row" spacing={ 8 } justifyContent="center">
-									{
-										checkoutOptions.map( ( { label, description, Icon, emoji }, index ) => (
-											<Box key={ index }>
-												<Button
-													variant="outlined"
-													color="secondary"
-													sx={ { flexDirection: 'column', height: 'auto', width: 250, py: 10, px: 3, borderColor: Number.isInteger( selectedCheckoutOption ) && selectedCheckoutOption === index ? 'secondary.dark' : 'secondary.background' } }
-													onClick={ () => setAfterThankYou( true ) }
-												>
-													<Box>
-														<img src={ emoji } alt={ label } width="100%" style={ { width: 80, height: 'auto' } } />
-													</Box>
+									<Stack direction="row" spacing={ 8 } justifyContent="center">
+										{
+											checkoutOptions.map( ( { label, description, Icon, emoji }, index ) => (
+												<Box key={ index }>
+													<Button
+														variant="outlined"
+														color="secondary"
+														sx={ { flexDirection: 'column', height: 'auto', width: 250, py: 10, px: 3, borderColor: Number.isInteger( selectedCheckoutOption ) && selectedCheckoutOption === index ? 'secondary.dark' : 'secondary.background' } }
+														onClick={ () => setAfterThankYou( true ) }
+													>
+														<Box>
+															<img src={ emoji } alt={ label } width="100%" style={ { width: 80, height: 'auto' } } />
+														</Box>
 
-													<Stack spacing={ 2 }>
-														<Typography variant="h6" sx={ { fontWeight: 'normal' } }>{ label }</Typography>
-														<Typography variant="h4" sx={ { fontWeight: 'body' } }>{ description }{ Icon && <Icon fontSize="large" sx={ { ml: 2 } } /> }</Typography>
-													</Stack>
-												</Button>
-											</Box>
-										) )
-									}
+														<Stack spacing={ 2 }>
+															<Typography variant="h6" sx={ { fontWeight: 'normal' } }>{ label }</Typography>
+															<Typography variant="h4" sx={ { fontWeight: 'body' } }>{ description }{ Icon && <Icon fontSize="large" sx={ { ml: 2 } } /> }</Typography>
+														</Stack>
+													</Button>
+												</Box>
+											) )
+										}
+									</Stack>
 								</Stack>
 							</Stack>
 						</DialogContent>

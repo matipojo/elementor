@@ -55,7 +55,11 @@ const defaultMessages = [
 				<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
 					<divider width="105px" color="var( --divider-color )"></divider>
 					<title color="var( --primary-color )" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
-					<text color="var( --text-color )" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
+					<text color="var( --text-color )" font="Poppins" fontWeight="300" fontSize="20px">
+						An award-winning full-stack digital marketing studio provides comprehensive solutions in SEO, social media, content marketing, web design, and development.
+					Their talented team of experts is renowned for their innovative strategies and creative approach.
+					With a proven track record, the studio has received prestigious accolades for their exceptional work in the industry.
+					</text>
 				</column>
 				<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">
 					<img width="40%" alt="studio portrait of black woman drinking coffee" />
@@ -93,14 +97,14 @@ const defaultMessages = [
 	},
 	{
 		role: 'user',
-		content: `Create an about us section as boxed column with a accent background, padding, and a gap between elements. Inside, add a
+		content: `Create an about us section as boxed column center in the middle with a image background of graphic design, padding, and a gap between elements. Inside, add a
 		divider, titles, and a text paragraph. Below, create a boxed row with two columns. The first column contains an
 		image, while the second column has a divider, a title, a text paragraph, and a button.`,
 	},
 	{
 		role: 'assistant',
 		content: `
-			<column boxed="true" width="100%" gap="50px" bgColor="var( --accent-color )" padding="4% 8%">
+			<column boxed="true" width="1200px" gap="50px" bgImageAlt="graphic pad with pencil and eraser" padding="4% 8%">
 				<column boxed="true" width="100%" gap="30px" padding="0">
 					<divider align="center" width="60px" color="var( --divider-color )"></divider>
 					<title align="center" color="var( --primary-color )" font="Montserrat" fontWeight="600" fontSize="18px">ABOUT US</title>
@@ -108,7 +112,7 @@ const defaultMessages = [
 					<text align="center" color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="18px" padding="0 10%">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
 				</column>
 				<row boxed="true" width="1050px" justifyContent="center" gap="5%">
-					<column width="50%">
+					<column width="50%" alignItems="center">
 							<img width="100%" alt="Creative graphic designer brainstorming ideas at office desk" />
 							<button align="center" width="150px" height="50px" bgColor="#fff" color="var( --secondary-color )" font="Poppins" fontWeight="500" fontSize="16px">LEARN MORE</button>
 					</column>

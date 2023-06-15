@@ -8,7 +8,7 @@ import { AIIcon } from '@elementor/icons';
 import defaultMessages from '../../api/messages';
 
 const prompts = {
-	hero: 'Create a hero section that suits my business. add a background image, a title, and a button.',
+	hero: 'Create an enchanting hero section for a flower shop website that celebrates the beauty of nature and the art of floral arrangements. Incorporate stunning floral imagery, a captivating headline, and an irresistible invitation to explore the shop\'s vibrant collection of blooms. The hero section should entice visitors to indulge their senses and discover the perfect flowers for every occasion.',
 	about: 'Create an about section that suits my business. make sure to add a form with 70% width input and a 30% width button.',
 };
 

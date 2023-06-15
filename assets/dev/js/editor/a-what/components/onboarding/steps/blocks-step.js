@@ -27,6 +27,45 @@ const sectionTypes = [
 ];
 
 export default function BlocksStep( { data, setData } ) {
+	const fallbackColors =	[
+		{
+			primary: '#815034',
+			secondary: '#cfb6a2',
+			text: '#000000',
+			accent: '#cc9e7b',
+		},
+		{
+			primary: '#364f6b',
+			secondary: '#f5f5f5',
+			text: '#000000',
+			accent: '#fc5185',
+		},
+		{
+			primary: '#f7a541',
+			secondary: '#ffffff',
+			text: '#000000',
+			accent: '#ffa07a',
+		},
+		{
+			primary: '#f26d6d',
+			secondary: '#ffa07a',
+			text: '#000000',
+			accent: '#8A9CA4',
+		},
+		{
+			primary: '#4682B4',
+			secondary: '#ffffff',
+			text: '#000000',
+			accent: '#ffd700',
+		},
+		{
+			primary: '#4c586f',
+			secondary: '#dbe9f6',
+			text: '#000000',
+			accent: '#27a9e3',
+		},
+	];
+
 	const request = ( businessType ) => {
 		const body = {
 			messages: [
@@ -34,9 +73,10 @@ export default function BlocksStep( { data, setData } ) {
 					role: 'user',
 					content: `
 							Create 6 unique modern color palettes, that will match my business of ${ businessType } each containing four colors.
-							The first 2 palettes should evoke a sense of tranquility and relaxation, the second 2 palettes should convey energy and vibrancy, and the third 2 palettes should capture a feeling of elegance and sophistication.
-							Be creative and use any combination of colors that you think best represents each theme.
-							return only a json in the following structure: [ { primary: '', secondary: '', text: '', accent: ''} ]`,
+							The first 2 palettes should be modern style, the second 2 palettes should be pastel style, the third 2 palettes should be vivid style.
+							Be creative and use any combination of colors that should match together.
+							return only a json in the following structure: [ { primary: '', secondary: '', text: '', accent: ''} ] without and other text.
+							the color of the text should be black.`,
 				},
 			],
 			model: 'gpt-3.5-turbo',
@@ -53,9 +93,12 @@ export default function BlocksStep( { data, setData } ) {
 			body: JSON.stringify( body ),
 		} )
 			.then( ( response ) => response.json() )
-			.then( ( res ) => {
-				console.log( '@@@ --- res', res );
-				return JSON.parse( res.choices[ 0 ].message.content );
+			.then( ( data ) => {
+				try {
+					return JSON.parse( data.choices[ 0 ].message.content );
+				} catch ( e ) {
+					return fallbackColors;
+				}
 			} )
 			.catch( ( error ) => console.log( error ) );
 	};

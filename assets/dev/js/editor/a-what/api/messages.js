@@ -17,22 +17,22 @@ const defaultMessages = [
 		role: 'assistant',
 		content: `
 			<column boxed="true" width="100%" gap="50px" bgColor="var( --background-color )" padding="4% 8%" alignItems="center">
-				<title align="center" color="var( --primary-color )" font="Montserrat" fontWeight="600" fontSize="18px">OUR SERVICES</title>
+				<title align="center" color="var( --primary-color )" font="Montserrat" fontWeight="600" fontSize="40px">OUR SERVICES</title>
 				<row boxed="true" width="100%" justifyContent="center" gap="50px" padding="0">
 					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="#FFFFFF" borderRadius="20px" alignItems="center" justifyContent="space-between">
-						<icon align="center" width="70px" alt="icon for SEO optimization" />
+						<img align="center" width="70px" alt="icon for SEO optimization" />
 						<title align="center" color="var( --primary-color )" font="Poppins" fontWeight="700" fontSize="22px">Search Engine Optimization</title>
 						<text color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="16px" align="center">Our SEO experts work on strategies that help your website rank higher on Google and other search engines, increasing organic traffic to your website. </text>
 						<button href="/seo" color="#FFFFFF" bgColor="var( --secondary-color )" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
 					</column>
 					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="var( --accent-color )" borderRadius="20px" alignItems="center" justifyContent="space-between">
-						<icon align="center" width="70px" alt="icon for social media marketing" />
+						<img align="center" width="70px" alt="icon for social media marketing" />
 						<title align="center" color="var( --primary-color )" font="Poppins" fontWeight="700" fontSize="22px">Social Media Marketing</title>
 						<text color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="16px" align="center">We run targeted ad campaigns on social media platforms that help you reach your target audience, increase brand awareness, and drive more traffic to your website or store.</text>
 						<button href="/social-media" color="#FFFFFF" bgColor="var( --secondary-color )" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>
 					</column>
 					<column boxed="true" width="350px" gap="20px" padding="30px" bgColor="#FFFFFF" borderRadius="20px" alignItems="center" justifyContent="space-between">
-						<icon align="center" width="70px" alt="icon for web design" />
+						<img align="center" width="70px" alt="icon for web design" />
 						<title align="center" color="var( --primary-color )" font="Poppins" fontWeight="700" fontSize="22px">Web Design and Development</title>
 						<text color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="16px" align="center">Our web design and development team creates visually stunning and user-friendly websites that help you convert more visitors into customers and grow your business online.</text>
 						<button href="/web-design" color="#FFFFFF" bgColor="var( --secondary-color )" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">Read More</button>

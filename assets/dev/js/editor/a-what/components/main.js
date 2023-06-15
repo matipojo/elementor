@@ -20,6 +20,8 @@ listenTo(
 				cache.hero.xml,
 			);
 
+			delete heroModel.__ai;
+
 			const heroContainer = $e.run( 'document/elements/create', {
 				container: elementor.getPreviewContainer(),
 				model: heroModel,
@@ -29,6 +31,8 @@ listenTo(
 			const { content: [ aboutModel ] } = window.elementor.html4Parser.parse(
 				cache.about.xml,
 			);
+
+			delete aboutModel.__ai;
 
 			const aboutContainer = $e.run( 'document/elements/create', {
 				container: elementor.getPreviewContainer(),

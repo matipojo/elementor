@@ -9,8 +9,8 @@ const sectionTypes = [
 		value: 'introduction',
 	},
 	{
-		label: 'About us',
-		value: 'about-us',
+		label: 'About',
+		value: 'about',
 	},
 	{
 		label: 'Forms',
@@ -53,7 +53,10 @@ export default function BlocksStep( { data, setData } ) {
 			body: JSON.stringify( body ),
 		} )
 			.then( ( response ) => response.json() )
-			.then( ( data ) => JSON.parse( data.choices[ 0 ].message.content ) )
+			.then( ( res ) => {
+				console.log( '@@@ --- res', res );
+				return JSON.parse( res.choices[ 0 ].message.content );
+			} )
 			.catch( ( error ) => console.log( error ) );
 	};
 
@@ -76,14 +79,22 @@ export default function BlocksStep( { data, setData } ) {
 	};
 
 	return (
-		<Stack spacing={ 7 } width="100%">
-			<Stack>
-				<Typography variant="h4" sx={ { mb: 3 } }>
-					Home is where… we start
-				</Typography>
-				<Typography variant="subtitle1">
-					Imagine your homepage section-by-section, selecting the ones you wish to generate.
-				</Typography>
+		<Stack spacing={ 8 } width="100%">
+			<Stack spacing={ 3 }>
+				<img
+					src={ `${ elementorCommonConfig.urls.assets }images/ai/homepage.png` }
+					alt="Blocks"
+					style={ { width: '32px', height: 'auto' } }
+				/>
+
+				<Stack>
+					<Typography variant="h4" sx={ { mb: 3 } }>
+						Home is where… we start
+					</Typography>
+					<Typography variant="subtitle1">
+						Imagine your homepage section-by-section, selecting the ones you wish to generate.
+					</Typography>
+				</Stack>
 			</Stack>
 
 			<Stack spacing={ 7 }>
@@ -100,7 +111,7 @@ export default function BlocksStep( { data, setData } ) {
 								disablePortal
 								id="combo-box-demo"
 								options={ sectionTypes }
-								renderInput={ ( params ) => <TextField color="secondary" { ...params } label="Select a section type" /> }
+								renderInput={ ( params ) => <TextField color="secondary" { ...params } placeholder="Select a section type" /> }
 								onChange={ ( e, { label, value } ) => handleSection( index, label, value ) }
 								color="secondary"
 							/>

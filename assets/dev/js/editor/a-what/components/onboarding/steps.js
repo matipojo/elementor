@@ -124,10 +124,10 @@ export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 					)
 				}
 
-				<Stack direction="row" justifyContent="flex-end" flexGrow={ 1 }>
+				<Stack direction="row" justifyContent="flex-end" flexGrow={ 1 } sx={ { mb: 6 } }>
 					{
 						activeStep === steps.length - 1
-							? <Button variant="contained" onClick={ handleFinish } disabled={ isButtonLoading } startIcon={ isButtonLoading ? <CircularProgress /> : <AIIcon /> }>
+							? <Button variant="contained" onClick={ handleFinish } disabled={ ! data.colors || ! data.font || isButtonLoading } startIcon={ isButtonLoading ? <CircularProgress /> : <AIIcon /> }>
 								Generate
 							</Button>
 							: <Button variant="contained" onClick={ handleNext } disabled={ ! data.type?.label || ! data.name || data.pending } startIcon={ data.pending && <CircularProgress color="secondary" size={ 20 } /> }>

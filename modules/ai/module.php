@@ -483,7 +483,8 @@ class Module extends BaseModule {
 		];
 	}
 
-	private function darkenColor($color)
+
+	private function darkenColor($color, $darken = 0.88)
 	{
 		// Remove the '#' symbol if present
 		$color = str_replace('#', '', $color);
@@ -494,14 +495,35 @@ class Module extends BaseModule {
 		$blue = hexdec(substr($color, 4, 2));
 
 		// Calculate the darker RGB values
-		$red = round($red * 0.88);
-		$green = round($green * 0.88);
-		$blue = round($blue * 0.88);
+		$red = round($red * $darken);
+		$green = round($green * $darken);
+		$blue = round($blue * $darken);
 
 		// Convert the darker RGB values back to hexadecimal format
 		$darkerColor = sprintf("#%02x%02x%02x", $red, $green, $blue);
 
 		return $darkerColor;
+	}
+
+	private function getLightColor($color)
+	{
+		// Remove '#' from the beginning of the color if present
+		$color = ltrim($color, '#');
+
+		// Convert the color to RGB
+		$red = hexdec(substr($color, 0, 2));
+		$green = hexdec(substr($color, 2, 2));
+		$blue = hexdec(substr($color, 4, 2));
+
+		// Calculate the light shade RGB values
+		$lightRed = min(255, $red + round(255 * 0.5));
+		$lightGreen = min(255, $green + round(255 * 0.5));
+		$lightBlue = min(255, $blue + round(255 * 0.5));
+
+		// Convert the light shade RGB values back to hexadecimal
+		$lightColor = sprintf("#%02X%02X%02X", $lightRed, $lightGreen, $lightBlue);
+
+		return $lightColor;
 	}
 
 	private function reverseColor($color)
@@ -540,25 +562,25 @@ class Module extends BaseModule {
 								[
 									'_id' => 'primary',
 									'title' => 'Primary',
-									'color' => $data[ 'primary_color' ],
+									'color' => $data[ 'primary' ],
 								],
 							1 =>
 								[
 									'_id' => 'secondary',
 									'title' => 'Secondary',
-									'color' => $data[ 'secondary_color' ],
+									'color' => $data[ 'secondary' ],
 								],
 							2 =>
 								[
 									'_id' => 'text',
 									'title' => 'Body Text',
-									'color' => $data[ 'text_color' ],
+									'color' => $data[ 'text' ],
 								],
 							3 =>
 								[
 									'_id' => 'accent',
 									'title' => 'Accent',
-									'color' => $data[ 'accent_color' ],
+									'color' => $data[ 'accent' ],
 								],
 						],
 					'custom_colors' =>
@@ -567,31 +589,31 @@ class Module extends BaseModule {
 								[
 									'_id' => 'primary_darker',
 									'title' => 'Primary Darker',
-									'color' => $this->darkenColor( $data['primary_color'] ),
+									'color' => $this->darkenColor( $data['primary'] ),
 								],
 							1 =>
 								[
 									'_id' => 'secondary_darker',
 									'title' => 'Secondary Darker',
-									'color' => $this->darkenColor( $data['secondary_color'] ),
+									'color' => $this->darkenColor( $data['secondary'] ),
 								],
 							2 =>
 								[
 									'_id' => 'text_darker',
 									'title' => 'Body Darker',
-									'color' => $this->darkenColor( $data['text_color'] ),
+									'color' => $this->darkenColor( $data['text'] ),
 								],
 							3 =>
 								[
 									'_id' => 'accent_darker',
 									'title' => 'Accent Darker',
-									'color' => $this->darkenColor( $data['accent_color'] ),
+									'color' => $this->darkenColor( $data['accent'] ),
 								],
 							4 =>
 								[
 									'_id' => 'background',
 									'title' => 'Background',
-									'color' => $this->reverseColor( $data['primary_color'] ),
+									'color' => $this->getLightColor( $data['primary'] ),
 								],
 						],
 				],

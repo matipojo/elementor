@@ -33,8 +33,8 @@ export default function BlocksStep( { data, setData } ) {
 				{
 					role: 'user',
 					content: `
-							Create three unique modern color palettes, that will match my business of ${ businessType } each containing four colors.
-							The first palette should evoke a sense of tranquility and relaxation, the second palette should convey energy and vibrancy, and the third palette should capture a feeling of elegance and sophistication.
+							Create 6 unique modern color palettes, that will match my business of ${ businessType } each containing four colors.
+							The first 2 palettes should evoke a sense of tranquility and relaxation, the second 2 palettes should convey energy and vibrancy, and the third 2 palettes should capture a feeling of elegance and sophistication.
 							Be creative and use any combination of colors that you think best represents each theme.
 							return only a json in the following structure: [ { primary: '', secondary: '', text: '', accent: ''} ]`,
 				},

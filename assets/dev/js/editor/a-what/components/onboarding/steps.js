@@ -44,14 +44,7 @@ export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 	};
 
 	const handleFinish = () => {
-		console.log( 'data', data );
-
-		updateGlobals( {
-			primary_color: '#75976A',
-			secondary_color: '#CCCFD8',
-			text_color: '#586264',
-			accent_color: '#CC5B76',
-		} );
+		updateGlobals( data.colors );
 	};
 
 	return (

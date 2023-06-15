@@ -172,8 +172,8 @@ export class Parser {
 			...bgColor( 'hover_bgColor', 'background_hover' ),
 		};
 
-		if ( result.settings.background_color && result.__ai.prompt ) {
-			delete result.settings.background_color;
+		if ( result.__ai.prompt ) {
+			result.settings.background_color = '';
 		}
 
 		result.settings = {

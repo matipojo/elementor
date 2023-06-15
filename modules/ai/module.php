@@ -557,6 +557,36 @@ class Module extends BaseModule {
 		return $inverseColor;
 	}
 
+	private function getLightOrDarkColor($color)
+	{
+		// Remove '#' from the beginning of the color if present
+		$color = ltrim($color, '#');
+
+		// Convert the color to RGB
+		$red = hexdec(substr($color, 0, 2));
+		$green = hexdec(substr($color, 2, 2));
+		$blue = hexdec(substr($color, 4, 2));
+
+		// Calculate the lightness of the color (as perceived by humans)
+		$lightness = (max($red, $green, $blue) + min($red, $green, $blue)) / 2;
+
+		// Determine whether the color is light or dark
+		$isLightColor = $lightness > 127;
+
+		// Set the brightness adjustment value (adjust as desired)
+		$brightnessAdjustment = $isLightColor ? -50 : 50;
+
+		// Adjust the brightness by the adjustment value
+		$newRed = max(0, min(255, $red + $brightnessAdjustment));
+		$newGreen = max(0, min(255, $green + $brightnessAdjustment));
+		$newBlue = max(0, min(255, $blue + $brightnessAdjustment));
+
+		// Convert the adjusted RGB values back to hexadecimal
+		$newColor = sprintf("#%02X%02X%02X", $newRed, $newGreen, $newBlue);
+
+		return $newColor;
+	}
+
 	public function ajax_onboarding_update_globals( $data ) {
 		$kit = Plugin::$instance->kits_manager->get_active_kit();
 
@@ -623,7 +653,7 @@ class Module extends BaseModule {
 								[
 									'_id' => 'background',
 									'title' => 'Background',
-									'color' => $this->getLightColor( $data['primary'] ),
+									'color' => $this->getLightOrDarkColor( $data['primary'] ),
 								],
 						],
 				],

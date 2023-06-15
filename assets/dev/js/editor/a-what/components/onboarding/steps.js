@@ -83,6 +83,7 @@ export default function Steps( { activeStep, setActiveStep, data, setData } ) {
 					},
 				} ) );
 			} )
+			.then( () => $e.run( 'document/save/publish', { force: true } ) )
 			.then( () => {
 				const url = new URL( window.location.href );
 

@@ -38,7 +38,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 
 	const [ enhancing, setEnhancing ] = useState( false );
 
-	const generateButtonText = results.current?.nextPrompt ? 'Regenerate' : 'Generate';
+	const generateButtonText = 'Generate';
 
 	const inputPromptPlaceholder = 'I want a hero section with background image and two columns.';
 

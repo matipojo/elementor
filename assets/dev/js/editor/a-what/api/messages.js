@@ -43,8 +43,8 @@ const defaultMessages = [
 	},
 	{
 		role: 'user',
-		content: `Create a boxed row with a width of 1400px and a height of 80% of the viewport.
-			The row has a background gradient, fading from pink to white. Inside the row, place a centered column with
+		content: `Create an about section as boxed row with a width of 1400px and a height of 80% of the viewport.
+			The row has a background gradient, fading from primary color to white. Inside the row, place a centered column with
 			a divider, a title, and a text paragraph. Next, create another row that spans the full width and has images
 			aligned to the right with some spacing. The images depict studio portraits of different individuals.`,
 	},
@@ -93,7 +93,7 @@ const defaultMessages = [
 	},
 	{
 		role: 'user',
-		content: `Create a boxed column with a accent background, padding, and a gap between elements. Inside, add a
+		content: `Create an about us section as boxed column with a accent background, padding, and a gap between elements. Inside, add a
 		divider, titles, and a text paragraph. Below, create a boxed row with two columns. The first column contains an
 		image, while the second column has a divider, a title, a text paragraph, and a button.`,
 	},
@@ -102,26 +102,38 @@ const defaultMessages = [
 		content: `
 			<column boxed="true" width="100%" gap="50px" bgColor="var( --accent-color )" padding="4% 8%">
 				<column boxed="true" width="100%" gap="30px" padding="0">
-					<divider width="60px" color="var( --divider-color )"></divider>
+					<divider align="center" width="60px" color="var( --divider-color )"></divider>
 					<title align="center" color="var( --primary-color )" font="Montserrat" fontWeight="600" fontSize="18px">ABOUT US</title>
 					<title align="center" color="var( --secondary-color )" font="Poppins" fontWeight="900" fontSize="3.5vw">CREATIVE IS OUR CORE</title>
 					<text align="center" color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="18px" padding="0 10%">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
 				</column>
-				<row boxed="true" width="1050px" justifyContent="space-between" gap="5%">
-					<column width="45%">
+				<row boxed="true" width="1050px" justifyContent="center" gap="5%">
+					<column width="50%">
 							<img width="100%" alt="Creative graphic designer brainstorming ideas at office desk" />
-					</column>
-					<column width="45%">
-						<column boxed="true" width="100%" gap="30px" padding="0">
-							<divider width="90px" color="#000"></divider>
-							<title color="var( --primary-color )" font="Poppins" fontWeight="700" fontSize="22px">The best of your ideas combined with our creativity</title>
-							<text color="var( --text-color )" font="Poppins" fontWeight="400" fontSize="18px" padding="20px 0">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</text>
-							<button href="/services" color="#fff" bgColor="var( --accent-color )" font="Poppins" fontWeight="700" fontSize="14px" padding="14px 35px">See our services</button>
-						</column>
+							<button align="center" width="150px" height="50px" bgColor="#fff" color="var( --secondary-color )" font="Poppins" fontWeight="500" fontSize="16px">LEARN MORE</button>
 					</column>
 				</row>
 			</column>`,
 	},
+	// {
+	// 	role: 'user',
+	// 	content: `Create a boxed row with a width of 1400px and a height of 80% of the viewport.
+	// 		The row has a background gradient, fading from pink to white. Inside the row, place a centered column with a title,
+	// 		and a heart pink icon of size 200px.`,
+	// },
+	// {
+	// 	role: 'assistant',
+	// 	content: `
+	// 		<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, var( --primary-color ) 10%, var( --primary_darker-color ) 30%)" padding="5%">
+	// 			<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
+	// 				<title color="#fff" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
+	// 				<text color="var( --text-color )" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
+	// 			</column>
+	// 			<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">
+	// 				<icon color="var( --primary-color )" fontSize="200px" value="fas fa-heart"></icon>
+	// 			</row>
+	// 		</row>`,
+	// },
 ];
 
 export default defaultMessages;

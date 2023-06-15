@@ -102,10 +102,14 @@ export function parseGradient( bgGradient ) {
 
 		// Extract angle and colors
 		let angle = null;
+		let colors = [];
+
 		if ( gradientParams[ 0 ].includes( 'deg' ) ) {
 			angle = parseSize( gradientParams[ 0 ], true );
+			colors = gradientParams.slice( 1 ).map( ( color ) => color.trim() );
+		} else {
+			colors = gradientParams.map( ( color ) => color.trim() );
 		}
-		const colors = gradientParams.slice( 1 ).map( ( color ) => color.trim() );
 
 		return {
 			type: 'linear',

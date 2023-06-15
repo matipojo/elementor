@@ -9,7 +9,7 @@ import defaultMessages from '../../api/messages';
 
 const prompts = {
 	hero: 'Create an enchanting hero section for a flower shop website that celebrates the beauty of nature and the art of floral arrangements. Incorporate stunning floral imagery, a captivating headline, and an irresistible invitation to explore the shop\'s vibrant collection of blooms. The hero section should entice visitors to indulge their senses and discover the perfect flowers for every occasion.',
-	about: 'Create an about section that suits my business. make sure to add a form with 70% width input and a 30% width button.',
+	about: 'Create a row with a width of 1400px and a height of 80% of the viewport. The row has a subtle background gradient. Inside the row, place a centered column with a divider, a title, and a text paragraph. Next, create another row that spans the full width and has images aligned to the right with gap between elements. The images are of a flower shop Instagram style',
 };
 
 export default function Steps( { activeStep, setActiveStep, data, setData } ) {

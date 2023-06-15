@@ -51,7 +51,7 @@ const defaultMessages = [
 	{
 		role: 'assistant',
 		content: `
-			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, var( --primary-color ) 10%, #FFF 30%)" padding="5%">
+			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, var( --primary-color ) 10%, var( --primary-darker-color ) 30%)" padding="5%">
 				<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
 					<divider width="105px" color="var( --divider-color )"></divider>
 					<title color="var( --primary-color )" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
@@ -134,6 +134,9 @@ const defaultMessages = [
 	// 			</row>
 	// 		</row>`,
 	// },
+
+	// Varda's flower shop
+	// A flower shop that sells flowers and bouquets for all occasions.
 ];
 
 export default defaultMessages;

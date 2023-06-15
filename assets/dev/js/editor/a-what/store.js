@@ -33,6 +33,16 @@ export const selectElementsIds = createSelector(
 	}, [] ),
 );
 
+export const selectLastResult = createSelector(
+	selectResults,
+	( state, elementId ) => elementId,
+	( results, elementId ) => {
+		return Object.values( results )
+			.filter( ( item ) => item.elementId === elementId )
+			.find( ( item ) => -1 === item.position );
+	},
+);
+
 // Slice
 export const slice = createSlice( {
 	name: 'aWhat',

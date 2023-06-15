@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, IconButton, Stack, Divider, Tooltip, ToggleButton, CircularProgress, styled } from '@elementor/ui';
 import { useDispatch, useSelector } from '@elementor/store';
 import { XIcon, AIIcon } from '@elementor/icons';
-import { selectElementResults, selectStatus, slice } from '../store';
+import { selectElementResults, selectLastResult, selectStatus, slice } from '../store';
 import defaultMessages from '../api/messages';
 import { env } from '../env';
 import Draggable from 'react-draggable';
@@ -35,17 +35,24 @@ export default function PromptModal( { setElementId, elementId } ) {
 	const results = useSelector( ( state ) => selectElementResults( state, elementId ) );
 	const status = useSelector( selectStatus );
 	const promptInputRef = useRef();
+	const lastResult = useSelector( ( state ) => selectLastResult( state, elementId ) );
+	const [ reRenderHack, setReRenderHack ] = useState( null );
 
 	const [ enhancing, setEnhancing ] = useState( false );
 
-	const generateButtonText = 'Generate';
+	const generateButtonText = lastResult?.nextPrompt && ! promptInputRef.current?.value?.trim?.() ? 'Regenerate' : 'Generate';
 
 	const inputPromptPlaceholder = 'I want a hero section with background image and two columns.';
 
 	const submit = async ( { prompt, eId } ) => {
-		if ( ! promptInputRef.current.value.trim() ) {
+		const pastPrompt = lastResult?.nextPrompt;
+		prompt = prompt.trim() || pastPrompt;
+
+		if ( ! prompt ) {
 			return;
 		}
+
+		console.log( prompt );
 
 		dispatch( slice.actions.start( { elementId: eId, prompt } ) );
 
@@ -86,7 +93,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 			},
 		} );
 
-		// Const result = `<row bgImage="coffee" height="500px"><col><text>${ prompt }</text></col></row>>`;
+		// Const result = `<row><col><text>${ prompt }</text></col></row>`;
 
 		const isValid = result.includes( '<' );
 
@@ -241,6 +248,7 @@ export default function PromptModal( { setElementId, elementId } ) {
 							await submit( { eId: elementId, prompt: e.target.prompt.value } );
 
 							e.target.reset();
+							setReRenderHack( null );
 						} }
 						display="flex"
 					>
@@ -264,6 +272,9 @@ export default function PromptModal( { setElementId, elementId } ) {
 									event.preventDefault();
 									promptInputRef.current.value = inputPromptPlaceholder;
 								}
+							} }
+							onChange={ ( e ) => {
+								setReRenderHack( e.target.value );
 							} }
 							sx={ {
 								'& .Mui-disabled': {

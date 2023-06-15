@@ -51,7 +51,7 @@ const defaultMessages = [
 	{
 		role: 'assistant',
 		content: `
-			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, var( --primary-color ), 10%, #FFF 30%)" padding="5%">
+			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, var( --primary-color ) 10%, #FFF 30%)" padding="5%">
 				<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
 					<divider width="105px" color="var( --divider-color )"></divider>
 					<title color="var( --primary-color )" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
@@ -121,25 +121,6 @@ const defaultMessages = [
 					</column>
 				</row>
 			</column>`,
-	},
-	{
-		role: 'user',
-		content: `Create a boxed row with a width of 1400px and a height of 80% of the viewport.
-			The row has a background gradient, fading from pink to white. Inside the row, place a centered column with a title,
-			and a heart pink icon of size 200px.`,
-	},
-	{
-		role: 'assistant',
-		content: `
-			<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, var( --primary-color ) 10%, var( --primary_darker-color ) 30%)" padding="5%">
-				<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
-					<title color="#fff" font="Poppins" fontWeight="500" fontSize="60px">An award-winning full-stack digital marketing studio</title>
-					<text color="var( --text-color )" font="Poppins" fontWeight="300" fontSize="20px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius massa at urna pretium convallis. Sed sed ullamcorper ligula. Praesent sagittis nisi eu eros consequat luctus. Proin a mollis ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam enim elit, hendrerit eu metus ut, porttitor dictum purus. Praesent sit amet purus turpis. </text>
-				</column>
-				<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">
-					<icon color="var( --primary-color )" fontSize="200px" value="fas fa-heart"></icon>
-				</row>
-			</row>`,
 	},
 ];
 

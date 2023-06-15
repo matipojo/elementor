@@ -87,6 +87,21 @@ export default function BlocksStep( { data, setData } ) {
 			Authorization: `Bearer ${ env.apiKey }`,
 		};
 
+		const parseDirtyJSONWithComments = ( dirtyJSON ) => {
+			// Remove comments
+			const jsonWithoutComments = dirtyJSON.replace( /\/\*[\s\S]*?\*\/|\/\/.*/g, '' );
+
+			// Find the JSON object within the remaining text
+			const startIndex = jsonWithoutComments.indexOf( '[' );
+			const endIndex = jsonWithoutComments.lastIndexOf( ']' );
+			const jsonString = jsonWithoutComments.substring( startIndex, endIndex + 1 );
+
+			// Parse the JSON
+			const parsedJSON = JSON.parse( jsonString );
+
+			return parsedJSON;
+		};
+
 		return fetch( env.apiURL, {
 			method: 'POST',
 			headers,
@@ -97,7 +112,11 @@ export default function BlocksStep( { data, setData } ) {
 				try {
 					return JSON.parse( data.choices[ 0 ].message.content );
 				} catch ( e ) {
-					return fallbackColors;
+					try {
+						return parseDirtyJSONWithComments( data.choices[ 0 ].message.content );
+					} catch ( e ) {
+						return fallbackColors;
+					}
 				}
 			} )
 			.catch( ( error ) => console.log( error ) );

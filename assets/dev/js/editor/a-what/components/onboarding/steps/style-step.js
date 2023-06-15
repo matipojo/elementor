@@ -8,8 +8,7 @@ const ColorCircle = styled( Box, { name: 'color-circle' } )( ( { theme, color } 
 	height: theme.sizing[ 300 ],
 	borderRadius: theme.border.radius.circle,
 	backgroundColor: color,
-	border: `1px solid ${ theme.palette.common.white }`,
-	boxShadow: `0px 0px 3px 3px rgba(0, 0, 0, 0.25)`,
+	boxShadow: `0px 0px 1px 1px rgba(0, 0, 0, 0.25)`,
 } ) );
 
 export default function StyleStep( { data, setData } ) {
@@ -48,17 +47,25 @@ export default function StyleStep( { data, setData } ) {
 	};
 
 	return (
-		<Stack spacing={ 7 } width="100%">
-			<Stack>
-				<Typography variant="h4" sx={ { mb: 3 } }>
-					Never go out of style
-				</Typography>
-				<Typography variant="subtitle1">
-					These styles are recommended by our AI.
-				</Typography>
-				<Typography variant="subtitle1">
-					You can always change them later.
-				</Typography>
+		<Stack spacing={ 8 } width="100%">
+			<Stack spacing={ 3 }>
+				<img
+					src={ `${ elementorCommonConfig.urls.assets }images/ai/style.png` }
+					alt="Blocks"
+					style={ { width: '32px', height: 'auto' } }
+				/>
+
+				<Stack>
+					<Typography variant="h4" sx={ { mb: 3 } }>
+						Never go out of style
+					</Typography>
+					<Typography variant="subtitle1">
+						These styles are recommended by our AI.
+					</Typography>
+					<Typography variant="subtitle1">
+						You can always change them later.
+					</Typography>
+				</Stack>
 			</Stack>
 
 			<Stack spacing={ 7 }>
@@ -67,15 +74,15 @@ export default function StyleStep( { data, setData } ) {
 						Choose a color palette
 					</Typography>
 
-					<Box direction="row" display="flex" justifyContent={ { xs: 'space-between', sm: 'flex-start' } } flexWrap="wrap" gap={ 4 }>
+					<Box direction="row" display="flex" justifyContent={ { xs: 'flex-start', sm: 'space-between' } } flexWrap="wrap" gap={ 4 }>
 						{
-							colors.map( ( colorRow, index ) => (
+							colors?.map( ( colorRow, index ) => (
 								<Box key={ index }>
 									<Button
 										onClick={ () => handleColors( index ) }
 										variant="outlined"
 										color="secondary"
-										sx={ { width: squareWidth, py: 10, opacity: Number.isInteger( selectedColors ) && selectedColors !== index ? '0.25' : '1' } }
+										sx={ { width: squareWidth, py: 10, borderColor: Number.isInteger( selectedColors ) && selectedColors === index ? 'secondary.dark' : 'secondary.background' } }
 									>
 										<Stack direction="row" spacing={ -3 }>
 											{
@@ -96,14 +103,14 @@ export default function StyleStep( { data, setData } ) {
 						Choose a font pairing
 					</Typography>
 
-					<Box direction="row" display="flex" justifyContent={ { xs: 'space-between', sm: 'flex-start' } } flexWrap="wrap" gap={ 4 }>
+					<Box direction="row" display="flex" justifyContent={ { xs: 'flex-start', sm: 'space-between' } } flexWrap="wrap" gap={ 4 }>
 						{
 							fonts.map( ( { value, family }, index ) => (
 								<Box key={ value }>
 									<Button
 										variant="outlined"
 										color="secondary"
-										sx={ { width: squareWidth, py: 10, px: 3, opacity: Number.isInteger( selectedFont ) && selectedFont !== index ? '0.25' : '1' } }
+										sx={ { width: squareWidth, py: 10, px: 3, borderColor: Number.isInteger( selectedFont ) && selectedFont === index ? 'secondary.dark' : 'secondary.background' } }
 										onClick={ () => handleFont( index ) }
 									>
 										<Stack>

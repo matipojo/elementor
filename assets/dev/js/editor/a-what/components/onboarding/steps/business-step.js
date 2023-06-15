@@ -27,12 +27,20 @@ export default function BusinessStep( { setData, data } ) {
 
 	return (
 		<Stack spacing={ 7 } width="100%">
-			<Typography variant="h4">
-				Let's get down to business
-			</Typography>
+			<Stack spacing={ 3 }>
+				<img
+					src={ `${ elementorCommonConfig.urls.assets }images/ai/business.png` }
+					alt="Business"
+					style={ { width: '32px', height: 'auto' } }
+				/>
+
+				<Typography variant="h4">
+					Let's get down to business
+				</Typography>
+			</Stack>
 
 			<FormControl fullWidth>
-				<Stack spacing={ 7 }>
+				<Stack spacing={ 8 }>
 					<Stack spacing={ 4 }>
 						<Typography variant="h6" sx={ { fontWeight: 'bold', mt: 4 } }>
 							What’s your site about?
@@ -44,7 +52,7 @@ export default function BusinessStep( { setData, data } ) {
 								disablePortal
 								id="combo-box-demo"
 								options={ siteTypes }
-								renderInput={ ( params ) => <TextField color="secondary" { ...params } label="Select a business type" /> }
+								renderInput={ ( params ) => <TextField InputLabelProps={ { shrink: false } } color="secondary" { ...params } placeholder="Select a business type" /> }
 								onChange={ handleType }
 								color="secondary"
 							/>

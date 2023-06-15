@@ -372,6 +372,11 @@ export class Parser {
 
 		const attrsMap = {
 			...common(),
+			// Override things from common.
+			...border( 'border', 'image_border' ),
+			borderRadius: ( value ) => {
+				return [ 'image_border_radius', normalize4Sizes( value ) ];
+			},
 		};
 
 		result.settings = this.parseAttributes( node, attrsMap );

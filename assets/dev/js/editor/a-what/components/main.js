@@ -44,9 +44,9 @@ listenTo(
 				[ aboutContainer.id ]: `<row boxed="true" width="1400px" height="80vh" bgGradient="linear-gradient(40deg, var( --primary-color ) 10%, var( --primary-darker-color ) 30%)" padding="5%">
 					<column fullWidth="true" width="100%" justifyContent="center" gap="30px" padding="0">
 						<divider width="105px" color="var( --divider-color )"></divider>
-						<title color="var( --primary-color )" font="Poppins" fontWeight="500" fontSize="60px">Welcome to Varda's Flower Shop</title>
+						<title color="var( --primary-color )" font="Poppins" fontWeight="500" fontSize="60px">Welcome to Rosa's Flower Shop</title>
 						<text color="var( --text-color )" font="Poppins" fontWeight="300" fontSize="20px">
-							We provide beautiful, fresh and high-quality flowers and bouquets for every occasion, from weddings and birthdays to funerals and corporate events. Our team of expert florists handpick and arrange each stem with great care and attention to detail, ensuring that every creation is unique and stunning. Come visit Varda's and let us help you express your feelings with flowers.
+							We provide beautiful, fresh and high-quality flowers and bouquets for every occasion, from weddings and birthdays to funerals and corporate events. Our team of expert florists handpick and arrange each stem with great care and attention to detail, ensuring that every creation is unique and stunning. Come visit Rosa's and let us help you express your feelings with flowers.
 						</text>
 					</column>
 					<row fullWidth="true" width="100%" justifyContent="end" gap="20px" padding="0" wrap="true">

@@ -8,7 +8,7 @@ import { AIIcon } from '@elementor/icons';
 import defaultMessages from '../../api/messages';
 
 const prompts = {
-	hero: 'Create an enchanting hero section for with background image and a title. The title is centered and has a subtle shadow. The section has a height of 100% of the viewport.',
+	hero: 'Create an enchanting hero section for with background image, a title and short text. The title is centered and has a subtle shadow. The section has a height of 100% of the viewport.',
 	about: 'Create a row with a width of 1400px and a height of 80% of the viewport. The row has a subtle background gradient. Inside the row, place a centered column with a divider, a title, and a text paragraph. Next, create another row that spans the full width and has images aligned to the right with gap between elements. The images are rounded and have a subtle shadow.',
 };
 

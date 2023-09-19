@@ -93,7 +93,7 @@ class Module extends BaseModule {
 			'title' => esc_html__( 'Build with AI', 'elementor' ),
 			'default' => Experiments_Manager::STATE_INACTIVE,
 			'status' => Experiments_Manager::RELEASE_STATUS_ALPHA,
-			'hidden' => true,
+			'hidden' => false,
 			'dependencies' => [
 				'container',
 			],

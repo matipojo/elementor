@@ -476,12 +476,13 @@ class Ai extends Library {
 		return $result;
 	}
 
-	public function generate_layout( $prompt, $context, $variation_type ) {
+	public function generate_layout( $prompt, $attachments, $context, $variation_type ) {
 		return $this->ai_request(
 			'POST',
-			'generate/layout',
+			empty( $attachments ) ? 'generate/layout' : 'generate/html-to-elementor',
 			[
 				'prompt' => $prompt,
+				'attachments' => $attachments,
 				'context' => $context ?? [],
 				'api_version' => ELEMENTOR_VERSION,
 				'site_lang' => get_bloginfo( 'language' ),
@@ -496,6 +497,19 @@ class Ai extends Library {
 			'generate/enhance-prompt',
 			[
 				'prompt' => $prompt,
+				'context' => wp_json_encode( $context ),
+				'api_version' => ELEMENTOR_VERSION,
+				'site_lang' => get_bloginfo( 'language' ),
+			]
+		);
+	}
+
+	public function generate_from_html( $html, $context, $variation_type ) {
+		return $this->ai_request(
+			'POST',
+			'generate/enhance-prompt',
+			[
+				'html' => $html,
 				'context' => wp_json_encode( $context ),
 				'api_version' => ELEMENTOR_VERSION,
 				'site_lang' => get_bloginfo( 'language' ),

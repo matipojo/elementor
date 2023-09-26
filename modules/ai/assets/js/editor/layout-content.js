@@ -8,7 +8,6 @@ import WizardDialog from './components/wizard-dialog';
 import LayoutDialog from './pages/form-layout/components/layout-dialog';
 import { Alert } from '@elementor/ui';
 import useIntroduction from './hooks/use-introduction';
-import Inspiration from './pages/form-layout/components/inspiration';
 
 const LayoutContent = ( { onClose, onConnect, onData, onInsert, onSelect, onGenerate } ) => {
 	const { isLoading, isConnected, isGetStarted, connectUrl, fetchData, hasSubscription, credits, usagePercentage } = useUserInfo();
@@ -67,10 +66,7 @@ const LayoutContent = ( { onClose, onConnect, onData, onInsert, onSelect, onGene
 			onSelect={ onSelect }
 			onGenerate={ onGenerate }
 			DialogHeaderProps={ {
-				children: <>{ <Inspiration
-					text={ "Enter your favorite website URL and we'll help you get started with a layout." }
-					title={ 'Get inspired by your favorite website' }
-				/> } { showUpgradeChip && <UpgradeChip hasSubscription={ hasSubscription } usagePercentage={ usagePercentage } /> }</>,
+				children: showUpgradeChip && <UpgradeChip hasSubscription={ hasSubscription } usagePercentage={ usagePercentage } />,
 			} }
 			DialogContentProps={ {
 				children: ! isViewed && (

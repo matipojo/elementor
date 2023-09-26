@@ -21,7 +21,7 @@ const useScreenshots = ( { onData } ) => {
 
 	const abort = () => abortController.current?.abort();
 
-	const createScreenshots = async ( prompt ) => {
+	const createScreenshots = async ( prompt, attachments ) => {
 		abortController.current = new AbortController();
 
 		const onGenerate = ( screenshot ) => {
@@ -51,7 +51,7 @@ const useScreenshots = ( { onData } ) => {
 		};
 
 		const promises = screenshotsData.map( ( { generate } ) => {
-			return generate( prompt, abortController.current.signal )
+			return generate( prompt, attachments, abortController.current.signal )
 				.then( onGenerate )
 				.catch( onError );
 		} );
@@ -70,20 +70,20 @@ const useScreenshots = ( { onData } ) => {
 		}
 	};
 
-	const generate = ( prompt ) => {
+	const generate = ( prompt, attachments ) => {
 		const placeholders = Array( screenshotsGroupCount ).fill( PENDING_VALUE );
 
 		setScreenshots( placeholders );
 
-		createScreenshots( prompt );
+		createScreenshots( prompt, attachments );
 	};
 
-	const regenerate = ( prompt ) => {
+	const regenerate = ( prompt, attachments ) => {
 		const placeholders = Array( screenshotsGroupCount ).fill( PENDING_VALUE );
 
 		setScreenshots( ( prev ) => [ ...prev, ...placeholders ] );
 
-		createScreenshots( prompt );
+		createScreenshots( prompt, attachments );
 	};
 
 	return {

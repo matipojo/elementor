@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
-import { Box, Divider, Button, Pagination, IconButton, Collapse, Tooltip, withDirection } from '@elementor/ui';
+import {
+	Box,
+	Divider,
+	Button,
+	Pagination,
+	IconButton,
+	Collapse,
+	Tooltip,
+	withDirection,
+	Stack,
+} from '@elementor/ui';
 import PromptErrorMessage from '../../components/prompt-error-message';
 import UnsavedChangesAlert from './components/unsaved-changes-alert';
 import LayoutDialog from './components/layout-dialog';
@@ -10,6 +20,7 @@ import useScreenshots from './hooks/use-screenshots';
 import useSlider from './hooks/use-slider';
 import MinimizeDiagonalIcon from '../../icons/minimize-diagonal-icon';
 import ExpandDiagonalIcon from '../../icons/expand-diagonal-icon';
+import Inspiration from './components/inspiration';
 
 const DirectionalMinimizeDiagonalIcon = withDirection( MinimizeDiagonalIcon );
 const DirectionalExpandDiagonalIcon = withDirection( ExpandDiagonalIcon );
@@ -38,7 +49,6 @@ const UseLayoutButton = ( props ) => (
 UseLayoutButton.propTypes = {
 	sx: PropTypes.object,
 };
-
 const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHeaderProps = {}, DialogContentProps = {} } ) => {
 	const { screenshots, generate, regenerate, isLoading, error, abort } = useScreenshots( { onData } );
 
@@ -59,6 +69,8 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 	const [ showUnsavedChangesAlert, setShowUnsavedChangesAlert ] = useState( false );
 
 	const [ isPromptEditable, setIsPromptEditable ] = useState( true );
+
+	const [ attachments, setAttachments ] = useState( [] );
 
 	const [ isMinimized, setIsMinimized ] = useState( false );
 
@@ -93,7 +105,7 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 	const handleGenerate = ( event, prompt ) => {
 		event.preventDefault();
 
-		if ( '' === prompt.trim() ) {
+		if ( '' === prompt.trim() && 0 === attachments.length ) {
 			return;
 		}
 
@@ -101,7 +113,7 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 
 		lastRun.current = () => {
 			setSelectedScreenshotIndex( -1 );
-			generate( prompt );
+			generate( prompt, attachments );
 		};
 
 		lastRun.current();
@@ -112,7 +124,7 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 
 	const handleRegenerate = () => {
 		lastRun.current = () => {
-			regenerate( promptInputRef.current.value );
+			regenerate( promptInputRef.current.value, attachments );
 			// Changing the current page to the next page number.
 			setCurrentPage( pagesCount + 1 );
 		};
@@ -138,6 +150,18 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 			onSelect( template );
 		};
 	};
+
+	const addAttachment = ( type, content, label ) => {
+		setAttachments( ( prev ) => [ ...prev, { type, content, label } ] );
+	};
+
+	useEffect( () => {
+		window.addEventListener( 'inspiration-html', ( event ) => {
+			const { html, label } = event.detail;
+
+			addAttachment( 'html', html, label );
+		} );
+	}, [] );
 
 	useEffect( () => {
 		const isFirstTemplateExist = screenshots[ 0 ]?.template;
@@ -193,11 +217,23 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 						isActive={ isPromptFormActive }
 						isLoading={ isLoading }
 						showActions={ screenshots.length > 0 || isLoading }
+						attachments={ attachments }
 						onSubmit={ handleGenerate }
 						onBack={ () => setIsPromptEditable( false ) }
 						onEdit={ () => setIsPromptEditable( true ) }
-					/>
+					>
+						<Stack direction="row" spacing={ 3 } alignItems="center" sx={ { ml: 'auto' } }>
+							<Stack direction="row" sx={ { m: 3, marginInline: 4 } } >
+								<Inspiration
+									onAttach={ ( url, html ) => {
+										const host = new URL( url ).host;
 
+										setAttachments( [ { type: 'html', content: html, label: host } ] );
+									} }
+								/>
+							</Stack>
+						</Stack>
+					</PromptForm>
 					{
 						( screenshots.length > 0 || isLoading ) && (
 							<>

@@ -6,7 +6,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { XIcon } from '@elementor/icons';
 
-const Inspiration = ( { onAttach, ...props } ) => {
+const Inspiration = ( { onAttach, onDetach, ...props } ) => {
 	const [ mode, setMode ] = useState( 'button' ); // ['select', 'preview', 'button']
 	const [ attachment, setAttachment ] = useState( '' );
 	const [ startUrl, setStartUrl ] = useState( '' );
@@ -73,6 +73,7 @@ const Inspiration = ( { onAttach, ...props } ) => {
 					onClick={ ( event ) => {
 						setMode( 'button' );
 						setAttachment( '' );
+						onDetach();
 						event.stopPropagation();
 					} }
 					sx={ {

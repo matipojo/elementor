@@ -482,7 +482,7 @@ class Ai extends Library {
 			empty( $attachments ) ? 'generate/layout' : 'generate/html-to-elementor',
 			[
 				'prompt' => $prompt,
-				'attachments' => $attachments,
+				'html' => empty( $attachments ) ? '' : json_encode( $attachments[0]['content'] ),
 				'context' => $context ?? [],
 				'api_version' => ELEMENTOR_VERSION,
 				'site_lang' => get_bloginfo( 'language' ),

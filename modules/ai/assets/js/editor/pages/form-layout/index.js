@@ -156,11 +156,17 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 	};
 
 	useEffect( () => {
-		window.addEventListener( 'inspiration-html', ( event ) => {
+		const addAttachmentCallback = ( event ) => {
 			const { html, label } = event.detail;
 
 			addAttachment( 'html', html, label );
-		} );
+		};
+
+		window.addEventListener( 'inspiration-html', addAttachmentCallback );
+
+		return () => {
+			window.removeEventListener( 'inspiration-html', addAttachmentCallback );
+		};
 	}, [] );
 
 	useEffect( () => {
@@ -229,6 +235,11 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 										const host = new URL( url ).host;
 
 										setAttachments( [ { type: 'html', content: html, label: host } ] );
+										setIsPromptEditable( true );
+									} }
+									onDetach={ () => {
+										setAttachments( [] );
+										setIsPromptEditable( true );
 									} }
 								/>
 							</Stack>

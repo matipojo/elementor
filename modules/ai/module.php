@@ -692,33 +692,12 @@ class Module extends BaseModule {
 			throw new \Exception( 'not_connected' );
 		}
 
-		if ( ! empty( $data['attachments'])) {
-			$result = [
-				'text' => [
-					'elements' => [
-						[
-							'elType' => 'container',
-							'elements' => [
-								[
-									'elType' => 'widget',
-									'widgetType' => 'html',
-									'settings' => [
-										'html' => str_replace( 'rgb(254, 81, 21);', ' rgb(66, 139, 202);', $data['attachments'][0]['content'] )
-									],
-								],
-							],
-						],
-					],
-				],
-			];
-		} else {
-			$result = $app->generate_layout(
-				$data['prompt'],
-				$data['attachments'],
-				$this->prepare_generate_layout_context(),
-				$data['variationType']
-			);
-		}
+		$result = $app->generate_layout(
+			$data['prompt'],
+			$data['attachments'],
+			$this->prepare_generate_layout_context(),
+			$data['variationType']
+		);
 
 		if ( is_wp_error( $result ) ) {
 			throw new \Exception( $result->get_error_message() );

@@ -11,7 +11,7 @@ const Inspiration = ( { onAttach, ...props } ) => {
 	const [ attachment, setAttachment ] = useState( '' );
 	const [ startUrl, setStartUrl ] = useState( '' );
 	const previewRef = useRef( null );
-	const iframeSource = 'http://localhost:3000/?url=' + startUrl;
+	const iframeSource = 'https://ai-h2e-helper.s3.eu-west-1.amazonaws.com/index.html?url=' + startUrl;
 
 	useEffect( () => {
 		if ( previewRef.current ) {
@@ -147,3 +147,4 @@ Inspiration.propTypes = {
 };
 
 export default Inspiration;
+

@@ -6,6 +6,7 @@ import GenerateSubmit from '../../form-media/components/generate-submit';
 import ArrowLeftIcon from '../../../icons/arrow-left-icon';
 import EditIcon from '../../../icons/edit-icon';
 import usePromptEnhancer from '../../../hooks/use-prompt-enhancer';
+import Inspiration from './inspiration';
 
 const PROMPT_SUGGESTIONS = Object.freeze( [
 	{ text: __( 'Hero section with an image, headline, and call-to-action button about', 'elementor' ) },
@@ -57,7 +58,17 @@ const GenerateButton = ( props ) => (
 	</GenerateSubmit>
 );
 
-const PromptForm = forwardRef( ( { isActive, attachments, isLoading, showActions = false, onSubmit, onBack, onEdit, children }, ref ) => {
+const PromptForm = forwardRef( ( {
+	isActive,
+	attachments,
+	isLoading,
+	showActions = false,
+	onAttach,
+	onDetach,
+	onSubmit,
+	onBack,
+	onEdit,
+}, ref ) => {
 	const [ prompt, setPrompt ] = useState( '' );
 	const { isEnhancing, enhance } = usePromptEnhancer( prompt, 'layout' );
 	const previousPrompt = useRef( '' );
@@ -96,6 +107,16 @@ const PromptForm = forwardRef( ( { isActive, attachments, isLoading, showActions
 						)
 					}
 
+					<Stack direction="row" spacing={ 3 } alignItems="center" sx={ { ml: 'auto' } }>
+						<Stack direction="row" sx={ { m: 3, marginInline: 4 } } >
+							<Inspiration
+								onAttach={ onAttach }
+								onDetach={ onDetach }
+								disabled={ isLoading }
+							/>
+						</Stack>
+					</Stack>
+
 					<PromptAutocomplete
 						value={ prompt }
 						disabled={ isLoading || ! isActive || isEnhancing }
@@ -123,7 +144,6 @@ const PromptForm = forwardRef( ( { isActive, attachments, isLoading, showActions
 
 				<GenerateButton disabled={ isInteractionsDisabled } />
 			</Stack>
-			{ children }
 		</Box>
 	);
 } );
@@ -131,6 +151,8 @@ const PromptForm = forwardRef( ( { isActive, attachments, isLoading, showActions
 PromptForm.propTypes = {
 	isActive: PropTypes.bool,
 	attachments: PropTypes.array,
+	onAttach: PropTypes.func,
+	onDetach: PropTypes.func,
 	isLoading: PropTypes.bool,
 	showActions: PropTypes.bool,
 	onSubmit: PropTypes.func.isRequired,

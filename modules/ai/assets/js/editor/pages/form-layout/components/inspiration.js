@@ -6,7 +6,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { XIcon } from '@elementor/icons';
 
-const Inspiration = ( { onAttach, onDetach, ...props } ) => {
+const Inspiration = ( { onAttach, onDetach, disabled, ...props } ) => {
 	const [ mode, setMode ] = useState( 'button' ); // ['select', 'preview', 'button']
 	const [ attachment, setAttachment ] = useState( '' );
 	const [ startUrl, setStartUrl ] = useState( '' );
@@ -17,7 +17,7 @@ const Inspiration = ( { onAttach, onDetach, ...props } ) => {
 		if ( previewRef.current ) {
 			const attachmentWidth = previewRef.current.querySelector( '*' ).offsetWidth;
 			console.log( attachmentWidth );
-			previewRef.current.style.transform = 'scale(' + ( 150 / attachmentWidth ) + ')';
+			previewRef.current.style.transform = 'scale(' + ( 50 / attachmentWidth ) + ')';
 		}
 	}, [ attachment, mode ] );
 
@@ -43,33 +43,40 @@ const Inspiration = ( { onAttach, onDetach, ...props } ) => {
 
 	if ( 'button' === mode ) {
 		return <Button
+			disabled={ disabled }
 			onClick={ () => {
 				setMode( 'select' );
 			} }
-			color="secondary"
+			color="primary"
 			size="small"
 			variant="contained"
 			sx={ { ml: 1 } }
 		>
-			{ __( 'Attach Inspiration', 'elementor' ) }
+			+
 		</Button>;
 	}
 
 	if ( attachment && 'preview' === mode ) {
 		return (
 			<Box sx={ {
-				width: 150,
-				height: 150,
+				width: 50,
+				height: 50,
 				border: '1px solid gray',
 				position: 'relative',
 				cursor: 'pointer',
+				opacity: disabled ? 0.5 : 1,
+				'&:hover .remove-attachment': {
+					display: 'block',
+				},
 			} } onClick={ () => {
 				setMode( 'select' );
 			} }
 			>
 				<IconButton
+					className="remove-attachment"
 					size="small"
 					aria-label="close"
+					disabled={ disabled }
 					onClick={ ( event ) => {
 						setMode( 'button' );
 						setAttachment( '' );
@@ -77,12 +84,13 @@ const Inspiration = ( { onAttach, onDetach, ...props } ) => {
 						event.stopPropagation();
 					} }
 					sx={ {
+						display: 'none',
 						position: 'absolute',
-						insetInlineStart: -17,
+						insetInlineEnd: 0,
 						backgroundColor: 'grey.200',
 						zIndex: 1,
 						'&:hover': {
-							backgroundColor: 'grey.300',
+							backgroundColor: 'grey.200',
 						},
 					} }
 				>
@@ -145,6 +153,8 @@ const Inspiration = ( { onAttach, onDetach, ...props } ) => {
 
 Inspiration.propTypes = {
 	onAttach: PropTypes.func,
+	onDetach: PropTypes.func,
+	disabled: PropTypes.bool,
 };
 
 export default Inspiration;

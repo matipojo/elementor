@@ -8,7 +8,6 @@ import {
 	Collapse,
 	Tooltip,
 	withDirection,
-	Stack,
 } from '@elementor/ui';
 import PromptErrorMessage from '../../components/prompt-error-message';
 import UnsavedChangesAlert from './components/unsaved-changes-alert';
@@ -20,7 +19,6 @@ import useScreenshots from './hooks/use-screenshots';
 import useSlider from './hooks/use-slider';
 import MinimizeDiagonalIcon from '../../icons/minimize-diagonal-icon';
 import ExpandDiagonalIcon from '../../icons/expand-diagonal-icon';
-import Inspiration from './components/inspiration';
 
 const DirectionalMinimizeDiagonalIcon = withDirection( MinimizeDiagonalIcon );
 const DirectionalExpandDiagonalIcon = withDirection( ExpandDiagonalIcon );
@@ -224,27 +222,19 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 						isLoading={ isLoading }
 						showActions={ screenshots.length > 0 || isLoading }
 						attachments={ attachments }
+						onAttach={ ( url, html ) => {
+							const host = new URL( url ).host;
+							setAttachments( [ { type: 'html', content: html, label: host } ] );
+							setIsPromptEditable( true );
+						} }
+						onDetach={ () => {
+							setAttachments( [] );
+							setIsPromptEditable( true );
+						} }
 						onSubmit={ handleGenerate }
 						onBack={ () => setIsPromptEditable( false ) }
 						onEdit={ () => setIsPromptEditable( true ) }
-					>
-						<Stack direction="row" spacing={ 3 } alignItems="center" sx={ { ml: 'auto' } }>
-							<Stack direction="row" sx={ { m: 3, marginInline: 4 } } >
-								<Inspiration
-									onAttach={ ( url, html ) => {
-										const host = new URL( url ).host;
-
-										setAttachments( [ { type: 'html', content: html, label: host } ] );
-										setIsPromptEditable( true );
-									} }
-									onDetach={ () => {
-										setAttachments( [] );
-										setIsPromptEditable( true );
-									} }
-								/>
-							</Stack>
-						</Stack>
-					</PromptForm>
+					/>
 					{
 						( screenshots.length > 0 || isLoading ) && (
 							<>

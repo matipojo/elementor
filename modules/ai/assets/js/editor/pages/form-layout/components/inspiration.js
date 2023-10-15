@@ -1,10 +1,11 @@
 import {
 	Dialog,
 	DialogContent,
-	Toolbar, Stack, IconButton, AppBar, Box, Button,
+	Toolbar, Stack, IconButton, AppBar, Box,
 } from '@elementor/ui';
 import { useEffect, useRef, useState } from 'react';
 import { XIcon } from '@elementor/icons';
+import { AddAttachmentButton } from './add-attachment-button';
 
 const Inspiration = ( { onAttach, onDetach, disabled, ...props } ) => {
 	const [ mode, setMode ] = useState( 'button' ); // ['select', 'preview', 'button']
@@ -42,18 +43,16 @@ const Inspiration = ( { onAttach, onDetach, disabled, ...props } ) => {
 	}, [ startUrl ] );
 
 	if ( 'button' === mode ) {
-		return <Button
+		return <AddAttachmentButton
 			disabled={ disabled }
-			onClick={ () => {
-				setMode( 'select' );
+			onSelect={ ( type ) => {
+				switch ( type ) {
+					case 'url':
+						setMode( 'select' );
+						break;
+				}
 			} }
-			color="primary"
-			size="small"
-			variant="contained"
-			sx={ { ml: 1 } }
-		>
-			+
-		</Button>;
+		/>;
 	}
 
 	if ( attachment && 'preview' === mode ) {
@@ -158,4 +157,3 @@ Inspiration.propTypes = {
 };
 
 export default Inspiration;
-

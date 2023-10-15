@@ -11,12 +11,21 @@ export const AddAttachmentButton = ( props ) => {
 				ref={ anchorRef }
 				disabled={ props.disabled }
 				onClick={ () => setOpen( true ) }
-				color="primary"
+				color="secondary"
 				size="small"
-				variant="contained"
-				sx={ { ml: 1 } }
+				variant="outlined"
+				sx={ {
+					borderRadius: '50%',
+					borderWidth: 2,
+					width: 24,
+					height: 24,
+					padding: 0,
+					minWidth: 24,
+					background: 'g.700',
+					ml: 1,
+				} }
 			>
-				+
+				{ open ? 'X' : '+' }
 			</Button>
 
 			<Popover
@@ -24,7 +33,7 @@ export const AddAttachmentButton = ( props ) => {
 				anchorEl={ anchorRef.current }
 				onClose={ () => setOpen( false ) }
 				sx={ {
-					padding: 8,
+					padding: 16,
 				} }
 				anchorOrigin={ {
 					vertical: 'bottom',
@@ -32,7 +41,7 @@ export const AddAttachmentButton = ( props ) => {
 				} }
 			>
 				<Typography sx={ { p: 2, cursor: 'pointer' } } variant="body2" onClick={ () => props.onSelect( 'url' ) }>
-					Select from an existing website
+					URL as a reference
 				</Typography>
 			</Popover>
 		</>

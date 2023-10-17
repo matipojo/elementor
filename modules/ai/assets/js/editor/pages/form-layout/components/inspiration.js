@@ -1,18 +1,29 @@
 import {
-	Dialog,
-	DialogContent,
-	Toolbar, Stack, IconButton, AppBar, Box,
+	IconButton, Box,
 } from '@elementor/ui';
 import { useEffect, useRef, useState } from 'react';
 import { XIcon } from '@elementor/icons';
 import { AddAttachmentButton } from './add-attachment-button';
+import { UrlDialog } from './attachments/url-dialog';
+
+// Const APP_BASE_URL = 'https://ai-h2e-helper.s3.eu-west-1.amazonaws.com';
+const APP_BASE_URL = 'http://localhost:3000';
 
 const Inspiration = ( { onAttach, onDetach, disabled, ...props } ) => {
 	const [ mode, setMode ] = useState( 'button' ); // ['select', 'preview', 'button']
 	const [ attachment, setAttachment ] = useState( '' );
 	const [ startUrl, setStartUrl ] = useState( '' );
 	const previewRef = useRef( null );
-	const iframeSource = 'https://ai-h2e-helper.s3.eu-west-1.amazonaws.com/index.html?url=' + startUrl;
+
+	const urlObject = new URL( APP_BASE_URL );
+
+	const colorScheme = elementor?.getPreferences?.( 'ui_theme' ) || 'auto';
+	const isRTL = elementorCommon.config.isRTL;
+
+	urlObject.searchParams.append( 'colorScheme', colorScheme );
+	urlObject.searchParams.append( 'isRTL', isRTL );
+	urlObject.searchParams.append( 'locale', elementor.config.locale );
+	urlObject.searchParams.append( 'url', startUrl );
 
 	useEffect( () => {
 		if ( previewRef.current ) {
@@ -112,42 +123,9 @@ const Inspiration = ( { onAttach, onDetach, disabled, ...props } ) => {
 		);
 	}
 
-	return (
-		<Dialog
-			open={ true }
-			fullScreen={ true }
-			maxWidth="md"
-			style={ {
-				maxWidth: 1165,
-				margin: '0 auto',
-			} }
-			{ ...props }
-		>
-			<AppBar sx={ { fontWeight: 'normal' } } color="transparent" position="relative">
-				<Toolbar variant="dense">
-					<Stack direction="row" spacing={ 1 } alignItems="center" sx={ { ml: 'auto' } }>
-						<IconButton
-							size="small"
-							aria-label="close"
-							onClick={ () => setMode( attachment ? 'preview' : 'button' ) }
-							sx={ { '&.MuiButtonBase-root': { mr: -1 } } }
-						>
-							<XIcon />
-						</IconButton>
-					</Stack>
-				</Toolbar>
-			</AppBar>
-
-			<DialogContent>
-				<iframe title="Get Inspiration" src={ iframeSource } style={ {
-					border: 'none',
-					overflow: 'scroll',
-					width: '100%',
-					height: '1000px',
-				} }></iframe>
-			</DialogContent>
-		</Dialog>
-	);
+	return ( <UrlDialog
+		iframeSource={ urlObject.toString() }
+	/> );
 };
 
 Inspiration.propTypes = {

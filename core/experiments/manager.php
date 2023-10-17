@@ -93,7 +93,7 @@ class Manager extends Base_Object {
 		$new_site = $experimental_data['new_site'];
 
 		if ( $new_site['default_active'] || $new_site['always_active'] ) {
-			$is_new_installation = Upgrade_Manager::install_compare( $new_site['minimum_installation_version'], '>=' );
+			$is_new_installation = $this->install_compare( $new_site['minimum_installation_version'] );
 
 			if ( $is_new_installation ) {
 				if ( $new_site['always_active'] ) {
@@ -153,6 +153,18 @@ class Manager extends Base_Object {
 		do_action( 'elementor/experiments/feature-registered', $this, $experimental_data );
 
 		return $experimental_data;
+	}
+
+	private function install_compare( $version ) {
+		$installs_history = Upgrade_Manager::get_installs_history();
+
+		$cleaned_version = preg_replace( '/-(beta|cloud|dev)\d*$/', '', key( $installs_history ) );
+
+		return version_compare(
+			$cleaned_version,
+			$version,
+			'>='
+		);
 	}
 
 	/**
@@ -349,7 +361,7 @@ class Manager extends Base_Object {
 			'release_status' => self::RELEASE_STATUS_STABLE,
 			'new_site' => [
 				'default_active' => true,
-				'minimum_installation_version' => '3.3.0-beta',
+				'minimum_installation_version' => '3.3.0',
 			],
 			'generator_tag' => true,
 		] );
@@ -433,18 +445,6 @@ class Manager extends Base_Object {
 			'dependencies' => [
 				'container',
 			],
-		] );
-
-		$this->add_feature( [
-			'name' => 'rating',
-			'title' => esc_html__( 'Rating', 'elementor' ),
-			/* translators: %1$s Link open tag, %2$s: Link close tag. */
-			'description' => sprintf( esc_html__(
-				'Display author-assigned star ratings within your content in most customizable way and better performance. %1$sLearn more%2$s',
-				'elementor'
-			), '<a target="_blank" href="http://go.elementor.com/widget-rating">', '</a>'),
-			'release_status' => self::RELEASE_STATUS_ALPHA,
-			'hidden' => true,
 		] );
 	}
 

@@ -125,6 +125,9 @@ const Inspiration = ( { onAttach, onDetach, disabled, ...props } ) => {
 
 	return ( <UrlDialog
 		iframeSource={ urlObject.toString() }
+		onClose={ () => {
+			setMode( attachment ? 'preview' : 'button' );
+		} }
 	/> );
 };
 

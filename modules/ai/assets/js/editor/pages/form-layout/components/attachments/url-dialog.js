@@ -1,13 +1,13 @@
-import { AppBar, Dialog, DialogContent, IconButton, Stack, Toolbar, Typography } from '@elementor/ui';
+import { Dialog, DialogContent } from '@elementor/ui';
 import PropTypes from 'prop-types';
-import { XIcon } from '@elementor/icons';
+
 import { useEffect } from 'react';
 
 export const UrlDialog = ( props ) => {
 	useEffect( () => {
 		const onMessage = ( event ) => {
-			if ( 'height' === event.data.type ) {
-				setHeight( event.data.height );
+			if ( 'inspiration-close' === event.data.type ) {
+				props.onClose();
 			}
 		};
 
@@ -21,38 +21,35 @@ export const UrlDialog = ( props ) => {
 		<Dialog
 			open={ true }
 			fullScreen={ true }
+			hideBackdrop={ true }
 			maxWidth="md"
 			style={ {
 				maxWidth: 1165,
 				margin: '0 auto',
 			} }
+			sx={ {
+				'& .MuiPaper-root': {
+					backgroundColor: 'transparent',
+				},
+			} }
 			{ ...props }
 		>
-			<AppBar sx={ { fontWeight: 'normal' } } color="transparent" position="relative">
-				<Toolbar variant="dense">
-					<Stack direction="row" spacing={ 1 } justifyContent="space-between" sx={ { ml: 'auto' } }>
-						<Typography variant="body2" sx={ { mr: 1 } }>
-							URL selector
-						</Typography>
-						<IconButton
-							size="small"
-							aria-label="close"
-							onClick={ () => props.onClose() }
-							sx={ { '&.MuiButtonBase-root': { mr: -1 } } }
-						>
-							<XIcon />
-						</IconButton>
-					</Stack>
-				</Toolbar>
-			</AppBar>
 
-			<DialogContent>
-				<iframe title="Get Inspiration" src={ props.iframeSource } style={ {
-					border: 'none',
-					overflow: 'scroll',
-					width: '100%',
-					height: '100%',
-				} }></iframe>
+			<DialogContent
+				sx={ {
+					padding: 0,
+				} }
+			>
+				<iframe
+					title="Get Inspiration"
+					src={ props.iframeSource }
+					style={ {
+						border: 'none',
+						overflow: 'scroll',
+						width: '100%',
+						height: '100%',
+					} }
+				/>
 			</DialogContent>
 		</Dialog>
 	);
@@ -62,3 +59,4 @@ UrlDialog.propTypes = {
 	iframeSource: PropTypes.string.isRequired,
 	onClose: PropTypes.func.isRequired,
 };
+

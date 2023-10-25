@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Button, Popover, Stack, Typography } from '@elementor/ui';
+import { Button, Popover, Stack, Typography, useTheme } from '@elementor/ui';
 import PropTypes from 'prop-types';
 import WebsiteIcon from '../../../icons/website';
 import XCircleIcon from '../../../icons/x-circle';
@@ -8,6 +8,7 @@ import PlusCircleIcon from '../../../icons/plus-circle';
 export const AddAttachmentButton = ( props ) => {
 	const [ open, setOpen ] = useState( false );
 	const anchorRef = useRef( null );
+	const { direction } = useTheme();
 
 	return (
 		<>
@@ -35,21 +36,27 @@ export const AddAttachmentButton = ( props ) => {
 				onClose={ () => setOpen( false ) }
 				anchorOrigin={ {
 					vertical: 'bottom',
-					horizontal: 'left',
+					horizontal: 'rtl' === direction ? 'right' : 'left',
 				} }
 			>
 				<Stack spacing={ 2 } sx={ {
 					width: 440,
 					p: 2,
 				} }>
-					<Typography sx={ { cursor: 'pointer' } } variant="body2" onClick={ () => props.onSelect( 'url' ) }>
-						<Stack direction="row" spacing={ 1 } sx={ {
+					<Stack
+						direction="row"
+						spacing={ 1 }
+
+						sx={ {
+							cursor: 'pointer',
 							alignItems: 'center',
-						} }>
-							<WebsiteIcon sx={ { me: 1 } } />
-							<span>URL as a reference</span>
-						</Stack>
-					</Typography>
+						} }
+						variant="body2"
+						onClick={ () => props.onSelect( 'url' ) }
+					>
+						<WebsiteIcon sx={ { me: 1 } } />
+						<Typography>URL as a reference</Typography>
+					</Stack>
 				</Stack>
 			</Popover>
 		</>

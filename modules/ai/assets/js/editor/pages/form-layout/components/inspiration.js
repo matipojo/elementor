@@ -69,6 +69,7 @@ const Inspiration = ( { onAttach, onDetach, disabled } ) => {
 				border: '1px solid gray',
 				position: 'relative',
 				cursor: 'pointer',
+				overflow: 'hidden',
 				opacity: disabled ? 0.5 : 1,
 				'&:hover .remove-attachment': {
 					display: 'block',
@@ -85,6 +86,7 @@ const Inspiration = ( { onAttach, onDetach, disabled } ) => {
 					onClick={ ( event ) => {
 						setMode( 'button' );
 						setAttachment( '' );
+						setStartUrl( '' );
 						onDetach();
 						event.stopPropagation();
 					} }
@@ -102,15 +104,17 @@ const Inspiration = ( { onAttach, onDetach, disabled } ) => {
 					<XIcon />
 				</IconButton>
 
-				<Box component="div" sx={ {
-					overflow: 'hidden',
-				} }>
-					<Box component="div"
+				<Box>
+					<Box
 						ref={ previewRef }
 						sx={ {
+							pointerEvents: 'none',
 							transform: 'scale(0.10)',
 							transformOrigin: 'top left',
-						} } dangerouslySetInnerHTML={ { __html: attachment } }
+						} }
+						dangerouslySetInnerHTML={ {
+							__html: attachment,
+						} }
 					/>
 				</Box>
 
@@ -122,6 +126,9 @@ const Inspiration = ( { onAttach, onDetach, disabled } ) => {
 		iframeSource={ urlObject.toString() }
 		onClose={ () => {
 			setMode( attachment ? 'preview' : 'button' );
+			if ( ! attachment ) {
+				setStartUrl( '' );
+			}
 		} }
 	/> );
 };

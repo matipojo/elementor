@@ -8,6 +8,10 @@ const Connect = ( { connectUrl, onSuccess } ) => {
 	const approveButtonRef = useRef();
 
 	useEffect( () => {
+		if ( ! jQuery.fn.elementorConnect ) {
+			return;
+		}
+
 		jQuery( approveButtonRef.current ).elementorConnect( {
 			success: ( _, data ) => onSuccess( data ),
 			error: () => {

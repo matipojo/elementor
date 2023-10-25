@@ -1,4 +1,5 @@
 import { AppBar, Dialog, DialogContent, IconButton, Stack, Toolbar, Typography } from '@elementor/ui';
+import PropTypes from 'prop-types';
 import { XIcon } from '@elementor/icons';
 import { useEffect } from 'react';
 

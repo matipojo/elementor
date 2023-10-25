@@ -114,13 +114,11 @@ const PromptForm = forwardRef( ( {
 					}
 
 					<Stack direction="row" spacing={ 3 } alignItems="center" sx={ { ml: 'auto' } }>
-						<Stack direction="row" sx={ { m: 3, marginInline: 4 } } >
-							<Inspiration
-								onAttach={ onAttach }
-								onDetach={ onDetach }
-								disabled={ isLoading }
-							/>
-						</Stack>
+						<Inspiration
+							onAttach={ onAttach }
+							onDetach={ onDetach }
+							disabled={ isLoading }
+						/>
 					</Stack>
 
 					<PromptAutocomplete

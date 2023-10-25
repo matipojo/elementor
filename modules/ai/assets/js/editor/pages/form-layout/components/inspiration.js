@@ -1,6 +1,5 @@
-import {
-	IconButton, Box,
-} from '@elementor/ui';
+import { IconButton, Box, useTheme } from '@elementor/ui';
+import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
 import { XIcon } from '@elementor/icons';
 import { AddAttachmentButton } from './add-attachment-button';
@@ -9,26 +8,22 @@ import { UrlDialog } from './attachments/url-dialog';
 // Const APP_BASE_URL = 'https://ai-h2e-helper.s3.eu-west-1.amazonaws.com';
 const APP_BASE_URL = 'http://localhost:3000';
 
-const Inspiration = ( { onAttach, onDetach, disabled, ...props } ) => {
+const Inspiration = ( { onAttach, onDetach, disabled } ) => {
 	const [ mode, setMode ] = useState( 'button' ); // ['select', 'preview', 'button']
 	const [ attachment, setAttachment ] = useState( '' );
 	const [ startUrl, setStartUrl ] = useState( '' );
 	const previewRef = useRef( null );
+	const theme = useTheme();
 
 	const urlObject = new URL( APP_BASE_URL );
-
-	const colorScheme = elementor?.getPreferences?.( 'ui_theme' ) || 'auto';
-	const isRTL = elementorCommon.config.isRTL;
-
-	urlObject.searchParams.append( 'colorScheme', colorScheme );
-	urlObject.searchParams.append( 'isRTL', isRTL );
-	urlObject.searchParams.append( 'locale', elementor.config.locale );
+	urlObject.searchParams.append( 'colorScheme', theme.palette.mode );
+	urlObject.searchParams.append( 'isRTL', 'rtl' === theme.direction ? 'true' : 'false' );
+	urlObject.searchParams.append( 'locale', theme.locale );
 	urlObject.searchParams.append( 'url', startUrl );
 
 	useEffect( () => {
 		if ( previewRef.current ) {
 			const attachmentWidth = previewRef.current.querySelector( '*' ).offsetWidth;
-			console.log( attachmentWidth );
 			previewRef.current.style.transform = 'scale(' + ( 50 / attachmentWidth ) + ')';
 		}
 	}, [ attachment, mode ] );

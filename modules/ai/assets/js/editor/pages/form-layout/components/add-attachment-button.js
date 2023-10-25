@@ -40,11 +40,10 @@ export const AddAttachmentButton = ( props ) => {
 			>
 				<Stack spacing={ 2 } sx={ {
 					width: 440,
-					p: 3,
+					p: 2,
 				} }>
 					<Typography sx={ { cursor: 'pointer' } } variant="body2" onClick={ () => props.onSelect( 'url' ) }>
 						<Stack direction="row" spacing={ 1 } sx={ {
-							p: 2,
 							alignItems: 'center',
 						} }>
 							<WebsiteIcon sx={ { me: 1 } } />

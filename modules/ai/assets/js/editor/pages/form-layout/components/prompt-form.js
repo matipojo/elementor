@@ -8,7 +8,7 @@ import GenerateSubmit from '../../form-media/components/generate-submit';
 import ArrowLeftIcon from '../../../icons/arrow-left-icon';
 import EditIcon from '../../../icons/edit-icon';
 import usePromptEnhancer from '../../../hooks/use-prompt-enhancer';
-import Inspiration from './inspiration';
+import Attachments from './attachments';
 
 const PROMPT_SUGGESTIONS = Object.freeze( [
 	{ text: __( 'A services section with a list layout, icons, and corresponding service descriptions for', 'elementor' ) },
@@ -102,7 +102,7 @@ const PromptForm = forwardRef( ( {
 				alignItems="center"
 				gap={ 1 }
 			>
-				<Stack direction="row" flexGrow={ 1 } spacing={ 1 }>
+				<Stack direction="row" alignItems="center" flexGrow={ 1 } spacing={ 1 }>
 					{
 						showActions && (
 							isActive ? (
@@ -113,13 +113,11 @@ const PromptForm = forwardRef( ( {
 						)
 					}
 
-					<Stack direction="row" spacing={ 3 } alignItems="center" sx={ { ml: 'auto' } }>
-						<Inspiration
-							onAttach={ onAttach }
-							onDetach={ onDetach }
-							disabled={ isLoading }
-						/>
-					</Stack>
+					<Attachments
+						onAttach={ onAttach }
+						onDetach={ onDetach }
+						disabled={ isLoading }
+					/>
 
 					<PromptAutocomplete
 						value={ prompt }

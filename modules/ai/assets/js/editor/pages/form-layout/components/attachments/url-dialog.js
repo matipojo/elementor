@@ -1,6 +1,5 @@
 import { Dialog, DialogContent } from '@elementor/ui';
 import PropTypes from 'prop-types';
-
 import { useEffect } from 'react';
 
 export const UrlDialog = ( props ) => {
@@ -23,10 +22,6 @@ export const UrlDialog = ( props ) => {
 			fullScreen={ true }
 			hideBackdrop={ true }
 			maxWidth="md"
-			style={ {
-				maxWidth: 1165,
-				margin: '0 auto',
-			} }
 			sx={ {
 				'& .MuiPaper-root': {
 					backgroundColor: 'transparent',
@@ -34,14 +29,13 @@ export const UrlDialog = ( props ) => {
 			} }
 			{ ...props }
 		>
-
 			<DialogContent
 				sx={ {
 					padding: 0,
 				} }
 			>
 				<iframe
-					title="Get Inspiration"
+					title={ __( 'URL as a reference' ) }
 					src={ props.iframeSource }
 					style={ {
 						border: 'none',
@@ -59,4 +53,3 @@ UrlDialog.propTypes = {
 	iframeSource: PropTypes.string.isRequired,
 	onClose: PropTypes.func.isRequired,
 };
-

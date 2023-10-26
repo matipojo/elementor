@@ -1,97 +1,42 @@
-import { useEffect, useState } from 'react';
-import { useTheme } from '@elementor/ui';
+import { useState } from 'react';
 import { Menu } from './attachments/menu';
-import { UrlDialog } from './attachments/url-dialog';
-import { Thumbnail } from './attachments/thumbnail';
+import UrlAttachment from './attachments/url-attachment';
 import PropTypes from 'prop-types';
 
-const MODE_SELECT = 'select';
-const MODE_THUMBNAIL = 'thumbnail';
-const MODE_BUTTON = 'button';
+const ATTACHMENT_TYPE_URL = 'url';
 
-// Const APP_BASE_URL = 'https://ai-h2e-helper.s3.eu-west-1.amazonaws.com';
-const APP_BASE_URL = 'http://localhost:3000';
-const Attachments = ( { onAttach, onDetach, disabled } ) => {
-	const [ mode, setMode ] = useState( MODE_BUTTON ); // [ MODE_SELECT, MODE_THUMBNAIL, MODE_BUTTON ]
-	const [ attachment, setAttachment ] = useState( '' );
-	const [ startUrl, setStartUrl ] = useState( '' );
-	const theme = useTheme();
-
-	const urlObject = new URL( APP_BASE_URL );
-	urlObject.searchParams.append( 'colorScheme', theme.palette.mode );
-	urlObject.searchParams.append( 'isRTL', 'rtl' === theme.direction ? 'true' : 'false' );
-	urlObject.searchParams.append( 'locale', theme.locale );
-	urlObject.searchParams.append( 'url', startUrl );
-
-	useEffect( () => {
-		const onMessage = ( event ) => {
-			const { type, html, url } = event.data;
-
-			if ( 'inspiration-html' !== type ) {
-				return;
-			}
-			setStartUrl( url );
-			setAttachment( html );
-			onAttach( url, html );
-			setMode( MODE_THUMBNAIL );
-		};
-
-		window.addEventListener( 'message', onMessage );
-
-		return () => {
-			window.removeEventListener( 'message', onMessage );
-		};
-	}, [ startUrl ] );
-
-	if ( MODE_BUTTON === mode ) {
-		return (
-			<Menu
-				disabled={ disabled }
-				onSelect={ ( type ) => {
-					switch ( type ) {
-						case 'url':
-							setMode( MODE_SELECT );
-							break;
-					}
-				} }
-			/>
-		);
-	}
-
-	if ( MODE_THUMBNAIL === mode ) {
-		return (
-			<Thumbnail
-				disabled={ disabled }
-				html={ attachment }
-				onClick={ () => {
-					setMode( MODE_SELECT );
-				} }
-
-				onRemove={ ( event ) => {
-					setMode( MODE_BUTTON );
-					setAttachment( '' );
-					setStartUrl( '' );
-					onDetach();
-					event.stopPropagation();
-				} }
-			/>
-		);
-	}
+const Attachments = ( { attachments, onAttach, onDetach, disabled } ) => {
+	const [ currentAttachmentType, setCurrentAttachment ] = useState( null );
+	const showMenu = ! currentAttachmentType;
 
 	return (
-		<UrlDialog
-			iframeSource={ urlObject.toString() }
-			onClose={ () => {
-				setMode( attachment ? MODE_THUMBNAIL : MODE_BUTTON );
-				if ( ! attachment ) {
-					setStartUrl( '' );
-				}
-			} }
-		/>
+		<>
+			{
+				showMenu && <Menu
+					disabled={ disabled }
+					onSelect={ ( type ) => {
+						setCurrentAttachment( type );
+					} }
+				/>
+			}
+
+			{
+				ATTACHMENT_TYPE_URL === currentAttachmentType &&
+				<UrlAttachment
+					disabled={ disabled }
+					attachments={ attachments }
+					onAttach={ onAttach }
+					onDetach={ () => {
+						setCurrentAttachment( null );
+						onDetach();
+					} }
+				/> }
+		</>
 	);
 };
 
 Attachments.propTypes = {
+	attachments: PropTypes.array,
 	onAttach: PropTypes.func,
 	onDetach: PropTypes.func,
 	disabled: PropTypes.bool,

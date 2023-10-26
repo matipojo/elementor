@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { Button, Popover, Stack, Typography, useTheme } from '@elementor/ui';
+import { Button, Popover, Stack, useTheme } from '@elementor/ui';
+import { MenuItem } from './menu-item';
 import WebsiteIcon from '../../../../icons/website-icon';
 import XCircleIcon from '../../../../icons/x-circle-icon';
 import PlusCircleIcon from '../../../../icons/plus-circle-icon';
@@ -7,16 +8,16 @@ import { __ } from '@wordpress/i18n';
 import PropTypes from 'prop-types';
 
 export const Menu = ( props ) => {
-	const [ open, setOpen ] = useState( false );
-	const anchorRef = useRef( null );
+	const [ isOpen, setIsOpen ] = useState( false );
 	const { direction } = useTheme();
+	const anchorRef = useRef( null );
 
 	return (
 		<>
 			<Button
 				ref={ anchorRef }
 				disabled={ props.disabled }
-				onClick={ () => setOpen( true ) }
+				onClick={ () => setIsOpen( true ) }
 				color="secondary"
 				variant="text"
 				sx={ {
@@ -24,13 +25,13 @@ export const Menu = ( props ) => {
 					minWidth: 24,
 				} }
 			>
-				{ open ? <XCircleIcon /> : <PlusCircleIcon /> }
+				{ isOpen ? <XCircleIcon /> : <PlusCircleIcon /> }
 			</Button>
 
 			<Popover
-				open={ open }
+				open={ isOpen }
 				anchorEl={ anchorRef.current }
-				onClose={ () => setOpen( false ) }
+				onClose={ () => setIsOpen( false ) }
 				anchorOrigin={ {
 					vertical: 'bottom',
 					horizontal: 'rtl' === direction ? 'right' : 'left',
@@ -39,22 +40,13 @@ export const Menu = ( props ) => {
 				<Stack spacing={ 2 } sx={ {
 					width: 440,
 				} }>
-					<Stack
-						direction="row"
-						spacing={ 1 }
-						sx={ {
-							cursor: 'pointer',
-							alignItems: 'center',
-							p: 2,
-						} }
-						variant="body2"
+					<MenuItem
+						title={ __( 'URL as a reference', 'elementor' ) }
+						icon={ <WebsiteIcon sx={ {
+							me: 1,
+						} } /> }
 						onClick={ () => props.onSelect( 'url' ) }
-					>
-						<WebsiteIcon sx={ { me: 1 } } />
-						<Typography>
-							{ __( 'URL as a reference' ) }
-						</Typography>
-					</Stack>
+					/>
 				</Stack>
 			</Popover>
 		</>

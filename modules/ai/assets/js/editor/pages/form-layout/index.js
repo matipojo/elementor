@@ -1,16 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import {
-	Box,
-	Divider,
-	Button,
-	Pagination,
-	IconButton,
-	Collapse,
-	Tooltip,
-	withDirection,
-} from '@elementor/ui';
-import { __ } from '@wordpress/i18n';
 import PropTypes from 'prop-types';
+import { __ } from '@wordpress/i18n';
+import { Box, Divider, Button, Pagination, IconButton, Collapse, Tooltip, withDirection } from '@elementor/ui';
 import PromptErrorMessage from '../../components/prompt-error-message';
 import UnsavedChangesAlert from './components/unsaved-changes-alert';
 import LayoutDialog from './components/layout-dialog';

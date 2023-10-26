@@ -14,10 +14,15 @@ export const UrlAttachment = ( props ) => {
 	const [ mode, setMode ] = useState( initialAttachment ? MODE_THUMBNAIL : MODE_SELECT );
 	const [ attachment, setAttachment ] = useState( initialAttachment ? initialAttachment.html : '' );
 	const { iframeSource, setCurrentUrl } = useAttachUrlService();
+	const [ isIframeLoaded, setIsIframeLoaded ] = useState( false );
 
 	useEffect( () => {
 		const onMessage = ( event ) => {
 			const { type, html, url } = event.data;
+
+			if ( 'inspiration-loaded' === type ) {
+				setIsIframeLoaded( true );
+			}
 
 			if ( 'inspiration-close' === type ) {
 				if ( attachment ) {
@@ -41,6 +46,19 @@ export const UrlAttachment = ( props ) => {
 			window.removeEventListener( 'message', onMessage );
 		};
 	}, [ attachment ] );
+
+	useEffect( () => {
+		const timeout = setTimeout( () => {
+			if ( ! isIframeLoaded ) {
+				props.onDetach();
+				window.alert( 'Cannot load the app. Please try again later.' );
+			}
+		}, 2000 );
+
+		return () => {
+			clearTimeout( timeout );
+		};
+	}, [ isIframeLoaded ] );
 
 	if ( MODE_THUMBNAIL === mode ) {
 		return (

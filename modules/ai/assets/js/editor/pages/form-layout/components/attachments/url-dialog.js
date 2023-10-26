@@ -1,6 +1,7 @@
-import { Dialog, DialogContent } from '@elementor/ui';
-import PropTypes from 'prop-types';
 import { useEffect } from 'react';
+import { Dialog, DialogContent } from '@elementor/ui';
+import { __ } from '@wordpress/i18n';
+import PropTypes from 'prop-types';
 
 export const UrlDialog = ( props ) => {
 	useEffect( () => {
@@ -42,6 +43,7 @@ export const UrlDialog = ( props ) => {
 						overflow: 'scroll',
 						width: '100%',
 						height: '100%',
+						backgroundColor: 'rgba(255,255,255,0.6)',
 					} }
 				/>
 			</DialogContent>

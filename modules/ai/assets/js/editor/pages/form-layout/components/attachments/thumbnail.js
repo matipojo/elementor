@@ -1,27 +1,35 @@
 import { useEffect, useRef } from 'react';
 import { Box, IconButton } from '@elementor/ui';
-import { XIcon } from '@elementor/icons';
+import { TrashIcon, XIcon } from '@elementor/icons';
 import PropTypes from 'prop-types';
+import { __ } from '@wordpress/i18n';
 
 export const Thumbnail = ( props ) => {
 	const previewRef = useRef( null );
 
 	useEffect( () => {
 		if ( previewRef.current ) {
-			const attachmentWidth = previewRef.current.querySelector( '*' ).offsetWidth;
+			const attachmentWidth = previewRef.current.querySelector( '*' )?.offsetWidth || 1;
 			previewRef.current.style.transform = 'scale(' + ( 50 / attachmentWidth ) + ')';
 		}
 	}, [] );
 
 	return (
 		<Box sx={ {
-			width: 50,
-			height: 50,
-			border: '1px solid gray',
+			width: 60,
+			height: 60,
+			border: '1px solid grey',
 			position: 'relative',
 			cursor: 'pointer',
 			overflow: 'hidden',
+			borderRadius: '5px',
 			opacity: props.disabled ? 0.5 : 1,
+			'&:hover::before': {
+				content: '""',
+				position: 'absolute',
+				inset: 0,
+				backgroundColor: 'rgba(0,0,0,0.6)',
+			},
 			'&:hover .remove-attachment': {
 				display: 'block',
 			},
@@ -30,21 +38,24 @@ export const Thumbnail = ( props ) => {
 			<IconButton
 				className="remove-attachment"
 				size="small"
-				aria-label="close"
+				aria-label={ __( 'Remove' ) }
 				disabled={ props.disabled }
 				onClick={ props.onRemove }
 				sx={ {
 					display: 'none',
 					position: 'absolute',
 					insetInlineEnd: 0,
-					backgroundColor: 'grey.200',
+					backgroundColor: 'secondary.main',
 					zIndex: 1,
+					borderRadius: '5px',
 					'&:hover': {
-						backgroundColor: 'grey.200',
+						backgroundColor: 'secondary.dark',
 					},
 				} }
 			>
-				<XIcon />
+				<TrashIcon sx={ {
+					color: 'common.white',
+				} } />
 			</IconButton>
 
 			<Box>

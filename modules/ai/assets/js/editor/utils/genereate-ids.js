@@ -1,8 +1,8 @@
 // Create missing IDs for the elements.
-
 const getUniqueId = () => {
 	return Math.random().toString( 16 ).substr( 2, 7 );
 };
+
 export function generateIds( template ) {
 	template.id = getUniqueId().toString();
 

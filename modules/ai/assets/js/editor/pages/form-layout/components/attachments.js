@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 const ATTACHMENT_TYPE_URL = 'url';
 
 const Attachments = ( { attachments, onAttach, onDetach, disabled } ) => {
-	const [ currentAttachmentType, setCurrentAttachment ] = useState( null );
+	const [ currentAttachmentType, setCurrentAttachmentType ] = useState( null );
 	const showMenu = ! currentAttachmentType;
 
 	return (
@@ -15,7 +15,7 @@ const Attachments = ( { attachments, onAttach, onDetach, disabled } ) => {
 				showMenu && <Menu
 					disabled={ disabled }
 					onSelect={ ( type ) => {
-						setCurrentAttachment( type );
+						setCurrentAttachmentType( type );
 					} }
 				/>
 			}
@@ -27,7 +27,7 @@ const Attachments = ( { attachments, onAttach, onDetach, disabled } ) => {
 					attachments={ attachments }
 					onAttach={ onAttach }
 					onDetach={ () => {
-						setCurrentAttachment( null );
+						setCurrentAttachmentType( null );
 						onDetach();
 					} }
 				/> }

@@ -29,7 +29,7 @@ class Module extends BaseModule {
 
 	const LAYOUT_EXPERIMENT = 'ai-layout';
 
-	const URL_TO_CONTAINER_URL = 'https://ai-h2e-helper.s3.eu-west-1.amazonaws.com';
+	const URL_TO_CONTAINER_URL = 'https://ai-h2e-helper.s3.eu-west-1.amazonaws.com/index.html';
 
 	public function get_name() {
 		return 'ai';

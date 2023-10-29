@@ -1,10 +1,8 @@
 import { useRef, useState } from 'react';
 import { Button, Popover, Stack, useTheme } from '@elementor/ui';
 import { MenuItem } from './menu-item';
-import WebsiteIcon from '../../../../icons/website-icon';
 import XCircleIcon from '../../../../icons/x-circle-icon';
 import PlusCircleIcon from '../../../../icons/plus-circle-icon';
-import { __ } from '@wordpress/i18n';
 import PropTypes from 'prop-types';
 
 export const Menu = ( props ) => {
@@ -40,13 +38,13 @@ export const Menu = ( props ) => {
 				<Stack spacing={ 2 } sx={ {
 					width: 440,
 				} }>
-					<MenuItem
-						title={ __( 'URL as a reference', 'elementor' ) }
-						icon={ <WebsiteIcon sx={ {
-							me: 1,
-						} } /> }
-						onClick={ () => props.onSelect( 'url' ) }
-					/>
+					{ props.items.map( ( item ) => (
+						<MenuItem
+							key={ item.type }
+							title={ item.title }
+							icon={ item.icon }
+							onClick={ () => props.onSelect( item.type ) }
+						/> ) ) }
 				</Stack>
 			</Popover>
 		</>
@@ -56,4 +54,5 @@ export const Menu = ( props ) => {
 Menu.propTypes = {
 	disabled: PropTypes.bool,
 	onSelect: PropTypes.func,
+	items: PropTypes.array,
 };

@@ -33,7 +33,13 @@ export const UrlAttachment = ( props ) => {
 			}
 
 			if ( 'inspiration-html' === type ) {
-				props.onAttach( url, html );
+				const host = new URL( url ).host;
+
+				props.onAttach( [ {
+					type: 'url',
+					content: html,
+					label: host,
+				} ] );
 				setCurrentUrl( url );
 				setAttachment( html );
 				setMode( MODE_THUMBNAIL );
@@ -51,9 +57,9 @@ export const UrlAttachment = ( props ) => {
 		const timeout = setTimeout( () => {
 			if ( ! isIframeLoaded ) {
 				props.onDetach();
-				window.alert( 'Cannot load the app. Please try again later.' );
+				window.alert( __( 'Cannot load the app. Please try again later.' ) );
 			}
-		}, 2000 );
+		}, 4000 );
 
 		return () => {
 			clearTimeout( timeout );
@@ -68,7 +74,7 @@ export const UrlAttachment = ( props ) => {
 				onClick={ () => {
 					setMode( MODE_SELECT );
 				} }
-
+				allowRemove={ true }
 				onRemove={ ( event ) => {
 					event.stopPropagation();
 					setAttachment( '' );

@@ -142,24 +142,6 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 		};
 	};
 
-	const addAttachment = ( type, content, label ) => {
-		setAttachments( ( prev ) => [ ...prev, { type, content, label } ] );
-	};
-
-	useEffect( () => {
-		const addAttachmentCallback = ( event ) => {
-			const { html, label } = event.detail;
-
-			addAttachment( 'html', html, label );
-		};
-
-		window.addEventListener( 'inspiration-html', addAttachmentCallback );
-
-		return () => {
-			window.removeEventListener( 'inspiration-html', addAttachmentCallback );
-		};
-	}, [] );
-
 	useEffect( () => {
 		const isFirstTemplateExist = screenshots[ 0 ]?.template;
 
@@ -215,9 +197,15 @@ const FormLayout = ( { onClose, onInsert, onData, onSelect, onGenerate, DialogHe
 						isLoading={ isLoading }
 						showActions={ screenshots.length > 0 || isLoading }
 						attachments={ attachments }
-						onAttach={ ( url, html ) => {
-							const host = new URL( url ).host;
-							setAttachments( [ { type: 'html', content: html, label: host } ] );
+						onAttach={ ( items ) => {
+							/**
+							 * Var items = [ {
+							 *     type: 'url' | 'json' | 'image'
+							 *     content: string,
+							 *     label: string,
+							 * } ]
+							 */
+							setAttachments( items );
 							setIsPromptEditable( true );
 						} }
 						onDetach={ () => {

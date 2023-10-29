@@ -2,6 +2,7 @@ import { Box, Stack, Typography } from '@elementor/ui';
 import PropTypes from 'prop-types';
 
 export const MenuItem = ( props ) => {
+	const IconComponent = props.icon;
 	return (
 		<Stack
 			direction="row"
@@ -19,7 +20,11 @@ export const MenuItem = ( props ) => {
 					height: 18,
 				} }
 			>
-				{ props.icon }
+				<IconComponent
+					sx={ {
+						me: 1,
+					} }
+				/>
 			</Box>
 			<Typography>
 				{ props.title }

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Menu } from './attachments/menu';
 import UrlAttachment from './attachments/url-attachment';
+import WebsiteIcon from '../../../icons/website-icon';
+import { __ } from '@wordpress/i18n';
 import PropTypes from 'prop-types';
 
 const ATTACHMENT_TYPE_URL = 'url';
@@ -14,6 +16,11 @@ const Attachments = ( { attachments, onAttach, onDetach, disabled } ) => {
 			{
 				showMenu && <Menu
 					disabled={ disabled }
+					items={ [ {
+						title: __( 'URL as a reference', 'elementor' ),
+						icon: WebsiteIcon,
+						type: 'url',
+					} ] }
 					onSelect={ ( type ) => {
 						setCurrentAttachmentType( type );
 					} }

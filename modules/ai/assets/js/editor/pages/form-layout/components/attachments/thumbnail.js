@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Box, IconButton } from '@elementor/ui';
-import { TrashIcon, XIcon } from '@elementor/icons';
+import { TrashIcon } from '@elementor/icons';
 import PropTypes from 'prop-types';
 import { __ } from '@wordpress/i18n';
 
@@ -35,28 +35,30 @@ export const Thumbnail = ( props ) => {
 			},
 		} } onClick={ props.onClick }
 		>
-			<IconButton
-				className="remove-attachment"
-				size="small"
-				aria-label={ __( 'Remove' ) }
-				disabled={ props.disabled }
-				onClick={ props.onRemove }
-				sx={ {
-					display: 'none',
-					position: 'absolute',
-					insetInlineEnd: 0,
-					backgroundColor: 'secondary.main',
-					zIndex: 1,
-					borderRadius: '5px',
-					'&:hover': {
-						backgroundColor: 'secondary.dark',
-					},
-				} }
-			>
-				<TrashIcon sx={ {
-					color: 'common.white',
-				} } />
-			</IconButton>
+			{ props.allowRemove &&
+				<IconButton
+					className="remove-attachment"
+					size="small"
+					aria-label={ __( 'Remove' ) }
+					disabled={ props.disabled }
+					onClick={ props.onRemove }
+					sx={ {
+						display: 'none',
+						position: 'absolute',
+						insetInlineEnd: 0,
+						backgroundColor: 'secondary.main',
+						zIndex: 1,
+						borderRadius: '5px',
+						'&:hover': {
+							backgroundColor: 'secondary.dark',
+						},
+					} }
+				>
+					<TrashIcon sx={ {
+						color: 'common.white',
+					} } />
+				</IconButton>
+			}
 
 			<Box>
 				<Box
@@ -79,6 +81,7 @@ export const Thumbnail = ( props ) => {
 Thumbnail.propTypes = {
 	disabled: PropTypes.bool,
 	onClick: PropTypes.func.isRequired,
+	allowRemove: PropTypes.bool,
 	onRemove: PropTypes.func.isRequired,
 	html: PropTypes.string.isRequired,
 };

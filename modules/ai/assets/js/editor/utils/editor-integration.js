@@ -43,6 +43,7 @@ const REFORMAT_PROMPTS = [
 ];
 
 export const renderLayoutApp = ( options = {
+	mode: '',
 	at: null,
 	onClose: null,
 	onGenerate: null,
@@ -65,6 +66,7 @@ export const renderLayoutApp = ( options = {
 
 	ReactDOM.render(
 		<LayoutApp
+			mode={ options.mode }
 			isRTL={ isRTL }
 			colorScheme={ colorScheme }
 			attachmentsTypes={ {

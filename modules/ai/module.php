@@ -762,7 +762,11 @@ class Module extends BaseModule {
 			throw new \Exception( 'not_connected' );
 		}
 
-		$result = $app->get_layout_prompt_enhanced( $data['prompt'] );
+		$result = $app->get_layout_prompt_enhanced(
+			$data['prompt'],
+			$data['enhance_type'],
+			$this->prepare_generate_layout_context()
+		);
 
 		if ( is_wp_error( $result ) ) {
 			throw new \Exception( $result->get_error_message() );

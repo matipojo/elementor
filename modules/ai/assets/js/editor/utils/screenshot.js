@@ -93,6 +93,12 @@ function waitForContainer( id, timeout = 5000 ) {
 	const waitPromise = new Promise( ( resolve ) => {
 		elementorFrontend.hooks.addAction( 'frontend/element_ready/global', async ( $element ) => {
 			if ( $element.data( 'id' ) === id ) {
+				await new Promise( ( elementResolve ) => {
+					$element[ 0 ].addEventListener( 'elementor/element/rendered', () => {
+						elementResolve();
+					} );
+				} );
+
 				const images = [ ...$element[ 0 ].querySelectorAll( 'img' ) ];
 
 				// Wait for all images to load.

@@ -235,10 +235,16 @@ module.exports = elementorModules.ViewModule.extend( {
 		return elementorFrontend.getCurrentDeviceSetting( this.getElementSettings(), settingKey );
 	},
 
+	triggerRenderedEvent() {
+		this.$element[ 0 ].dispatchEvent( new CustomEvent( 'elementor/element/rendered' ) );
+	},
+
 	onInit() {
 		if ( this.isActive( this.getSettings() ) ) {
 			elementorModules.ViewModule.prototype.onInit.apply( this, arguments );
 		}
+
+		this.triggerRenderedEvent();
 	},
 
 	onDestroy() {

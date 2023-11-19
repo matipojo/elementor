@@ -183,6 +183,10 @@ export default class CarouselHandlerBase extends SwiperHandlerBase {
 		this.getDefaultElements().$swiperContainer[ 0 ].classList.add( className );
 	}
 
+	triggerRenderedEvent() {
+		// Do nothing, run it manually after the swiper is rendered.
+	}
+
 	async onInit( ...args ) {
 		super.onInit( ...args );
 
@@ -201,6 +205,8 @@ export default class CarouselHandlerBase extends SwiperHandlerBase {
 		if ( 'yes' === elementSettings.pause_on_hover ) {
 			this.togglePauseOnHover( true );
 		}
+
+		super.triggerRenderedEvent();
 	}
 
 	bindEvents() {

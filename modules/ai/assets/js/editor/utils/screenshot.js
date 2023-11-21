@@ -104,6 +104,13 @@ function waitForContainer( id, timeout = 5000 ) {
 				// Wait for all images to load.
 				await Promise.all( images.map( waitForImage ) );
 
+				const pseudoImages = [ ...$element[ 0 ].querySelectorAll( '[role=img]' ) ];
+
+				// Wait for all pseudo images to load.
+				await Promise.all( pseudoImages.map( waitForBackgrounds ) );
+
+				await waitForBackgrounds( $element[ 0 ] );
+
 				resolve();
 			}
 		} );
@@ -130,6 +137,32 @@ function waitForImage( image ) {
 			resolve();
 		} );
 	} );
+}
+
+function waitForBackgrounds( element ) {
+	const backgroundImage = elementorFrontend.elements.window.getComputedStyle( element ).backgroundImage;
+	const backgroundBeforeImage = elementorFrontend.elements.window.getComputedStyle( element, ':before' ).backgroundImage;
+
+	return Promise.all( [
+		waitForBackgroundImageUrl( backgroundImage ),
+		waitForBackgroundImageUrl( backgroundBeforeImage ),
+	] );
+}
+
+function waitForBackgroundImageUrl( backgroundImage ) {
+	const match = backgroundImage.match( /url\("(.*)"\)/ );
+
+	if ( ! match ) {
+		return Promise.resolve();
+	}
+
+	console.log( match[ 1 ] );
+
+	const image = new Image();
+
+	image.src = match[ 1 ];
+
+	return waitForImage( image );
 }
 
 function sleep( ms ) {

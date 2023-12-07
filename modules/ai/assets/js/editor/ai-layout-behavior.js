@@ -1,8 +1,9 @@
-import LayoutApp from './layout-app';
-import { onConnect } from './helpers';
-import { takeScreenshot } from './utils/screenshot';
-import { startHistoryLog } from './utils/history';
-import { createPreviewContainer } from './utils/preview-container';
+import { __ } from '@wordpress/i18n';
+import {
+	importToEditor,
+	renderLayoutApp,
+} from './utils/editor-integration';
+import { MODE_LAYOUT } from './pages/form-layout/context/config';
 
 export default class AiLayoutBehavior extends Marionette.Behavior {
 	previewContainer = null;
@@ -23,111 +24,31 @@ export default class AiLayoutBehavior extends Marionette.Behavior {
 	onAiButtonClick( e ) {
 		e.stopPropagation();
 
-		this.closePanel();
-
-		this.previewContainer = createPreviewContainer( {
-			// Create the container at the "drag widget here" area position.
+		renderLayoutApp( {
+			mode: MODE_LAYOUT,
 			at: this.view.getOption( 'at' ),
+			onInsert: this.onInsert.bind( this ),
+			onRenderApp: ( args ) => {
+				args.previewContainer.init();
+			},
+			onGenerate: ( args ) => {
+				args.previewContainer.reset();
+			},
 		} );
-
-		this.previewContainer.init();
-
-		const rootElement = document.createElement( 'div' );
-		const colorScheme = elementor?.getPreferences?.( 'ui_theme' ) || 'auto';
-		const isRTL = elementorCommon.config.isRTL;
-
-		document.body.append( rootElement );
-
-		ReactDOM.render(
-			<LayoutApp
-				isRTL={ isRTL }
-				colorScheme={ colorScheme }
-				onClose={ () => {
-					this.previewContainer.destroy();
-					this.previewContainer = null;
-
-					ReactDOM.unmountComponentAtNode( rootElement );
-					rootElement.remove();
-
-					this.openPanel();
-				} }
-				onConnect={ onConnect }
-				onGenerate={ this.onGenerate.bind( this ) }
-				onData={ this.onData }
-				onSelect={ this.onSelect.bind( this ) }
-				onInsert={ this.onInsert.bind( this ) }
-			/>,
-			rootElement,
-		);
-	}
-
-	closePanel() {
-		$e.run( 'panel/close' );
-		$e.components.get( 'panel' ).blockUserInteractions();
-	}
-
-	openPanel() {
-		$e.run( 'panel/open' );
-		$e.components.get( 'panel' ).unblockUserInteractions();
 	}
 
 	hideDropArea() {
 		this.view.onCloseButtonClick();
 	}
 
-	onGenerate() {
-		this.previewContainer?.reset();
-	}
-
-	async onData( template ) {
-		const screenshot = await takeScreenshot( template );
-
-		return {
-			screenshot,
-			template,
-		};
-	}
-
-	onSelect( template ) {
-		this.previewContainer.setContent( template );
-	}
-
-	async onInsert( template ) {
+	onInsert( template ) {
 		this.hideDropArea();
 
-		let templateData = null;
-
-		try {
-			// Import the template so the media files will be imported as well.
-			const [ importedTemplate ] = await this.importTemplate( template );
-
-			templateData = await this.getTemplateData(
-				importedTemplate.source,
-				importedTemplate.template_id,
-			);
-		} catch ( e ) {
-			return Promise.reject( 'cannot_import_template' );
-		}
-
-		if ( ! templateData ) {
-			return Promise.reject( 'imported_template_is_empty' );
-		}
-
-		const endHistoryLog = startHistoryLog( {
-			type: 'import',
-			title: __( 'AI Layout', 'elementor' ),
+		importToEditor( {
+			at: this.view.getOption( 'at' ),
+			template,
+			historyTitle: __( 'AI Layout', 'elementor' ),
 		} );
-
-		$e.run( 'document/elements/create', {
-			container: elementor.getPreviewContainer(),
-			model: templateData,
-			options: {
-				at: this.view.getOption( 'at' ),
-				edit: true,
-			},
-		} );
-
-		endHistoryLog();
 	}
 
 	onRender() {

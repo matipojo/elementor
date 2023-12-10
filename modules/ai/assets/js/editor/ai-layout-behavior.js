@@ -41,8 +41,24 @@ export default class AiLayoutBehavior extends Marionette.Behavior {
 		this.view.onCloseButtonClick();
 	}
 
-	onInsert( template ) {
+	async onInsert( template ) {
 		this.hideDropArea();
+
+		try {
+			// Import the template so the media files will be imported as well.
+			const [ importedTemplate ] = await this.importTemplate( template );
+
+			template = await this.getTemplateData(
+				importedTemplate.source,
+				importedTemplate.template_id,
+			);
+		} catch ( e ) {
+			return Promise.reject( 'cannot_import_template' );
+		}
+
+		if ( ! template ) {
+			return Promise.reject( 'imported_template_is_empty' );
+		}
 
 		importToEditor( {
 			at: this.view.getOption( 'at' ),

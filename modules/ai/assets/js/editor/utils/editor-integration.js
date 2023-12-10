@@ -154,7 +154,7 @@ export const importToEditor = ( {
 
 	$e.run( 'document/elements/create', {
 		container: elementor.getPreviewContainer(),
-		model: generateIds( template ),
+		model: template,
 		options: {
 			at,
 			edit: true,

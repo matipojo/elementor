@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { __ } from '@wordpress/i18n';
-import { Box, Button, Collapse, Divider, IconButton, Pagination, Tooltip, withDirection } from '@elementor/ui';
+import {
+	Box,
+	Button,
+	CircularProgress,
+	Collapse,
+	Divider,
+	IconButton,
+	Pagination,
+	Tooltip,
+	withDirection,
+} from '@elementor/ui';
 import PromptErrorMessage from '../../components/prompt-error-message';
 import UnsavedChangesAlert from './components/unsaved-changes-alert';
 import LayoutDialog from './components/layout-dialog';
@@ -103,7 +113,7 @@ const FormLayout = ( {
 	// When there are no screenshots the prompt field should be editable.
 	const shouldFallbackToEditPrompt = !! ( error && 0 === screenshots.length );
 
-	const isPromptFormActive = isPromptEditable || shouldFallbackToEditPrompt;
+	const isPromptFormActive = ( isPromptEditable || shouldFallbackToEditPrompt ) && ! isInserting;
 
 	const mayContainProWidgets = 0 === attachments.length || attachments.some( ( attachment ) => ATTACHMENT_TYPE_URL === attachment.type );
 

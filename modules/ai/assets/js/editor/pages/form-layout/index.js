@@ -58,7 +58,7 @@ const UseLayoutButton = ( { isLoading, disabled, ...props } ) => (
 		{ ...props }
 	>
 		{ isLoading
-			? <CircularProgress />
+			? <> { __( 'Importing', 'elementor' ) } <CircularProgress /></>
 			: __( 'Use Layout', 'elementor' )
 		}
 	</Button>

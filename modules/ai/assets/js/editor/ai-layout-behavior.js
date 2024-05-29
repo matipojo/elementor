@@ -26,27 +26,18 @@ export default class AiLayoutBehavior extends Marionette.Behavior {
 
 		window.elementorAiCurrentContext = this.getOption( 'context' );
 
-
-		window.dispatchEvent( new CustomEvent( 'elementor/ai/layout/button/click', {
-			detail: {
-				context: window.elementorAiCurrentContext,
-				mode: MODE_LAYOUT,
-				at: this.view.getOption( 'at' ),
+		renderLayoutApp( {
+			parentContainer: elementor.getPreviewContainer(),
+			mode: MODE_LAYOUT,
+			at: this.view.getOption( 'at' ),
+			onInsert: this.onInsert.bind( this ),
+			onRenderApp: ( args ) => {
+				args.previewContainer.init();
 			},
-		} ) );
-
-		// renderLayoutApp( {
-		// 	parentContainer: elementor.getPreviewContainer(),
-		// 	mode: MODE_LAYOUT,
-		// 	at: this.view.getOption( 'at' ),
-		// 	onInsert: this.onInsert.bind( this ),
-		// 	onRenderApp: ( args ) => {
-		// 		args.previewContainer.init();
-		// 	},
-		// 	onGenerate: ( args ) => {
-		// 		args.previewContainer.reset();
-		// 	},
-		// } );
+			onGenerate: ( args ) => {
+				args.previewContainer.reset();
+			},
+		} );
 	}
 
 	hideDropArea() {

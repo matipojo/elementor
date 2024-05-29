@@ -9,6 +9,7 @@
 	"author": "Elementor Team",
 	"homepage": "https://elementor.com/",
 	"scripts": {
+		"start": "wp-env start && npm run scripts:watch && npm run styles:watch",
 		"wp-env": "wp-env",
 		"test:linux": "node ./run-on-linux.js",
 		"setup-templates": "rm -rf ./templates && mkdir -p ./templates/playwright && mkdir -p ./templates/lighthouse && cp ./tests/playwright/templates/* ./templates/playwright && cp ./tests/lighthouse/templates/* ./templates/lighthouse",

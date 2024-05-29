@@ -2,7 +2,10 @@
 	"core": null,
 	"phpVersion": "8.0",
 	"plugins": [
-		"./build"
+		".",
+		"../editor-saas-services/packages/ai-remote-integration/wp-dev-plugins/use-local-integration",
+		"../editor-saas-services/packages/ai-remote-integration/wp-dev-plugins/use-local-ai-api"
+
 	],
 	"themes": [
 		"https://downloads.wordpress.org/theme/hello-elementor.zip"
@@ -14,7 +17,7 @@
 	},
 	"config": {
 		"ELEMENTOR_SHOW_HIDDEN_EXPERIMENTS": true,
-		"SCRIPT_DEBUG": false,
-		"WP_DEBUG": false
+		"SCRIPT_DEBUG": true,
+		"WP_DEBUG": true
 	}
 }

@@ -15,7 +15,7 @@ const useScreenshot = ( type, onData ) => {
 
 		return layoutData.send( requestBody, signal )
 			.then( async ( data ) => {
-				const createdScreenshot = await onData( data.result );
+				const createdScreenshot = await onData( data.result, type );
 
 				createdScreenshot.sendUsageData = () => layoutData.sendUsageData( data );
 				createdScreenshot.baseTemplateId = data.baseTemplateId;

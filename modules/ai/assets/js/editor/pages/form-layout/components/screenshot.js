@@ -23,24 +23,12 @@ const Screenshot = ( { url, type, isLoading = false, isSelected = false, isPlace
 		);
 	}
 
-	if ( ! url ) {
-		return (
-			<ScreenshotUnavailable
-				selected={ isSelected }
-				disabled={ disabled }
-				sx={ sx }
-				onClick={ onClick }
-				height={ SCREENSHOT_HEIGHT }
-				outlineOffset={ outlineOffset }
-			/>
-		);
-	}
-
 	return (
 		<ScreenshotContainer
+			className={ `elementor-template-preview` }
 			selected={ isSelected }
 			disabled={ disabled }
-			sx={ { backgroundImage: `url('${ url }')`, ...sx } }
+			sx={ sx }
 			onClick={ onClick }
 			height={ SCREENSHOT_HEIGHT }
 			outlineOffset={ outlineOffset }

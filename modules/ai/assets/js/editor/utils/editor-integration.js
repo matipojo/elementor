@@ -1,3 +1,4 @@
+import ReactUtils from 'elementor-utils/react';
 import { createPreviewContainer } from './preview-container';
 import LayoutApp from '../layout-app';
 import { takeScreenshot } from './screenshot';
@@ -46,27 +47,6 @@ const VARIATIONS_PROMPTS = [
 
 const PROMPT_PLACEHOLDER = __( "Press '/' for suggestions or describe the changes you want to apply (optional)...", 'elementor' );
 
-
-export const askIntegration = async ( message ) => {
-	return new Promise( ( resolve, reject ) => {
-		const messageChannel = new MessageChannel();
-
-		messageChannel.port1.onmessage = ( event ) => {
-			if ( event.data.status === 'success' ) {
-				resolve( event.data.payload );
-				return;
-			}
-
-			reject( event.data.payload );
-		};
-
-		window.postMessage( {
-			type: message.type,
-			payload: message.payload,
-		}, message.origin, [ messageChannel.port2 ] );
-	} );
-};
-
 export const renderLayoutApp = ( options = {
 	parentContainer: null,
 	mode: '',
@@ -87,13 +67,12 @@ export const renderLayoutApp = ( options = {
 
 	const { colorScheme, isRTL } = getUiConfig();
 
-	const previewDoc = window.elementor.$previewContents[ 0 ];
-	const domNode = previewDoc.createElement( 'div' );
+	const rootElement = document.createElement( 'div' );
+	document.body.append( rootElement );
 
 	const bodyStyle = window.elementorFrontend.elements.$window[ 0 ].getComputedStyle( window.elementorFrontend.elements.$body[ 0 ] );
-	const root = window.elementorFrontend.elements.$window[ 0 ].ReactDOM.createRoot( domNode );
 
-	root.render( (
+	const { unmount } = ReactUtils.render( (
 		<LayoutAppWrapper
 			isRTL={ isRTL }
 			colorScheme={ colorScheme }
@@ -125,7 +104,7 @@ export const renderLayoutApp = ( options = {
 					previewContainer.destroy();
 					options.onClose?.();
 
-					root.unmount();
+					unmount();
 					rootElement.remove();
 
 					openPanel();
@@ -134,19 +113,11 @@ export const renderLayoutApp = ( options = {
 				onGenerate={ () => {
 					options.onGenerate?.( { previewContainer } );
 				} }
-				onData={ async ( template, index ) => {
-					askIntegration( {
-						type: 'text-to-elementor/set-preview',
-						payload: {
-							index,
-							json: template,
-							jsonWithTexts: template,
-						},
-						origin: window.location.origin,
-					} );
+				onData={ async ( template ) => {
+					const screenshot = await takeScreenshot( template );
 
 					return {
-						screenshot: '',
+						screenshot,
 						template,
 					};
 				} }
@@ -158,9 +129,7 @@ export const renderLayoutApp = ( options = {
 				hasPro={ elementor.helpers.hasPro() }
 			/>
 		</LayoutAppWrapper>
-	) );
-
-	previewDoc.body.append( domNode );
+	), rootElement );
 
 	options.onRenderApp?.( { previewContainer } );
 };

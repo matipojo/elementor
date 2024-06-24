@@ -38,7 +38,7 @@ const DraggablePaper = ( props ) => {
 		<Draggable
 			position={ position }
 			onDrag={ onDrag }
-			handle=".MuiAppBar-root"
+			handle=".MuiAppBar-root, #text-to-elementor-iframe-wrapper-header"
 			cancel={ '[class*="MuiDialogContent-root"]' }
 			bounds="parent"
 		>

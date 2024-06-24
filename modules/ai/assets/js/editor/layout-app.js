@@ -7,24 +7,19 @@ import { RequestIdsProvider } from './context/requests-ids';
 
 const LayoutApp = ( props ) => {
 	return (
-		<RemoteConfigProvider
-			onError={ props.onClose }>
-			<RequestIdsProvider>
-				<ConfigProvider
-					mode={ props.mode }
-					attachmentsTypes={ props.attachmentsTypes }
-					onClose={ props.onClose }
-					onConnect={ props.onConnect }
-					onData={ props.onData }
-					onInsert={ props.onInsert }
-					onSelect={ props.onSelect }
-					onGenerate={ props.onGenerate }
-					currentContext={ props.currentContext }
-					hasPro={ props.hasPro }>
-					<LayoutContent attachments={ props.attachments } />
-				</ConfigProvider>
-			</RequestIdsProvider>
-		</RemoteConfigProvider>
+		<ConfigProvider
+			mode={ props.mode }
+			attachmentsTypes={ props.attachmentsTypes }
+			onClose={ props.onClose }
+			onConnect={ props.onConnect }
+			onData={ props.onData }
+			onInsert={ props.onInsert }
+			onSelect={ props.onSelect }
+			onGenerate={ props.onGenerate }
+			currentContext={ props.currentContext }
+			hasPro={ props.hasPro }>
+			<LayoutContent attachments={ props.attachments } />
+		</ConfigProvider>
 	);
 };
 

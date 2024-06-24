@@ -1,42 +1,29 @@
 import Connect from './pages/connect';
-import FormLayout from './pages/form-layout';
 import GetStarted from './pages/get-started';
-import Loader from './components/loader';
-import UpgradeChip from './components/upgrade-chip';
-import useUserInfo from './hooks/use-user-info';
 import WizardDialog from './components/wizard-dialog';
 import LayoutDialog from './pages/form-layout/components/layout-dialog';
 import PropTypes from 'prop-types';
 import { AttachmentPropType } from './types/attachment';
 import { useConfig } from './pages/form-layout/context/config';
+import {IframeWrapper} from "./utils/IframeWrapper";
+import {useState} from "react";
 
 const LayoutContent = ( props ) => {
-	const { isLoading, isConnected, isGetStarted, connectUrl, fetchData, hasSubscription, usagePercentage } = useUserInfo();
 	const { onClose, onConnect } = useConfig();
+	const [, forceRefresh] = useState(0);
 
-	if ( isLoading ) {
-		return (
-			<LayoutDialog onClose={ onClose }>
-				<LayoutDialog.Header onClose={ onClose } />
-
-				<LayoutDialog.Content dividers>
-					<Loader BoxProps={ { sx: { px: 3 } } } />
-				</LayoutDialog.Content>
-			</LayoutDialog>
-		);
-	}
-
-	if ( ! isConnected ) {
+	if ( ! window.ElementorAiConfig.is_connected ) {
 		return (
 			<WizardDialog onClose={ onClose }>
 				<LayoutDialog onClose={ onClose } />
 
 				<WizardDialog.Content dividers>
 					<Connect
-						connectUrl={ connectUrl }
+						connectUrl={ window.ElementorAiConfig.connect_url }
 						onSuccess={ ( data ) => {
 							onConnect( data );
-							fetchData();
+							window.ElementorAiConfig.is_connected = true;
+							forceRefresh(1);
 						} }
 					/>
 				</WizardDialog.Content>
@@ -44,26 +31,24 @@ const LayoutContent = ( props ) => {
 		);
 	}
 
-	if ( ! isGetStarted ) {
+	if ( '1' !== window.ElementorAiConfig.is_get_started ) {
 		return (
 			<WizardDialog onClose={ onClose }>
 				<LayoutDialog onClose={ onClose } />
 
 				<WizardDialog.Content dividers>
-					<GetStarted onSuccess={ fetchData } />
+					<GetStarted onSuccess={ () => {
+						window.ElementorAiConfig.is_get_started = '1';
+						forceRefresh(2);
+					} } />
 				</WizardDialog.Content>
 			</WizardDialog>
 		);
 	}
 
-	const showUpgradeChip = ! hasSubscription || 80 <= usagePercentage;
-
 	return (
-		<FormLayout
+		<IframeWrapper
 			attachments={ props.attachments }
-			DialogHeaderProps={ {
-				children: showUpgradeChip && <UpgradeChip hasSubscription={ hasSubscription } usagePercentage={ usagePercentage } />,
-			} }
 		/>
 	);
 };

@@ -7,6 +7,8 @@ import { __ } from '@wordpress/i18n';
 import LayoutAppWrapper from '../layout-app-wrapper';
 import { generateIds } from '../context/requests-ids';
 
+window.takeScreenshot = takeScreenshot;
+
 export const closePanel = () => {
 	$e.run( 'panel/close' );
 	$e.components.get( 'panel' ).blockUserInteractions();

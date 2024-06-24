@@ -6,12 +6,15 @@ import {useConfig} from "../pages/form-layout/context/config";
 import Loader from "../components/loader";
 
 export const IframeWrapper = (props) => {
-	const {onClose} = useConfig();
+	const {onClose, onInsert, onGenerate, onSelect} = useConfig();
 
 	useEffect(() => {
 		window.dispatchEvent(new CustomEvent('elementor/ai/layout/button/click', {
 			detail: {
 				onClose,
+				onInsert,
+				onGenerate,
+				onSelect,
 			},
 		}));
 	}, []);

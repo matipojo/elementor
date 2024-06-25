@@ -4,6 +4,7 @@ import {AttachmentPropType} from "../types/attachment";
 import LayoutDialog from "../pages/form-layout/components/layout-dialog";
 import {useConfig} from "../pages/form-layout/context/config";
 import Loader from "../components/loader";
+import {Paper} from "@elementor/ui";
 
 export const IframeWrapper = (props) => {
 	const {onClose, onInsert, onGenerate, onSelect} = useConfig();
@@ -28,8 +29,10 @@ export const IframeWrapper = (props) => {
 				style={{
 					height: '32px',
 					position: 'absolute',
-					width: 'calc(100% - 96px)',
-					zIndex:1,
+					width: 'calc(100% - 165px)',
+					top: '15px',
+					left: '15px',
+					zIndex: 1,
 					cursor: 'move',
 				}}
 			/>
@@ -37,6 +40,9 @@ export const IframeWrapper = (props) => {
 				<div
 					id="text-to-elementor-iframe-loader"
 				>
+					<Paper
+						elevation={6}
+						>
 					<LayoutDialog.Header
 						onClose={ onClose }
 
@@ -44,6 +50,7 @@ export const IframeWrapper = (props) => {
 					<Loader
 						BoxProps={ { sx: { px: 3 } } }
 					/>
+					</Paper>
 				</div>
 
 				<div

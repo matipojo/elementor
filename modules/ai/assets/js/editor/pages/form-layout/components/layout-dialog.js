@@ -68,7 +68,14 @@ const LayoutDialog = ( { sx = {}, PaperProps = {}, ...props } ) => {
 		<StyledDialog
 			maxWidth="md"
 			PaperProps={ {
-				sx: { pointerEvents: 'auto' },
+				elevation: 0,
+				sx: {
+					backgroundColor: 'transparent',
+					maxWidth: '930px',
+					width: '930px',
+					maxHeight: '70vh !important',
+					pointerEvents: 'auto',
+				},
 				onMouseEnter: () => {
 					clearTimeout( timeoutRef.current );
 

@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import LayoutContent from './layout-content';
 import { AttachmentPropType, AttachmentsTypesPropType } from './types/attachment';
 import { ConfigProvider, LAYOUT_APP_MODES } from './pages/form-layout/context/config';
-import { RemoteConfigProvider } from './pages/form-layout/context/remote-config';
-import { RequestIdsProvider } from './context/requests-ids';
 
 const LayoutApp = ( props ) => {
 	return (

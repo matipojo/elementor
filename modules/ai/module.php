@@ -183,6 +183,7 @@ class Module extends BaseModule {
 
 		$config = [
 			'is_get_started' => User::get_introduction_meta( 'ai_get_started' ),
+			'is_connected' => $this->get_ai_app()->is_connected(),
 			'connect_url' => $this->get_ai_connect_url(),
 			'client_session_id' => $session_id,
 		];

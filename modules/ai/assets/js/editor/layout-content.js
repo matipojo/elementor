@@ -12,7 +12,7 @@ const LayoutContent = ( props ) => {
 	const { onClose, onConnect } = useConfig();
 	const [, forceRefresh] = useState(0);
 
-	if ( ! window.ElementorAiConfig.is_connected ) {
+	if ( '1' !== window.ElementorAiConfig.is_connected ) {
 		return (
 			<WizardDialog onClose={ onClose }>
 				<LayoutDialog onClose={ onClose } />

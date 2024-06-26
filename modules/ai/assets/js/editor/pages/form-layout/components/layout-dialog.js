@@ -56,7 +56,7 @@ const StyledDialogContent = styled( PromptDialog.Content )( () => ( {
 } ) );
 
 const LayoutDialog = ( { sx = {}, PaperProps = {}, ...props } ) => {
-	const [ sxStyle, setSxStyle ] = useState( { pointerEvents: 'none' } );
+	const [ sxStyle, setSxStyle ] = useState( { pointerEvents: '' } );
 	const timeoutRef = useRef( null );
 
 	/**
@@ -70,10 +70,6 @@ const LayoutDialog = ( { sx = {}, PaperProps = {}, ...props } ) => {
 			PaperProps={ {
 				elevation: 0,
 				sx: {
-					backgroundColor: 'transparent',
-					maxWidth: '930px',
-					width: '930px',
-					maxHeight: '70vh !important',
 					pointerEvents: 'auto',
 				},
 				onMouseEnter: () => {

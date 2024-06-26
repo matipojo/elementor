@@ -1,15 +1,29 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from "prop-types";
 import {AttachmentPropType} from "../types/attachment";
 import LayoutDialog from "../pages/form-layout/components/layout-dialog";
 import {useConfig} from "../pages/form-layout/context/config";
 import Loader from "../components/loader";
-import {Paper} from "@elementor/ui";
+import {Alert, Stack} from "@elementor/ui";
+import ErrorIcon from "../icons/error-icon";
 
 export const IframeWrapper = (props) => {
 	const {onClose, onInsert, onGenerate, onSelect} = useConfig();
+	const [isTimeout, setIsTimeout] = useState(false);
+	const [isLoaded, setIsLoaded] = useState(false);
 
 	useEffect(() => {
+		window.addEventListener('message', (event) => {
+			if ('text-to-elementor/loaded' === event.data.type) {
+				setIsTimeout(false);
+				setIsLoaded(true);
+			}
+		});
+
+		setTimeout(() => {
+			setIsTimeout(true);
+		}, 10_000);
+
 		window.dispatchEvent(new CustomEvent('elementor/ai/layout/button/click', {
 			detail: {
 				onClose,
@@ -23,40 +37,38 @@ export const IframeWrapper = (props) => {
 	return (
 		<LayoutDialog
 			onClose={onClose}
+			PaperProps={isLoaded ? {
+				elevation: 0,
+				sx: {
+					backgroundColor: 'transparent',
+				},
+			} : {
+				elevation: 6,
+			}}
 		>
-			<div
-				id="text-to-elementor-iframe-wrapper-header"
-				style={{
-					height: '32px',
-					position: 'absolute',
-					width: 'calc(100% - 165px)',
-					top: '15px',
-					left: '15px',
-					zIndex: 1,
-					cursor: 'move',
-				}}
-			/>
 			<LayoutDialog.Content>
-				<div
+				{(!isLoaded) && <div
 					id="text-to-elementor-iframe-loader"
 				>
-					<Paper
-						elevation={6}
-						>
 					<LayoutDialog.Header
-						onClose={ onClose }
-
+						onClose={onClose}
 					/>
-					<Loader
-						BoxProps={ { sx: { px: 3 } } }
-					/>
-					</Paper>
-				</div>
 
-				<div
-					id={'text-to-elementor-iframe-wrapper'}
-				>
-				</div>
+					{(!isTimeout) && <Loader
+						BoxProps={{sx: {px: 3}}}
+					/>}
+
+					{(isTimeout) && <Stack
+						padding={2}
+					>
+						<Alert
+							color={'error'}
+							icon={<ErrorIcon/>}
+						>
+							{__('The app could not be loaded')}
+						</Alert>
+					</Stack>}
+				</div>}
 			</LayoutDialog.Content>
 		</LayoutDialog>
 	);

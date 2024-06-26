@@ -33,6 +33,8 @@ class Module extends BaseModule {
 		if ( is_admin() ) {
 			add_action( 'elementor/admin/after_create_settings/' . Settings::PAGE_ID, [ $this, 'register_admin_fields' ], 100 );
 		}
+
+		$this->clear_cache_on_site_changed();
 	}
 
 	private function register_experiments() {
@@ -41,8 +43,12 @@ class Module extends BaseModule {
 			'title' => esc_html__( 'Element Caching', 'elementor' ),
 			'tag' => esc_html__( 'Performance', 'elementor' ),
 			'description' => esc_html__( 'Elements caching reduces loading times by serving up a copy of an element instead of rendering it fresh every time the page is loaded. When active, Elementor will determine which elements can benefit from static loading - but you can override this.', 'elementor' ),
-			'release_status' => ExperimentsManager::RELEASE_STATUS_DEV,
+			'release_status' => ExperimentsManager::RELEASE_STATUS_BETA,
 			'default' => ExperimentsManager::STATE_INACTIVE,
+			'new_site' => [
+				'default_active' => true,
+				'minimum_installation_version' => '3.23.0',
+			],
 			'generator_tag' => true,
 		] );
 	}
@@ -137,5 +143,17 @@ class Module extends BaseModule {
 				],
 			]
 		);
+	}
+
+	private function clear_cache_on_site_changed() {
+		add_action( 'activated_plugin', [ $this, 'clear_cache' ] );
+		add_action( 'deactivated_plugin', [ $this, 'clear_cache' ] );
+		add_action( 'switch_theme', [ $this, 'clear_cache' ] );
+		add_action( 'upgrader_process_complete', [ $this, 'clear_cache' ] );
+	}
+
+	public function clear_cache() {
+		Plugin::$instance->files_manager->clear_cache();
+
 	}
 }

@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { parallelTest as test } from '../../../parallelTest';
 import WpAdminPage from '../../../pages/wp-admin-page';
 
 test.describe( 'Document tests', async () => {
 	test( 'Converting Gutenberg page to sections columns',
-		async ( { page }, testInfo ) => {
-			const wpAdmin = new WpAdminPage( page, testInfo );
+		async ( { page, apiRequests }, testInfo ) => {
+			const wpAdmin = new WpAdminPage( page, testInfo, apiRequests );
 			await wpAdmin.setExperiments( {
 				container: false,
 			} );
@@ -27,8 +28,8 @@ test.describe( 'Document tests', async () => {
 		} );
 
 	test( 'converting gutenberg page to container',
-		async ( { page }, testInfo ) => {
-			const wpAdmin = new WpAdminPage( page, testInfo );
+		async ( { page, apiRequests }, testInfo ) => {
+			const wpAdmin = new WpAdminPage( page, testInfo, apiRequests );
 			await wpAdmin.setExperiments( {
 				container: true,
 			} );
@@ -51,7 +52,13 @@ test.describe( 'Document tests', async () => {
 
 async function addElement( wpAdmin: WpAdminPage, elementType: string ) {
 	const frame = wpAdmin.page.frame( { name: 'editor-canvas' } );
-	await frame.click( '.block-editor-inserter__toggle' );
+	if ( ! await wpAdmin.page.frameLocator( 'iframe[name="editor-canvas"]' ).locator( 'p[role="document"]' ).isVisible() ) {
+		await frame.locator( '.block-editor-inserter__toggle' ).click();
+	} else {
+		await wpAdmin.page.frameLocator( 'iframe[name="editor-canvas"]' ).locator( 'p[role="document"]' ).click();
+		await wpAdmin.page.click( '.block-editor-inserter__toggle' );
+	}
+
 	await wpAdmin.page.click( '.editor-block-list-item-' + elementType );
 	await frame.click( '.editor-styles-wrapper' );
 }

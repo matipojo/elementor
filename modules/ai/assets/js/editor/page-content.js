@@ -18,7 +18,7 @@ import { Box, Typography } from '@elementor/ui';
 import Loader from './components/loader';
 import { useEffect, useState } from 'react';
 import { useRequestIds } from './context/requests-ids';
-import { FREE_TRIAL_FEATURES_NAMES } from './helpers/features-enum';
+import { FREE_TRIAL_FEATURES } from './helpers/features-enum';
 
 const PageContent = (
 	{
@@ -82,8 +82,15 @@ const PageContent = (
 			return;
 		}
 
+		const typesMap = {
+			media: FREE_TRIAL_FEATURES.IMAGES,
+			code: FREE_TRIAL_FEATURES.CODE,
+			text: FREE_TRIAL_FEATURES.TEXT,
+		};
+
 		return (
 			<UpgradeChip
+				featureId={ typesMap[ type ] }
 				hasSubscription={ hasSubscription }
 				usagePercentage={ usagePercentage }
 			/>
@@ -185,7 +192,7 @@ const PageContent = (
 									hasSubscription={ hasSubscription }
 									usagePercentage={ usagePercentage }
 									sx={ { mb: 2 } }
-									feature={ FREE_TRIAL_FEATURES_NAMES.CODE }
+									featureId={ FREE_TRIAL_FEATURES.CODE }
 								/>
 							</FormCode>
 						</PromptDialog.Content>
@@ -220,7 +227,7 @@ const PageContent = (
 								hasSubscription={ hasSubscription }
 								usagePercentage={ usagePercentage }
 								sx={ { mb: 2 } }
-								feature={ FREE_TRIAL_FEATURES_NAMES.TEXT }
+								featureId={ FREE_TRIAL_FEATURES.TEXT }
 							/>
 						</FormText>
 					</PromptDialog.Content>

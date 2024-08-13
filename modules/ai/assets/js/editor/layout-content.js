@@ -11,6 +11,7 @@ import { AttachmentPropType } from './types/attachment';
 import { useConfig } from './pages/form-layout/context/config';
 import { useRequestIds } from './context/requests-ids';
 import { useEffect, useState } from 'react';
+import { FREE_TRIAL_FEATURES } from './helpers/features-enum';
 
 const LayoutContent = ( props ) => {
 	const { isLoading, isConnected, isGetStarted, connectUrl, fetchData, hasSubscription, usagePercentage: initialUsagePercentage } = useUserInfo();
@@ -73,7 +74,11 @@ const LayoutContent = ( props ) => {
 		<FormLayout
 			attachments={ props.attachments }
 			DialogHeaderProps={ {
-				children: showUpgradeChip && <UpgradeChip hasSubscription={ hasSubscription } usagePercentage={ usagePercentage } />,
+				children: showUpgradeChip && <UpgradeChip
+					featureId={ FREE_TRIAL_FEATURES.CONTAINERS }
+					hasSubscription={ hasSubscription }
+					usagePercentage={ usagePercentage }
+				/>,
 			} }
 		/>
 	);

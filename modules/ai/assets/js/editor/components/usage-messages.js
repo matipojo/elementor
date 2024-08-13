@@ -2,13 +2,13 @@ import UpgradeBanner from './upgrade-banner';
 import UsageLimitAlert from './usage-limit-alert';
 import useUpgradeMessage from '../hooks/use-upgrade-message';
 
-const UsageMessages = ( { hasSubscription, usagePercentage, sx, feature } ) => {
+const UsageMessages = ( { hasSubscription, usagePercentage, sx, featureId } ) => {
 	const { showBanner, markBannerAsViewed } = useUpgradeMessage( { usagePercentage, hasSubscription } );
 
 	return (
 		<>
-			{ showBanner && <UpgradeBanner onClose={ markBannerAsViewed } sx={ sx } /> }
-			<UsageLimitAlert hasSubscription={ hasSubscription } usagePercentage={ usagePercentage } sx={ sx } feature={ feature } />
+			{ showBanner && <UpgradeBanner featureId={ featureId } onClose={ markBannerAsViewed } sx={ sx } /> }
+			<UsageLimitAlert hasSubscription={ hasSubscription } usagePercentage={ usagePercentage } sx={ sx } featureId={ featureId } />
 		</>
 	);
 };
@@ -17,7 +17,7 @@ UsageMessages.propTypes = {
 	hasSubscription: PropTypes.bool,
 	usagePercentage: PropTypes.number,
 	sx: PropTypes.object,
-	feature: PropTypes.string,
+	featureId: PropTypes.string,
 };
 
 export default UsageMessages;

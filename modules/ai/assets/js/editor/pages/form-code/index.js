@@ -19,6 +19,7 @@ import PromptLibraryLink from '../../components/prompt-library-link';
 import { useRequestIds } from '../../context/requests-ids';
 import { VoicePromotionAlert } from '../../components/voice-promotion-alert';
 import { splitText } from './splitTextResult';
+import { FREE_TRIAL_FEATURES } from '../../helpers/features-enum';
 
 const CodeDisplayWrapper = styled( Box )( () => ( {
 	'& p': {
@@ -90,7 +91,12 @@ const FormCode = ( { onClose, getControlValue, setControlValue, additionalOption
 
 	return (
 		<>
-			{ error && <PromptErrorMessage error={ error } onRetry={ lastRun.current } sx={ { mb: 2.5 } } /> }
+			{ error && <PromptErrorMessage
+				featureId={ FREE_TRIAL_FEATURES.CODE }
+				error={ error }
+				onRetry={ lastRun.current }
+				sx={ { mb: 2.5 } }
+			/> }
 
 			{ children }
 

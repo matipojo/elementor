@@ -15,6 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import PropTypes from 'prop-types';
 import { CheckedCircleIcon, AIIcon } from '@elementor/icons';
+import { createPricingUrl, createUpgradeUrl } from '../helpers/utm';
 
 const popoverId = 'e-ai-upgrade-popover';
 
@@ -79,6 +80,7 @@ const Chip = styled( ChipBase )( () => ( {
 } ) );
 
 const UpgradeChip = ( {
+	featureId,
 	hasSubscription = false,
 	usagePercentage = 0,
 } ) => {
@@ -90,10 +92,26 @@ const UpgradeChip = ( {
 
 	const hidePopover = () => setIsPopoverOpen( false );
 
-	let actionUrl = 'https://go.elementor.com/ai-popup-purchase-dropdown/';
+	let actionUrl = '';
+
+	const limits = [ 75, 80, 95, 100 ];
+	const limit = limits.findLast( ( limit ) => usagePercentage >= limit );
+
+	const contentPrefix = hasSubscription ? 'paid' : 'free';
+	const utmContent = `${ contentPrefix }-${ limit }-limit-reach`;
+
 	if ( hasSubscription ) {
-		actionUrl = usagePercentage >= 100 ? 'https://go.elementor.com/ai-popup-upgrade-limit-reached/' : 'https://go.elementor.com/ai-popup-upgrade-limit-reached-80-percent/';
+		actionUrl = createUpgradeUrl( {
+			utm_term: featureId,
+			utm_content: utmContent,
+		} );
+	} else {
+		actionUrl = createPricingUrl( {
+			utm_term: featureId,
+			utm_content: utmContent,
+		} );
 	}
+
 	const actionLabel = hasSubscription ? __( 'Upgrade Elementor AI', 'elementor' ) : __( 'Get Elementor AI', 'elementor' );
 
 	return (
@@ -168,6 +186,7 @@ const UpgradeChip = ( {
 export default UpgradeChip;
 
 UpgradeChip.propTypes = {
+	featureId: PropTypes.string,
 	hasSubscription: PropTypes.bool,
 	usagePercentage: PropTypes.number,
 };

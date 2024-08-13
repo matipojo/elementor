@@ -1,12 +1,16 @@
 import { Alert, AlertAction } from '@elementor/ui';
+import { createPricingUrl } from '../helpers/utm';
 
-const UpgradeBanner = ( { onClose, ...props } ) => {
+const UpgradeBanner = ( { onClose, featureId, ...props } ) => {
 	return (
 		<Alert
 			icon={ false }
 			action={ (
 				<AlertAction
-					onClick={ () => window.open( 'https://go.elementor.com/ai-banner-free-upgrade/', '_blank' ) }
+					onClick={ () => window.open( createPricingUrl( {
+						utm_term: featureId,
+						utm_content: 'free-upgrade',
+					} ), '_blank' ) }
 				>
 					{ __( 'Upgrade', 'elementor' ) }
 				</AlertAction>
@@ -24,6 +28,7 @@ const UpgradeBanner = ( { onClose, ...props } ) => {
 UpgradeBanner.propTypes = {
 	onClose: PropTypes.func,
 	sx: PropTypes.object,
+	featureId: PropTypes.string,
 };
 
 export default UpgradeBanner;

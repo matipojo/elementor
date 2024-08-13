@@ -26,7 +26,7 @@ const App = ( props ) => {
 
 App.propTypes = {
 	colorScheme: PropTypes.oneOf( [ 'auto', 'light', 'dark' ] ),
-	type: PropTypes.string,
+	type: PropTypes.oneOf( [ 'media', 'code', 'text', 'textarea' ] ).isRequired,
 	controlType: PropTypes.string,
 	onClose: PropTypes.func,
 	getControlValue: PropTypes.func,

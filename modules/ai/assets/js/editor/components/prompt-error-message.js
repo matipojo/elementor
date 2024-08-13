@@ -1,30 +1,27 @@
 import { Alert, AlertTitle, Box, Button } from '@elementor/ui';
 import { __ } from '@wordpress/i18n';
 import PropTypes from 'prop-types';
+import { createPricingUrl, createUpgradeUrl } from '../helpers/utm';
 
-const PromptErrorMessage = ( { error, onRetry = () => {}, actionPosition = 'default', ...props } ) => {
-	function getQuotaReachedTrailMessage( featureName ) {
-		if ( ! featureName ) {
-			return {
-				text: <AlertTitle>{ __( 'It\'s time to upgrade.', 'elementor' ) }</AlertTitle>,
-				description: __( 'Enjoy the free trial? Upgrade now for unlimited access to built-in image, text and custom code generators.', 'elementor' ),
-				buttonText: __( 'Upgrade', 'elementor' ),
-				buttonAction: () => window.open( 'https://go.elementor.com/ai-popup-purchase-limit-reached/', '_blank' ),
-			};
-		}
+const PromptErrorMessage = ( { featureId, error, onRetry = () => {}, actionPosition = 'default', ...props } ) => {
+	function getQuotaReachedTrailMessage( serverFeatureName ) {
+		const featureName = serverFeatureName || featureId;
 
 		return {
 			// Translators: %s is the feature name.
 			text: <AlertTitle>{ sprintf( __( 'You\'ve used all AI credits for %s.', 'elementor' ), featureName.toLowerCase() ) }</AlertTitle>,
 			description: __( 'Upgrade now to keep using this feature. You still have credits for other AI features (Text, Code, Images, Containers, etc.)', 'elementor' ),
 			buttonText: __( 'Upgrade now', 'elementor' ),
-			buttonAction: () => window.open( 'https://go.elementor.com/ai-popup-purchase-limit-reached/', '_blank' ),
+			buttonAction: () => window.open( createPricingUrl( {
+				utm_term: featureName,
+				utm_content: 'limit-reached',
+			} ), '_blank' ),
 		};
 	}
 
 	function getErrorMessage() {
 		const errMsg = error.message || error;
-		const featureName = error.extra_data?.featureName;
+		const serverFeatureName = error.extra_data?.featureName;
 
 		const messages = {
 			default: {
@@ -56,12 +53,15 @@ const PromptErrorMessage = ( { error, onRetry = () => {}, actionPosition = 'defa
 				buttonText: __( 'Connect', 'elementor' ),
 				buttonAction: () => window.open( window.ElementorAiConfig.connect_url ),
 			},
-			quota_reached_trail: getQuotaReachedTrailMessage( featureName ),
+			quota_reached_trail: getQuotaReachedTrailMessage( serverFeatureName ),
 			quota_reached_subscription: {
 				text: <AlertTitle>{ __( 'Looks like you\'re out of credits.', 'elementor' ) }</AlertTitle>,
 				description: __( 'Ready to take it to the next level?', 'elementor' ),
 				buttonText: __( 'Upgrade now', 'elementor' ),
-				buttonAction: () => window.open( 'https://go.elementor.com/ai-popup-purchase-limit-reached/', '_blank' ),
+				buttonAction: () => window.open( createUpgradeUrl( {
+					utm_term: serverFeatureName || featureId,
+					utm_content: 'limit-reached',
+				} ), '_blank' ),
 			},
 			rate_limit_network: {
 				text: <AlertTitle>{ __( 'Whoa! Slow down there.', 'elementor' ) }</AlertTitle>,
@@ -125,6 +125,7 @@ const PromptErrorMessage = ( { error, onRetry = () => {}, actionPosition = 'defa
 };
 
 PromptErrorMessage.propTypes = {
+	featureId: PropTypes.string,
 	error: PropTypes.oneOfType( [
 		PropTypes.object,
 		PropTypes.string,

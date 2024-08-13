@@ -73,7 +73,9 @@ const PromptHistoryModal = ( props ) => {
 		<ModalContainer { ...props }>
 			<PromptHistoryModalHeader onClose={ onClose } />
 
-			{ error && ! FREE_PLAN_ERRORS.includes( error ) && <PromptErrorMessage error={ error }
+			{ error && ! FREE_PLAN_ERRORS.includes( error ) && <PromptErrorMessage
+				featureId={ historyType }
+				error={ error }
 				onRetry={ lastRun.current }
 				sx={ {
 					position: 'absolute',

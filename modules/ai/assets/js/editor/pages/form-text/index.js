@@ -20,6 +20,7 @@ import {
 } from '../../components/prompt-history/context/prompt-history-action-context';
 import { useRequestIds } from '../../context/requests-ids';
 import { VoicePromotionAlert } from '../../components/voice-promotion-alert';
+import { FREE_TRIAL_FEATURES } from '../../helpers/features-enum';
 
 const promptActions = [
 	{
@@ -134,7 +135,12 @@ const FormText = (
 
 	return (
 		<>
-			{ error && <PromptErrorMessage error={ error } onRetry={ lastRun.current } sx={ { mb: 2.5 } } /> }
+			{ error && <PromptErrorMessage
+				featureId={ FREE_TRIAL_FEATURES.TEXT }
+				error={ error }
+				onRetry={ lastRun.current }
+				sx={ { mb: 2.5 } } />
+			}
 
 			{ children }
 

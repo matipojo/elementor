@@ -19,6 +19,7 @@ import { ATTACHMENT_TYPE_URL } from './components/attachments';
 import AttachDialog from './components/attachments/attach-dialog';
 import isURL from 'validator/lib/isURL';
 import { VoicePromotionAlert } from '../../components/voice-promotion-alert';
+import { FREE_TRIAL_FEATURES } from '../../helpers/features-enum';
 
 const DirectionalMinimizeDiagonalIcon = withDirection( MinimizeDiagonalIcon );
 const DirectionalExpandDiagonalIcon = withDirection( ExpandDiagonalIcon );
@@ -254,7 +255,11 @@ const FormLayout = ( {
 
 					{ error && (
 						<Box sx={ { pt: 2, px: 2, pb: 0 } }>
-							<PromptErrorMessage error={ error } onRetry={ lastRun.current } />
+							<PromptErrorMessage
+								featureId={ FREE_TRIAL_FEATURES.CONTAINERS }
+								error={ error }
+								onRetry={ lastRun.current }
+							/>
 						</Box>
 					) }
 

@@ -8,7 +8,7 @@ import BackButton from './back-button';
 import { useLocation } from '../context/location-context';
 import { useGlobalSettings } from '../context/global-settings-context';
 import UsageMessages from '../../../components/usage-messages';
-import { FREE_TRIAL_FEATURES_NAMES } from '../../../helpers/features-enum';
+import { FREE_TRIAL_FEATURES } from '../../../helpers/features-enum';
 
 const ViewBackButton = ( { sx = {}, ...props } ) => {
 	const { back } = useLocation();
@@ -88,7 +88,12 @@ Content.propTypes = {
 };
 
 const ErrorMessage = ( { sx = {}, ...props } ) => (
-	<PromptErrorMessage actionPosition="bottom" { ...props } sx={ { mb: 2.5, ...sx } } />
+	<PromptErrorMessage
+		featureId={ FREE_TRIAL_FEATURES.IMAGES }
+		actionPosition="bottom"
+		{ ...props }
+		sx={ { mb: 2.5, ...sx }
+		} />
 );
 
 ErrorMessage.propTypes = {
@@ -104,7 +109,7 @@ const ViewPanel = ( props ) => {
 				hasSubscription={ hasSubscription }
 				usagePercentage={ usagePercentage }
 				sx={ { mb: 4 } }
-				feature={ FREE_TRIAL_FEATURES_NAMES.IMAGES }
+				featureId={ FREE_TRIAL_FEATURES.IMAGES }
 			/>
 
 			{ props.children }

@@ -98,7 +98,7 @@ const UpgradeChip = ( {
 	const limit = limits.findLast( ( limit ) => usagePercentage >= limit );
 
 	const contentPrefix = hasSubscription ? 'paid' : 'free';
-	const utmContent = `${ contentPrefix }-${ limit }-limit-reach`;
+	const utmContent = `dropdown-cta-${ contentPrefix }-${ limit }-limit-reach`;
 
 	if ( hasSubscription ) {
 		actionUrl = createUpgradeUrl( {

@@ -38,3 +38,14 @@ export const createUpgradeUrl = ( utm ) => createUrlWithParams( 'https://my.elem
 	utm_medium: 'wp-dash',
 	...utm,
 } );
+
+/**
+ * Create a URL with UTM parameters for Pro pricing page referred from AI
+ * @param  utm {{utm_term: string, utm_content: string}}
+ * @return {string}
+ */
+export const createProPricingUrl = ( utm ) => createUrlWithParams( 'https://elementor.com/pro/', {
+	utm_campaign: 'ai-gopro',
+	utm_medium: 'wp-dash',
+	...utm,
+} );

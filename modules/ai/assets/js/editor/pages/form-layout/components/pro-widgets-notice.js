@@ -2,11 +2,14 @@ import { Alert, Box, Button, Stack, Typography } from '@elementor/ui';
 import { __ } from '@wordpress/i18n';
 import LockIcon from '../../../icons/lock-icon';
 import useIntroduction from '../../../hooks/use-introduction';
+import { createProPricingUrl } from '../../../helpers/utm';
+import useUserInfo from '../../../hooks/use-user-info';
 
 export const ProWidgetsNotice = () => {
 	const { isViewed, markAsViewed } = useIntroduction( 'e-ai-builder-pro-widget' );
+	const { hasSubscription, isLoaded } = useUserInfo();
 
-	if ( isViewed ) {
+	if ( isViewed || ! isLoaded ) {
 		return null;
 	}
 
@@ -57,7 +60,9 @@ export const ProWidgetsNotice = () => {
 					<Button
 						variant="outlined"
 						size="small"
-						onClick={ () => window.open( 'https://go.elementor.com/upgrade-pro/', '_blank' ) }
+						onClick={ () => window.open( createProPricingUrl( {
+							utm_content: `pro-notice-${ hasSubscription ? 'paid' : 'free' }`,
+						} ), '_blank' ) }
 						color="inherit"
 					>
 						{ __( 'Go Pro', 'elementor' ) }

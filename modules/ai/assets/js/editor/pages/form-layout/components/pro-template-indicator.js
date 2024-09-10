@@ -2,6 +2,8 @@ import { __ } from '@wordpress/i18n';
 import { Box, Button, Chip, IconButton, Paper, Popper, Stack, styled, Typography } from '@elementor/ui';
 import LockIcon from '../../../icons/lock-icon';
 import { useRef, useState } from 'react';
+import useUserInfo from '../../../hooks/use-user-info';
+import { createProPricingUrl } from '../../../helpers/utm';
 
 const popoverId = 'e-pro-upgrade-popover';
 
@@ -36,7 +38,17 @@ const StyledArrow = styled( Box )( ( { theme } ) => ( {
 } ) );
 
 export const ProTemplateIndicator = () => {
-	const actionUrl = 'https://go.elementor.com/go-pro-ai/';
+	const { hasSubscription, isLoaded } = useUserInfo();
+
+	if ( ! isLoaded ) {
+		return null;
+	}
+
+	const actionUrl = createProPricingUrl( {
+		utm_source: 'element-pro-ai',
+		utm_content: hasSubscription ? 'paid' : 'free',
+	} );
+
 	const actionLabel = __( 'Go Pro', 'elementor' );
 
 	const [ isPopoverOpen, setIsPopoverOpen ] = useState( false );

@@ -492,6 +492,17 @@ class Widget_Star_Rating extends Widget_Base {
 		<?php
 	}
 
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$title = wp_strip_all_tags( $settings['title'] ?? '' );
+		$value = $settings['rating'] ?? '';
+		$scale = $settings['rating_scale'] ?? '5';
+		if ( empty( $value ) ) { return ''; }
+		$md = $value . '/' . $scale;
+		if ( ! empty( $title ) ) { $md = $title . ': ' . $md; }
+		return $md;
+	}
+
 	/**
 	 * @since 2.9.0
 	 * @access protected

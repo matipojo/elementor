@@ -713,4 +713,16 @@ class Widget_Social_Icons extends Widget_Base {
 		</div>
 		<?php
 	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		if ( empty( $settings['social_icon_list'] ) ) { return ''; }
+		$links = [];
+		foreach ( $settings['social_icon_list'] as $item ) {
+			$url = $item['link']['url'] ?? '';
+			if ( empty( $url ) ) { continue; }
+			$links[] = '- [' . ucfirst( $item['social_icon']['value'] ?? 'Link' ) . '](' . esc_url( $url ) . ')';
+		}
+		return implode( "\n", $links );
+	}
 }

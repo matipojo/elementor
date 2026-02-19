@@ -710,4 +710,16 @@ class Widget_Counter extends Widget_Base {
 		</div>
 		<?php
 	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$number = $settings['ending_number'] ?? '';
+		$prefix = $settings['prefix'] ?? '';
+		$suffix = $settings['suffix'] ?? '';
+		$title = wp_strip_all_tags( $settings['title'] ?? '' );
+		$value = $prefix . $number . $suffix;
+		if ( empty( $value ) && empty( $title ) ) { return ''; }
+		$parts = array_filter( [ $value, $title ] );
+		return implode( ' - ', $parts );
+	}
 }

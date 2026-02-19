@@ -575,4 +575,14 @@ class Widget_Progress extends Widget_Base {
 		</div>
 		<?php
 	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$title = wp_strip_all_tags( $settings['title'] ?? '' );
+		$percent = $settings['percent']['size'] ?? ( $settings['percent'] ?? '' );
+		if ( empty( $title ) && empty( $percent ) ) { return ''; }
+		if ( ! empty( $title ) && ! empty( $percent ) ) { return $title . ': ' . $percent . '%'; }
+		if ( ! empty( $title ) ) { return $title; }
+		return $percent . '%';
+	}
 }

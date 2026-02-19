@@ -896,4 +896,23 @@ class Widget_Image_Box extends Widget_Base {
 		#>
 		<?php
 	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$title = wp_strip_all_tags( $settings['title_text'] ?? '' );
+		$description = wp_strip_all_tags( $settings['description_text'] ?? '' );
+		$image_url = $settings['image']['url'] ?? '';
+		if ( empty( $title ) && empty( $description ) && empty( $image_url ) ) { return ''; }
+		$parts = [];
+		if ( ! empty( $image_url ) ) { $parts[] = '![' . $title . '](' . esc_url( $image_url ) . ')'; }
+		if ( ! empty( $title ) ) {
+			if ( ! empty( $settings['link']['url'] ) ) {
+				$parts[] = '### [' . $title . '](' . esc_url( $settings['link']['url'] ) . ')';
+			} else {
+				$parts[] = '### ' . $title;
+			}
+		}
+		if ( ! empty( $description ) ) { $parts[] = $description; }
+		return implode( "\n\n", $parts );
+	}
 }

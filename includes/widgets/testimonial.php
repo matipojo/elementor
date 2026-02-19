@@ -568,6 +568,33 @@ class Widget_Testimonial extends Widget_Base {
 	 * @since 2.9.0
 	 * @access protected
 	 */
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+
+		$content = wp_strip_all_tags( $settings['testimonial_content'] ?? '' );
+		$name = wp_strip_all_tags( $settings['testimonial_name'] ?? '' );
+		$job = wp_strip_all_tags( $settings['testimonial_job'] ?? '' );
+
+		if ( empty( $content ) && empty( $name ) ) {
+			return '';
+		}
+
+		$md = '';
+
+		if ( ! empty( $content ) ) {
+			$md = '> "' . $content . '"';
+		}
+
+		$attribution = array_filter( [ $name, $job ] );
+
+		if ( ! empty( $attribution ) ) {
+			$md .= "\n>\n> -- " . implode( ', ', $attribution );
+		}
+
+		return $md;
+	}
+
 	protected function content_template() {
 		?>
 		<#

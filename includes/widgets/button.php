@@ -144,4 +144,20 @@ class Widget_Button extends Widget_Base {
 	protected function render() {
 		$this->render_button();
 	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+
+		$text = wp_strip_all_tags( $settings['text'] ?? '' );
+
+		if ( empty( $text ) ) {
+			return '';
+		}
+
+		if ( ! empty( $settings['link']['url'] ) ) {
+			return '[' . $text . '](' . esc_url( $settings['link']['url'] ) . ')';
+		}
+
+		return '**' . $text . '**';
+	}
 }

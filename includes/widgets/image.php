@@ -774,6 +774,31 @@ class Widget_Image extends Widget_Base {
 		<?php
 	}
 
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+
+		if ( empty( $settings['image']['url'] ) ) {
+			return '';
+		}
+
+		$url = esc_url( $settings['image']['url'] );
+		$alt = '';
+
+		if ( ! empty( $settings['image']['id'] ) ) {
+			$alt = get_post_meta( $settings['image']['id'], '_wp_attachment_image_alt', true );
+		}
+
+		$caption = '';
+
+		if ( $this->has_caption( $settings ) ) {
+			$caption = wp_strip_all_tags( $this->get_caption( $settings ) );
+		}
+
+		$label = ! empty( $caption ) ? $caption : $alt;
+
+		return '![' . $label . '](' . $url . ')';
+	}
+
 	/**
 	 * Render image widget output in the editor.
 	 *

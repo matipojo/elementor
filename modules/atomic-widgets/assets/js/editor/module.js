@@ -2,10 +2,9 @@ import Component from './component';
 import AtomicElementBaseType from './atomic-element-base-type';
 import createAtomicElementViewBase from './create-atomic-element-base-view';
 import AtomicElementBaseModel from './atomic-element-base-model';
-import createAtomicFormType from './atomic-element-types/atomic-form/create-atomic-form-type';
-import createFormMessageType from './atomic-element-types/atomic-form/create-form-message-type';
 import createDivBlockType from './atomic-element-types/create-div-block-type';
 import createFlexboxType from './atomic-element-types/create-flexbox-type';
+import createGridType from './atomic-element-types/create-grid-type';
 
 class Module extends elementorModules.editor.utils.Module {
 	onInit() {
@@ -24,9 +23,10 @@ class Module extends elementorModules.editor.utils.Module {
 	registerAtomicElements() {
 		elementor.elementsManager.registerElementType( createDivBlockType() );
 		elementor.elementsManager.registerElementType( createFlexboxType() );
-		elementor.elementsManager.registerElementType( createAtomicFormType() );
-		elementor.elementsManager.registerElementType( createFormMessageType( 'e-form-success-message' ) );
-		elementor.elementsManager.registerElementType( createFormMessageType( 'e-form-error-message' ) );
+
+		if ( elementorCommon.config.experimentalFeatures?.e_css_grid ) {
+			elementor.elementsManager.registerElementType( createGridType() );
+		}
 	}
 }
 

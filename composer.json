@@ -6,7 +6,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=7.4",
-        "elementor/wp-one-package": "1.0.52"
+        "elementor/wp-one-package": "1.0.60"
     },
     "repositories": [
         {
@@ -33,7 +33,8 @@
         "thor-juhasz/phpunit-coverage-check": "^0.3.0",
         "spatie/phpunit-snapshot-assertions": "^4.2",
         "humbug/php-scoper": "0.17.5",
-        "twig/twig": "3.11.3"
+        "twig/twig": "3.11.3",
+        "wordpress/mcp-adapter": "^0.5.0"
     },
     "scripts": {
         "lint": "vendor/bin/phpcs --extensions=php --standard=./ruleset.xml",

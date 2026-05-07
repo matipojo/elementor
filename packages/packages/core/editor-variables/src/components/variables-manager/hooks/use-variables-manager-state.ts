@@ -1,9 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { generateTempId } from '../../../batch-operations';
 import { getVariables } from '../../../hooks/use-prop-variables';
 import { service } from '../../../service';
-import { type TVariablesList } from '../../../storage';
+import { STORAGE_UPDATED_EVENT, type TVariablesList } from '../../../storage';
+import { generateDuplicateLabel } from '../../../utils/duplicate-label';
 import { filterBySearch } from '../../../utils/filter-by-search';
 import { applySelectionFilters, variablesToList } from '../../../utils/variables-to-list';
 import { getVariableTypes } from '../../../variables-registry/variable-type-registry';
@@ -15,6 +16,20 @@ export const useVariablesManagerState = () => {
 	const [ isDirty, setIsDirty ] = useState( false );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ searchValue, setSearchValue ] = useState( '' );
+
+	useEffect( () => {
+		const handleStorageUpdated = () => {
+			setVariables( getVariables( false ) );
+			setDeletedVariables( [] );
+			setIsDirty( false );
+		};
+
+		window.addEventListener( STORAGE_UPDATED_EVENT, handleStorageUpdated );
+
+		return () => {
+			window.removeEventListener( STORAGE_UPDATED_EVENT, handleStorageUpdated );
+		};
+	}, [] );
 
 	const handleOnChange = useCallback(
 		( newVariables: TVariablesList ) => {
@@ -36,6 +51,33 @@ export const useVariablesManagerState = () => {
 		setVariables( ( prev ) => ( { ...prev, [ newId ]: newVariable } ) );
 		setIsDirty( true );
 
+		return newId;
+	}, [] );
+
+	const duplicateVariable = useCallback( ( sourceId: string ): string => {
+		const newId = generateTempId();
+
+		setVariables( ( prev ) => {
+			const source = prev[ sourceId ];
+			if ( ! source || source.deleted ) {
+				return prev;
+			}
+
+			const existingLabels = Object.values( prev )
+				.filter( ( v ) => ! v.deleted )
+				.map( ( v ) => v.label );
+
+			return {
+				...prev,
+				[ newId ]: {
+					label: generateDuplicateLabel( source.label, existingLabels ),
+					value: source.value,
+					type: source.type,
+				},
+			};
+		} );
+
+		setIsDirty( true );
 		return newId;
 	}, [] );
 
@@ -97,6 +139,7 @@ export const useVariablesManagerState = () => {
 		isSaveDisabled,
 		handleOnChange,
 		createVariable,
+		duplicateVariable,
 		handleDeleteVariable,
 		handleStartSync,
 		handleStopSync,

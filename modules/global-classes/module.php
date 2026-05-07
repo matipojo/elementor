@@ -8,6 +8,7 @@ use Elementor\Modules\AtomicWidgets\Module as Atomic_Widgets_Module;
 use Elementor\Modules\GlobalClasses\Database\Global_Classes_Database_Updater;
 use Elementor\Modules\GlobalClasses\ImportExport\Import_Export;
 use Elementor\Modules\GlobalClasses\ImportExportCustomization\Import_Export_Customization;
+use Elementor\Modules\GlobalClasses\Utils\Template_Library_Global_Classes;
 use Elementor\Modules\GlobalClasses\Usage\Global_Classes_Usage;
 use Elementor\Plugin;
 
@@ -38,15 +39,41 @@ class Module extends BaseModule {
 
 		// TODO: When the `e_atomic_elements` feature is not hidden, add it as a dependency
 		if ( $is_feature_active && $is_atomic_widgets_active ) {
+			( new Global_Class_Post_Type() )->register();
+
+			$relations = new Global_Classes_Relations();
+			$relations->register_hooks();
+
 			add_filter( 'elementor/editor/v2/packages', fn( $packages ) => $this->add_packages( $packages ) );
 
 			( new Global_Classes_Usage() )->register_hooks();
 			( new Global_Classes_REST_API() )->register_hooks();
-			( new Atomic_Global_Styles() )->register_hooks();
+			( new Atomic_Global_Styles( $relations ) )->register_hooks();
 			( new Global_Classes_Cleanup() )->register_hooks();
 			( new Import_Export() )->register_hooks();
 			( new Import_Export_Customization() )->register_hooks();
 			( new Global_Classes_Database_Updater() )->register();
+
+			add_filter(
+				'elementor/template_library/export/build_snapshots',
+				[ Template_Library_Global_Classes::class, 'add_global_classes_snapshot' ],
+				10,
+				4
+			);
+
+			add_filter(
+				'elementor/template_library/get_data/extract_snapshots',
+				[ Template_Library_Global_Classes::class, 'extract_global_classes_from_data' ],
+				10,
+				3
+			);
+
+			add_filter(
+				'elementor/template_library/import/process_content',
+				[ Template_Library_Global_Classes::class, 'process_global_classes_import' ],
+				20,
+				3
+			);
 		}
 	}
 
@@ -58,6 +85,10 @@ class Module extends BaseModule {
 			'hidden' => true,
 			'default' => Experiments_Manager::STATE_INACTIVE,
 			'release_status' => Experiments_Manager::RELEASE_STATUS_ALPHA,
+			'new_site' => [
+				'default_active' => true,
+				'minimum_installation_version' => '4.0.0',
+			],
 		]);
 
 		Plugin::$instance->experiments->add_feature([

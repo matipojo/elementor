@@ -1,3 +1,4 @@
+import { getCurrentDocument } from '@elementor/editor-documents';
 import {
 	createElement,
 	deleteElement,
@@ -8,35 +9,52 @@ import {
 import { type MCPRegistryEntry } from '@elementor/editor-mcp';
 
 import { CompositionBuilder } from '../../../composition-builder/composition-builder';
+import { AVAILABLE_WIDGETS_URI_V4 } from '../../resources/available-widgets-resource';
 import { BEST_PRACTICES_URI, STYLE_SCHEMA_URI, WIDGET_SCHEMA_URI } from '../../resources/widgets-schema-resource';
 import { doUpdateElementProperty } from '../../utils/do-update-element-property';
-import { generatePrompt } from './prompt';
+import { getCompositionTargetContainer } from '../../utils/get-composition-target-container';
+import { BUILD_COMPOSITIONS_GUIDE_URI, generatePrompt } from './prompt';
 import { inputSchema as schema, outputSchema } from './schema';
 
 export const initBuildCompositionsTool = ( reg: MCPRegistryEntry ) => {
-	const { addTool } = reg;
+	const { addTool, resource } = reg;
+
+	resource(
+		'build-compositions-guide',
+		BUILD_COMPOSITIONS_GUIDE_URI,
+		{
+			title: 'Build Compositions Guide',
+			description: 'Detailed guide for using the build-compositions tool',
+			mimeType: 'text/plain',
+		},
+		async ( uri: URL ) => ( {
+			contents: [ { uri: uri.href, mimeType: 'text/plain', text: generatePrompt() } ],
+		} )
+	);
 
 	addTool( {
 		name: 'build-compositions',
-		description: generatePrompt(),
+		description: 'Build V4 element compositions on the Elementor canvas. Read the guide resource before use.',
 		schema,
 		requiredResources: [
+			{ description: 'Build compositions guide', uri: BUILD_COMPOSITIONS_GUIDE_URI },
 			{ description: 'Widgets schema', uri: WIDGET_SCHEMA_URI },
 			{ description: 'Styles schema', uri: STYLE_SCHEMA_URI },
 			{ description: 'Global Classes', uri: 'elementor://global-classes' },
 			{ description: 'Global Variables', uri: 'elementor://global-variables' },
 			{ description: 'Styles best practices', uri: BEST_PRACTICES_URI },
+			{ description: 'Available widgets for this tool', uri: AVAILABLE_WIDGETS_URI_V4 },
 		],
 		outputSchema,
-		modelPreferences: {
-			hints: [ { name: 'claude-sonnet-4-5' } ],
-		},
 		handler: async ( params ) => {
-			const { xmlStructure, elementConfig, stylesConfig } = params;
+			assertCompositionXmlUsesV4WidgetsOnly( params.xmlStructure );
+			const { xmlStructure, elementConfig, stylesConfig, customCSS } = params;
 			let generatedXML: string = '';
 			const errors: Error[] = [];
 			const rootContainers: V1Element[] = [];
 			const documentContainer = getContainer( 'document' ) as unknown as V1Element;
+			const currentDocument = getCurrentDocument();
+			const targetContainer = getCompositionTargetContainer( documentContainer, currentDocument?.type.value );
 			try {
 				const compositionBuilder = CompositionBuilder.fromXMLString( xmlStructure, {
 					createElement,
@@ -44,21 +62,13 @@ export const initBuildCompositionsTool = ( reg: MCPRegistryEntry ) => {
 				} );
 				compositionBuilder.setElementConfig( elementConfig );
 				compositionBuilder.setStylesConfig( stylesConfig );
+				compositionBuilder.setCustomCSS( customCSS );
 
-				const {
-					configErrors,
-					invalidStyles,
-					rootContainers: generatedRootContainers,
-				} = compositionBuilder.build( documentContainer );
-
-				generatedXML = new XMLSerializer().serializeToString( compositionBuilder.getXML() );
-
-				if ( configErrors.length ) {
-					errors.push( ...configErrors.map( ( e ) => new Error( e ) ) );
-					throw new Error( 'Configuration errors occurred during composition building.' );
-				}
+				const { invalidStyles, rootContainers: generatedRootContainers } =
+					await compositionBuilder.build( targetContainer );
 
 				rootContainers.push( ...generatedRootContainers );
+				generatedXML = new XMLSerializer().serializeToString( compositionBuilder.getXML() );
 
 				Object.entries( invalidStyles ).forEach( ( [ elementId, rawCssRules ] ) => {
 					const customCss = {
@@ -113,7 +123,7 @@ export const initBuildCompositionsTool = ( reg: MCPRegistryEntry ) => {
 
 				const errorText = `Failed to build composition with the following errors:\n\n${ errorMessages.join(
 					'\n\n'
-				) }\n\n"Missing $$type" errors indicate that the configuration objects are invalid. Try again and apply **ALL** object entries with correct $$type.\nNow that you have these errors, fix them and try again. Errors regarding configuration objects, please check against the PropType schemas`;
+				) }`;
 				throw new Error( errorText );
 			}
 			return {
@@ -136,3 +146,26 @@ Remember: Global classes ensure design consistency and reusability. Don't skip a
 		},
 	} );
 };
+
+function assertCompositionXmlUsesV4WidgetsOnly( xmlStructure: string ) {
+	const doc = new DOMParser().parseFromString( xmlStructure, 'application/xml' );
+	if ( doc.querySelector( 'parsererror' ) ) {
+		throw new Error( 'Failed to parse XML string: ' + doc );
+	}
+	const widgetsCache = getWidgetsCache() ?? {};
+	for ( const node of doc.querySelectorAll( '*' ) ) {
+		const type = node.tagName;
+		const widgetData = widgetsCache[ type ];
+		if ( ! widgetData ) {
+			continue;
+		}
+		if ( widgetData.elType !== 'widget' ) {
+			continue;
+		}
+		if ( ! widgetData.atomic_props_schema ) {
+			throw new Error(
+				`This tool does not support V3 elements. Please use the elementor-v3-mcp tools instead for element type: ${ type }`
+			);
+		}
+	}
+}

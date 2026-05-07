@@ -131,7 +131,7 @@ const TemplateLibrarySaveTemplateView = Marionette.ItemView.extend( {
 
 		this.ui.templateNameInput.val( title );
 
-		this.handleContextUiStateChecboxes();
+		this.handleContextUiStateCheckboxes();
 
 		this.maybeEnableSaveButton();
 	},
@@ -154,11 +154,11 @@ const TemplateLibrarySaveTemplateView = Marionette.ItemView.extend( {
 
 	handleBulkActionContextUiState() {
 		this.ui.templateNameInput.remove();
-		this.handleContextUiStateChecboxes();
+		this.handleContextUiStateCheckboxes();
 		this.maybeEnableSaveButton();
 	},
 
-	handleContextUiStateChecboxes() {
+	handleContextUiStateCheckboxes() {
 		const fromSource = elementor.templates.getFilter( 'source' );
 
 		if ( 'local' === fromSource ) {
@@ -289,7 +289,7 @@ const TemplateLibrarySaveTemplateView = Marionette.ItemView.extend( {
 		this.ui.ellipsisIcon.attr( 'aria-expanded', expanded ? 'true' : 'false' );
 	},
 
-	onFormSubmit( event ) {
+	async onFormSubmit( event ) {
 		event.preventDefault();
 
 		var formData = this.ui.form.elementorSerializeObject(),
@@ -315,6 +315,14 @@ const TemplateLibrarySaveTemplateView = Marionette.ItemView.extend( {
 
 		this.updateSourceState( formData );
 
+		try {
+			await $e.run( 'document/save/auto', { force: true } );
+		} catch ( e ) {
+			// Proceed even if auto-save fails or is rejected.
+		}
+
+		await elementor.templates.syncGlobalStylesBeforeSave();
+
 		elementor.templates.saveTemplate( this.getSaveType(), formData );
 	},
 
@@ -333,7 +341,7 @@ const TemplateLibrarySaveTemplateView = Marionette.ItemView.extend( {
 	showEmptySourceErrorDialog( ) {
 		elementorCommon.dialogsManager.createWidget( 'alert', {
 			id: 'elementor-template-library-error-dialog',
-			headerMessage: __( 'An error occured.', 'elementor' ),
+			headerMessage: __( 'An error occurred.', 'elementor' ),
 			message: __( 'Please select at least one location.', 'elementor' ),
 		} ).show();
 	},

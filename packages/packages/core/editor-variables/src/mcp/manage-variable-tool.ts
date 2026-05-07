@@ -1,11 +1,13 @@
-import { getMCPByDomain } from '@elementor/editor-mcp';
+import { type MCPRegistryEntry } from '@elementor/editor-mcp';
 import { z } from '@elementor/schema';
 
 import { service } from '../service';
+import { validateLabel } from '../utils/validations';
 import { GLOBAL_VARIABLES_URI } from './variables-resource';
 
-export const initManageVariableTool = () => {
-	getMCPByDomain( 'variables' ).addTool( {
+export const initManageVariableTool = ( reg: MCPRegistryEntry ) => {
+	const { addTool } = reg;
+	addTool( {
 		name: 'manage-global-variable',
 		schema: {
 			action: z.enum( [ 'create', 'update', 'delete' ] ).describe( 'Operation to perform' ),
@@ -18,15 +20,16 @@ export const initManageVariableTool = () => {
 				.optional()
 				.describe( 'Variable type: "global-color-variable" or "global-font-variable" (required for create)' ),
 			label: z.string().optional().describe( 'Variable label (required for create/update)' ),
-			value: z.string().optional().describe( 'Variable value (required for create/update)' ),
+			value: z
+				.string()
+				.optional()
+				.describe(
+					'The variable value (required for create/update). Provide a plain CSS value matching the variable type (font: family name; color: CSS color; size: value with unit). Never JSON.'
+				),
 		},
 		outputSchema: {
 			status: z.enum( [ 'ok' ] ).describe( 'Operation status' ),
 			message: z.string().optional().describe( 'Error details if status is error' ),
-		},
-		modelPreferences: {
-			intelligencePriority: 0.75,
-			speedPriority: 0.75,
 		},
 		requiredResources: [
 			{
@@ -34,14 +37,11 @@ export const initManageVariableTool = () => {
 				description: 'Global variables',
 			},
 		],
-		description: `Manages global variables (create/update/delete). Existing variables available in resources.
-CREATE: requires type, label, value. Ensure label is unique.
-UPDATE: requires id, label, value. When renaming: keep existing value. When updating value: keep exact label.
-DELETE: requires id. DESTRUCTIVE - confirm with user first.
-
-# NAMING - IMPORTANT
-the variables names should ALWAYS be lowercased and dashed spaced. example: "Headline Primary" should be "headline-primary"
-`,
+		description: `Create, update, or delete V4 global variables (distinct from legacy "globals").
+- Values: any valid CSS value, inserted as-is (1:1 with \`--css-var: VALUE\`). Do NOT pass JSON or legacy-globals object structures.
+- Names: lowercase, dash-separated (e.g. "Headline Primary" → "headline-primary").
+- Update: when renaming, keep the existing value; when updating value, keep the exact label.
+- Delete: destructive — confirm with user first.`,
 		handler: async ( params ) => {
 			const operations = getServiceActions( service );
 			const op = operations[ params.action ];
@@ -67,11 +67,19 @@ function getServiceActions( svc: typeof service ) {
 			if ( ! type || ! label || ! value ) {
 				throw new Error( 'Create requires type, label, and value' );
 			}
+			const labelError = validateLabel( label );
+			if ( labelError ) {
+				throw new Error( labelError );
+			}
 			return svc.create( { type, label, value } );
 		},
 		update( { id, label, value }: Opts< { id: string; label: string; value: string } > ) {
 			if ( ! id || ! label || ! value ) {
 				throw new Error( 'Update requires id, label, and value' );
+			}
+			const labelError = validateLabel( label );
+			if ( labelError ) {
+				throw new Error( labelError );
 			}
 			return svc.update( id, { label, value } );
 		},
